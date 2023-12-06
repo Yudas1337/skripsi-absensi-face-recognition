@@ -1,0 +1,3 @@
+rootProject.name='Attendance System Using Face Recognition'
+include ':app'
+include ':engine'

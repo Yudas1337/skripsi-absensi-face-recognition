@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Face Recognition</string>
+    <string name="real_face">Real</string>
+    <string name="fake_face">Fake</string>
+    <string name="set_threshold_dialog_title">Threshold Configuration</string>
+    <string name="set_threshold_dialog_text_hint">Threshold range 0–1, recommended threshold 0.915</string>
+    <string name="set_threshold_dialog_confirm">OK</string>
+    <string name="set_threshold_dialog_hint">Enter Threshold Value</string>
+
+    <string name="author_name">Created By Yudas Malabi</string>
+
+    <string name="header">Sistem Presensi Hummatech</string>
+    <string name="sub_header">Powered By Machine Learning Model</string>
+
+    <string name="menu_1">Presensi</string>
+    <string name="menu_2">Daftar Hadir</string>
+    <string name="menu_3">Pengaturan Jam</string>
+    <string name="menu_4">Tentang</string>
+
+    <string name="instructions_label">Silakan scan ID Card Anda!</string>
+    <string name="instructions_hint">Scan ID Card Anda</string>
+</resources>
