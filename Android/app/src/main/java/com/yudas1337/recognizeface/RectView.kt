@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import com.yudas1337.recognizeface.screens.MainActivity
 import java.text.DecimalFormat
 
 class RectView : View {

@@ -7,6 +7,7 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -15,21 +16,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".helpers.MLVideoHelperActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.FaceRecognitionActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.ScanActivity"
-            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".screens.MenuActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".screens.MainActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".intro.SplashActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/NoActionBarTheme">
+            android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

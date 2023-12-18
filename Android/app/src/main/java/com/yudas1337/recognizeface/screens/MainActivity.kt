@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         calculateSize()
 
         binding.surface.holder.let {
-            it.setFormat(ImageFormat.NV21)
+//            it.setFormat(ImageFormat.NV21)
             it.addCallback(object : SurfaceHolder.Callback, Camera.PreviewCallback {
 
                 @Deprecated("Deprecated in Java")
