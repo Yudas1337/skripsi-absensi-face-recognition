@@ -33,7 +33,6 @@ class UserSeeder extends Seeder
             $profile = User::query()
                 ->create([
                     'name' => $user,
-                    'username' => $user,
                     'birth_place' => 'Malang',
                     'birth_date' => '2002-01-13',
                     'gender' => GenderEnum::MALE->value,

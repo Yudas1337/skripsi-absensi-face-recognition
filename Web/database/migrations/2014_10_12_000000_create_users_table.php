@@ -18,7 +18,6 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('rfid')->nullable()->unique();
             $table->string('name');
-            $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('birth_place');
             $table->date('birth_date');
