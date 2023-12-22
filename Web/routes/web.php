@@ -3,7 +3,10 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\InstanceController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +36,11 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
 
     Route::middleware('role:admin')->group(function () {
 
+        Route::resources([
+            'employees' => EmployeeController::class,
+            'students' => StudentController::class,
+            'instances' => InstanceController::class
+        ]);
     });
 
     Route::name('user.')->group(function () {

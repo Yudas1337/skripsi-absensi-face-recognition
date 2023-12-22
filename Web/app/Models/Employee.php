@@ -11,7 +11,7 @@ class Employee extends Model
 
     public $incrementing = false;
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'nip', 'user_id', 'instance_id'];
+    protected $fillable = ['id', 'nip', 'position', 'start_work', 'user_id', 'instance_id'];
     protected $keyType = 'char';
 
 }

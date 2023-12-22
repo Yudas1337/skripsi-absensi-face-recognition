@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('rfid')->nullable()->unique();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('phone_number', 15);
             $table->string('birth_place');
             $table->date('birth_date');
             $table->enum('gender', array_column(GenderEnum::cases(), 'value'))->nullable();

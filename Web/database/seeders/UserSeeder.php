@@ -38,6 +38,7 @@ class UserSeeder extends Seeder
                     'gender' => GenderEnum::MALE->value,
                     'address' => 'Malang',
                     'email' => $user . "@gmail.com",
+                    'phone_number' => '082257181297',
                     'password' => bcrypt('password'),
                     'email_verified_at' => now()
                 ]);
@@ -45,7 +46,9 @@ class UserSeeder extends Seeder
             Employee::query()->create([
                 'nip' => '123456789123456789',
                 'user_id' => $profile->id,
-                'instance_id' => $instance->id
+                'instance_id' => $instance->id,
+                'position' => 'Senior Admin',
+                'start_work' => '2018-10-28'
             ]);
 
             $profile->assignRole($role);

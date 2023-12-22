@@ -13,6 +13,8 @@ return new class extends Migration {
         Schema::create('employees', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->char('nip', 18)->nullable();
+            $table->string('position', 100);
+            $table->date('start_work');
             $table->foreignUuid('user_id')->constrained();
             $table->foreignUuid('instance_id')->constrained();
             $table->timestamps();

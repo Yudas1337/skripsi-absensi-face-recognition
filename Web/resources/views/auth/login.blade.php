@@ -51,8 +51,8 @@
                             <form class="form-horizontal" action="{{ route('login') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
-                                    <label for="username" class="form-label">Email</label>
-                                    <input autocomplete="off" type="text" name="email"
+                                    <label for="email" class="form-label">Email</label>
+                                    <input value="{{ old('email') }}" autocomplete="off" type="text" name="email"
                                            class="form-control @error('email') is-invalid @enderror" id="email"
                                            placeholder="Enter email">
 
