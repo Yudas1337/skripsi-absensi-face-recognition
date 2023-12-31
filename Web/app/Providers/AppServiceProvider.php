@@ -2,14 +2,17 @@
 
 namespace App\Providers;
 
+use App\Contracts\Interfaces\ChangePasswordInterface;
 use App\Contracts\Interfaces\ProfileInterface;
+use App\Contracts\Repositories\ChangePasswordRepository;
 use App\Contracts\Repositories\ProfileRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     private array $register = [
-        ProfileInterface::class => ProfileRepository::class
+        ProfileInterface::class => ProfileRepository::class,
+        ChangePasswordInterface::class => ChangePasswordRepository::class
     ];
 
     /**
