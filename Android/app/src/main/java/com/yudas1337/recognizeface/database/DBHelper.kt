@@ -29,6 +29,8 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 
         db.insert(tableName, null, values)
 
+//        db.close()
+
     }
 
     fun getName(): Cursor? {

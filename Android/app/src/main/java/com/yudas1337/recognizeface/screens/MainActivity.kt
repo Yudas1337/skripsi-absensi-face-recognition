@@ -43,8 +43,9 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     private var camera: Camera? = null
     private var cameraId: Int = Camera.CameraInfo.CAMERA_FACING_FRONT
-    private val previewWidth: Int = 640
-    private val previewHeight: Int = 480
+
+    private val previewWidth: Int = 1920
+    private val previewHeight: Int = 1440
     private val frameOrientation: Int = 7
 
     private var screenWidth: Int = 0
@@ -116,11 +117,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
                                 binding.result = result.updateLocation(rect)
 
-                                Log.d(
-                                    tag,
-                                    "threshold:${result.threshold}, confidence: ${result.confidence}"
-                                )
-
                                 binding.rectView.postInvalidate()
                                 working = false
                             }
@@ -155,6 +151,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                     }
 
                     val parameters = camera?.parameters
+
                     parameters?.setPreviewSize(previewWidth, previewHeight)
 
                     factorX = screenWidth / previewHeight.toFloat()
@@ -176,13 +173,13 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             })
         }
 
-        scaleAnimator = ObjectAnimator.ofFloat(binding.scan, View.SCALE_Y, 1F, -1F, 1F).apply {
-            this.duration = 3000
-            this.repeatCount = ValueAnimator.INFINITE
-            this.repeatMode = ValueAnimator.REVERSE
-            this.interpolator = LinearInterpolator()
-            this.start()
-        }
+//        scaleAnimator = ObjectAnimator.ofFloat(binding.scan, View.SCALE_Y, 1F, -1F, 1F).apply {
+//            this.duration = 3000
+//            this.repeatCount = ValueAnimator.INFINITE
+//            this.repeatMode = ValueAnimator.REVERSE
+//            this.interpolator = LinearInterpolator()
+//            this.start()
+//        }
 
     }
 
@@ -205,6 +202,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         val info = Camera.CameraInfo()
         Camera.getCameraInfo(cameraId, info)
         val rotation = windowManager.defaultDisplay.rotation
+        Log.d("tester", "$rotation")
         var degrees = 0
         when (rotation) {
             Surface.ROTATION_0 -> degrees = 0
@@ -263,7 +261,8 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     companion object {
         const val tag = "MainActivity"
-        const val defaultThreshold = 0.915F
+//      const val defaultThreshold = 0.915F
+        const val defaultThreshold = 0.71F
 
         val permissions: Array<String> = arrayOf(Manifest.permission.CAMERA)
         const val permissionReqCode = 1

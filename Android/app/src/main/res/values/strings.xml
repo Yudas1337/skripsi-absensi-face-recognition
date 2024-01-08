@@ -14,9 +14,14 @@
 
     <string name="menu_1">Presensi</string>
     <string name="menu_2">Daftar Hadir</string>
-    <string name="menu_3">Pengaturan Jam</string>
+    <string name="menu_3">Sinkronisasi</string>
     <string name="menu_4">Tentang</string>
 
     <string name="instructions_label">Silakan scan ID Card Anda!</string>
-    <string name="instructions_hint">Scan ID Card Anda</string>
+    <string name="instructions_hint">Tab Kartu anda untuk absen hari ini</string>
+
+    <string name="cr_1">Copyright By Hummatech</string>
+    <string name="cr_2">2024 Hummatech All Rights Reserved.</string>
+
+    <string name="back_button">Kembali</string>
 </resources>

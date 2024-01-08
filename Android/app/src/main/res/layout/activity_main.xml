@@ -20,35 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <View
-            android:id="@+id/scan"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="21dp"
-            android:layout_marginTop="136dp"
-            android:layout_marginRight="21dp"
-            android:layout_marginBottom="136dp"
-            android:visibility="@{result.hasFace ? View.GONE : View.VISIBLE}"
-            android:background="@drawable/scanning" />
-
-        <com.yudas1337.recognizeface.CoverView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:horizontalPadding="21dp"
-            app:verticalPadding="136dp"
-            app:backgroundColor="@color/cover_background"/>
-
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/frame"
-            android:keepScreenOn="true"
-            android:layout_marginLeft="21dp"
-            android:layout_marginTop="136dp"
-            android:layout_marginRight="21dp"
-            android:layout_marginBottom="136dp" />
-
-
         <LinearLayout
             android:layout_width="165dp"
             android:layout_height="31dp"

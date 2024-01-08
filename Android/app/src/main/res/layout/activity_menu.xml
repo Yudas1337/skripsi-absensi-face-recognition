@@ -5,15 +5,8 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
+    android:background="@drawable/menu_bg"
     tools:context=".screens.MenuActivity">
-
-    <ImageView
-        android:id="@+id/root"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/dashboard_background" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -28,6 +21,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/lato_bold"
@@ -36,14 +30,6 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/lato_bold"
-            android:text="@string/sub_header"
-            android:textColor="@color/text_color_description"
-            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -55,7 +41,6 @@
         android:layout_marginBottom="20dp"
         android:layout_weight="3"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
@@ -169,6 +154,7 @@
 
 
                 <LinearLayout
+                    android:id="@+id/sync_menu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/background_color_50"
@@ -181,7 +167,7 @@
                         android:layout_margin="20dp"
                         android:background="@drawable/general_img_background"
                         android:padding="25dp"
-                        android:src="@drawable/clock"
+                        android:src="@drawable/ic_sync"
                         app:tint="#fff" />
 
                     <TextView
