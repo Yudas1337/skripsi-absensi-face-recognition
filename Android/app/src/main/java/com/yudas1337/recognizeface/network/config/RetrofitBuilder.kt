@@ -1,7 +1,7 @@
 package com.yudas1337.recognizeface.network.config
 
 import android.content.Context
-import com.yudas1337.recognizeface.URL
+import com.yudas1337.recognizeface.constants.URL
 import com.yudas1337.recognizeface.network.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

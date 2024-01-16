@@ -1,7 +1,9 @@
 package com.yudas1337.recognizeface.screens
 
+import VoiceHelper
 import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -19,8 +21,10 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
     private lateinit var networkConnection: NetworkConnection
     private lateinit var presentCard: CardView
     private lateinit var presentListCard: CardView
-    private lateinit var syncMenu: LinearLayout
+    private lateinit var syncMenu: CardView
+    private lateinit var presentDayCard: CardView
     private var isInternetAvailable: Boolean = false
+    private var voiceHelper: VoiceHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +35,10 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
         syncMenu = findViewById(R.id.sync_menu)
         presentCard = findViewById(R.id.present_card)
         presentListCard = findViewById(R.id.present_list_card)
+        presentDayCard = findViewById(R.id.present_day)
+
+        voiceHelper = VoiceHelper.getInstance(this)
+        voiceHelper!!.initializeTextToSpeech(this)
 
         networkConnection = NetworkConnection(applicationContext)
         lifecycle.addObserver(this)
@@ -59,10 +67,15 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
             startActivity(Intent(this, ClassifyActivity::class.java))
             finish()
         }
+
+        presentDayCard.setOnClickListener {
+            voiceHelper!!.runVoice("Presensi Berhasil")
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         networkConnection.clearObserver()
+        voiceHelper!!.stopAndShutdown()
     }
 }

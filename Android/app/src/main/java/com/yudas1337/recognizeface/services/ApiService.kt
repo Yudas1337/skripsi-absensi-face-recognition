@@ -23,7 +23,7 @@ class ApiService(private val context: Context) {
             MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
 
         // Call the uploadImage method from the ApiService interface
-        val call: Call<Value> = RetrofitBuilder.builder(context).recognizeFaceRequest(body)
+        val call: Call<Value> = RetrofitBuilder.builder(context).doAttendance(body, "123123")
 
         // Enqueue the call to run it asynchronously
         call.enqueue(object : Callback<Value> {

@@ -162,12 +162,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
                                 binding.result = result.updateLocation(rect)
 
-                                if (result.confidence > result.threshold) {
-                                    Log.d("confidence", "aslii ${result.confidence}")
-                                } else {
-                                    Log.d("confidence", "palsuu ${result.confidence}")
-                                }
-
                                 FaceBox.updateColor(result.confidence, result.threshold)
 
                                 binding.rectView.postInvalidate()
