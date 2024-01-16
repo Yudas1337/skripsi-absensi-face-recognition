@@ -129,7 +129,7 @@
                 android:background="@color/white"
                 android:cursorVisible="true"
                 android:hint="@string/instructions_hint"
-                android:inputType="text"
+                android:inputType="number"
                 android:padding="12dp" />
 
             <Button

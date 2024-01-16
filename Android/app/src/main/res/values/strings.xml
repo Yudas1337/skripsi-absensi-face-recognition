@@ -13,9 +13,9 @@
     <string name="sub_header">Powered By Machine Learning Model</string>
 
     <string name="menu_1">Presensi</string>
-    <string name="menu_2">Daftar Hadir</string>
+    <string name="menu_2">Daftar Pengguna</string>
     <string name="menu_3">Sinkronisasi</string>
-    <string name="menu_4">Tentang</string>
+    <string name="menu_4">Presensi Hari Ini</string>
 
     <string name="instructions_label">Silakan scan ID Card Anda!</string>
     <string name="instructions_hint">Tab Kartu anda untuk absen hari ini</string>

@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleObserver
-import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.Table
@@ -25,7 +24,7 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_menu);
+        setContentView(R.layout.activity_menu)
 
         val dbHelper = DBHelper(this, null)
         val timestamp = PackageHelper.timestamp
@@ -57,7 +56,8 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
         }
 
         presentListCard.setOnClickListener{
-
+            startActivity(Intent(this, ClassifyActivity::class.java))
+            finish()
         }
     }
 

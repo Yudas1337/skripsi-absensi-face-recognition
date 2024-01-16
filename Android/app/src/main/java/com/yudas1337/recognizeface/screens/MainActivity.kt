@@ -4,7 +4,6 @@ package com.yudas1337.recognizeface.screens
 
 import android.Manifest
 import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.graphics.ImageFormat
@@ -17,15 +16,18 @@ import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
-import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.yudas1337.recognizeface.DetectionResult
 import com.yudas1337.recognizeface.EngineWrapper
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.SetThresholdDialogFragment
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
+import com.yudas1337.recognizeface.detection.FaceBox
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
@@ -46,7 +48,10 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     private val previewWidth: Int = 1920
     private val previewHeight: Int = 1440
-    private val frameOrientation: Int = 7
+
+    // https://jpegclub.org/exif_orientation.html
+
+    private val frameOrientation: Int = 1
 
     private var screenWidth: Int = 0
     private var screenHeight: Int = 0
@@ -84,6 +89,41 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     @TargetApi(Build.VERSION_CODES.M)
     private fun requestPermission() = requestPermissions(permissions, permissionReqCode)
 
+    private fun processImageByteArray(data: ByteArray) {
+        val inputImage = InputImage.fromByteArray(
+            data,
+            previewWidth,
+            previewHeight,
+            0,
+            InputImage.IMAGE_FORMAT_NV21
+        )
+
+        val detector = FaceDetection.getClient(
+            FaceDetectorOptions.Builder()
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                .setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
+                .build())
+
+        // Proses deteksi wajah
+        detector.process(inputImage)
+            .addOnSuccessListener { faces ->
+
+                runOnUiThread {
+                    binding.graphicOverlay.clear()
+                    if (faces.isNotEmpty()) {
+                        val face = faces[0]
+                        val faceBox = FaceBox(binding.graphicOverlay, face, Rect(0, 0, previewWidth, previewHeight))
+                        binding.graphicOverlay.add(faceBox)
+                    }
+                }
+
+                binding.graphicOverlay.postInvalidate()
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+            }
+    }
+
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.result = DetectionResult()
@@ -91,11 +131,16 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         calculateSize()
 
         binding.surface.holder.let {
-//            it.setFormat(ImageFormat.NV21)
+            it.setFormat(ImageFormat.NV21)
             it.addCallback(object : SurfaceHolder.Callback, Camera.PreviewCallback {
 
                 @Deprecated("Deprecated in Java")
                 override fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
+
+                    if(data != null){
+                        processImageByteArray(data)
+                    }
+
                     if (enginePrepared && data != null) {
                         if (!working) {
                             GlobalScope.launch(detectionContext) {
@@ -116,6 +161,14 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                 )
 
                                 binding.result = result.updateLocation(rect)
+
+                                if (result.confidence > result.threshold) {
+                                    Log.d("confidence", "aslii ${result.confidence}")
+                                } else {
+                                    Log.d("confidence", "palsuu ${result.confidence}")
+                                }
+
+                                FaceBox.updateColor(result.confidence, result.threshold)
 
                                 binding.rectView.postInvalidate()
                                 working = false
@@ -140,6 +193,8 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                 }
 
                 override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+
+                    Log.d("formatnya", "adalah $p1")
                     if (p0.surface == null) return
 
                     if (camera == null) return
@@ -173,13 +228,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             })
         }
 
-//        scaleAnimator = ObjectAnimator.ofFloat(binding.scan, View.SCALE_Y, 1F, -1F, 1F).apply {
-//            this.duration = 3000
-//            this.repeatCount = ValueAnimator.INFINITE
-//            this.repeatMode = ValueAnimator.REVERSE
-//            this.interpolator = LinearInterpolator()
-//            this.start()
-//        }
 
     }
 
@@ -190,19 +238,20 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         screenHeight = dm.heightPixels
     }
 
-    private fun calculateBoxLocationOnScreen(left: Int, top: Int, right: Int, bottom: Int): Rect =
-        Rect(
-            (left * factorX).toInt(),
-            (top * factorY).toInt(),
-            (right * factorX).toInt(),
-            (bottom * factorY).toInt()
-        )
+    private fun calculateBoxLocationOnScreen(left: Int, top: Int, right: Int, bottom: Int): Rect {
+        return  Rect(
+                    (left * factorX).toInt(),
+                    (top * factorY).toInt(),
+                    (right * factorX).toInt(),
+                    (bottom * factorY).toInt()
+                )
+    }
+
 
     private fun setCameraDisplayOrientation() {
         val info = Camera.CameraInfo()
         Camera.getCameraInfo(cameraId, info)
         val rotation = windowManager.defaultDisplay.rotation
-        Log.d("tester", "$rotation")
         var degrees = 0
         when (rotation) {
             Surface.ROTATION_0 -> degrees = 0
@@ -214,6 +263,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             result = (info.orientation + degrees) % 360
             result = (360 - result) % 360 // compensate the mirror
+
         } else {  // back-facing
             result = (info.orientation - degrees + 360) % 360
         }
@@ -262,7 +312,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     companion object {
         const val tag = "MainActivity"
 //      const val defaultThreshold = 0.915F
-        const val defaultThreshold = 0.71F
+        const val defaultThreshold = 0.60F
 
         val permissions: Array<String> = arrayOf(Manifest.permission.CAMERA)
         const val permissionReqCode = 1

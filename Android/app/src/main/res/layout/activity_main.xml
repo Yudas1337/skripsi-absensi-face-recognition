@@ -41,7 +41,13 @@
 
         </LinearLayout>
 
+        <com.yudas1337.recognizeface.detection.FaceBoxOverlay
+            android:id="@+id/graphic_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <com.yudas1337.recognizeface.RectView
+            android:visibility="gone"
             android:id="@+id/rectView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
