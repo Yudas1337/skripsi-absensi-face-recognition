@@ -17,19 +17,20 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     }
 
 
-    fun insertData(tableName: String, data: Map<String, String>){
+    fun insertData(tableName: String, data: Map<String, Any>){
 
         val values = ContentValues()
         val db = this.writableDatabase
 
         for ((columnName, value) in data) {
-            values.put(columnName, value)
+            when (value) {
+                is String -> values.put(columnName, value)
+                is Int -> values.put(columnName, value)
+                else -> throw IllegalArgumentException("Unsupported data type for column $columnName")
+            }
         }
 
-
         db.insert(tableName, null, values)
-
-//        db.close()
 
     }
 

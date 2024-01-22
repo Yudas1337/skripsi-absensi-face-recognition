@@ -11,6 +11,7 @@ import android.graphics.Rect
 import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Surface
@@ -62,7 +63,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     private val detectionContext = newSingleThreadContext("detection")
     private var working: Boolean = false
 
-    private lateinit var scaleAnimator: ObjectAnimator
+    private lateinit var timer: CountDownTimer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,6 +129,17 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.result = DetectionResult()
 
+        timer = object: CountDownTimer(15000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+
+            }
+
+            override fun onFinish() {
+
+            }
+        }
+
+
         calculateSize()
 
         binding.surface.holder.let {
@@ -162,7 +174,13 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
                                 binding.result = result.updateLocation(rect)
 
-                                FaceBox.updateColor(result.confidence, result.threshold)
+                                if(result.confidence > result.threshold){
+                                    FaceBox.updateColor(true)
+                                    timer.start()
+                                } else{
+                                    FaceBox.updateColor(false)
+                                    timer.cancel()
+                                }
 
                                 binding.rectView.postInvalidate()
                                 working = false
@@ -221,7 +239,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                 }
             })
         }
-
 
     }
 
@@ -299,7 +316,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     override fun onDestroy() {
         engineWrapper.destroy()
-        scaleAnimator.cancel()
         super.onDestroy()
     }
 

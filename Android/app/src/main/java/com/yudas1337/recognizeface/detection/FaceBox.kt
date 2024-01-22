@@ -32,8 +32,8 @@ class FaceBox(
 
     companion object{
         var defaultColor: Int = Color.GREEN
-        fun updateColor(confidence: Float, threshold: Float) {
-            defaultColor = if (confidence > threshold) {
+        fun updateColor(isReal: Boolean) {
+            defaultColor = if (isReal) {
                 Color.GREEN
             } else {
                 Color.RED

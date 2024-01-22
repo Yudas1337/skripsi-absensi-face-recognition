@@ -24,4 +24,8 @@
     <string name="cr_2">2024 Hummatech All Rights Reserved.</string>
 
     <string name="back_button">Kembali</string>
+    <string name="title_activity_user_list">UserListActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

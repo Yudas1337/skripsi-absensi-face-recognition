@@ -20,6 +20,11 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
         <activity
+            android:screenOrientation="landscape"
+            android:name=".screens.UserListActivity"
+            android:exported="false"
+            android:label="@string/title_activity_user_list" />
+        <activity
             android:name=".screens.ClassifyActivity"
             android:exported="false" />
         <activity
