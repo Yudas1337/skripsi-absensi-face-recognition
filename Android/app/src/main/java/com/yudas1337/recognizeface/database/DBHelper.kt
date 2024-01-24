@@ -31,16 +31,15 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         }
 
         db.insert(tableName, null, values)
-
     }
 
-    fun getName(): Cursor? {
+    fun getStudents(): Cursor? {
 
         val db = this.readableDatabase
 
 //        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null)
 
-        return db.rawQuery("SELECT * FROM roles", null)
+        return db.rawQuery("SELECT * FROM students", null)
     }
 
     companion object{

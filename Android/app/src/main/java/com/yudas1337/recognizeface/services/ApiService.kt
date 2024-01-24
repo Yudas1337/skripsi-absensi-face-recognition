@@ -1,7 +1,12 @@
 package com.yudas1337.recognizeface.services
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.util.Log
+import android.widget.Toast
+import com.yudas1337.recognizeface.database.DBHelper
+import com.yudas1337.recognizeface.database.DBManager
+import com.yudas1337.recognizeface.network.Result
 import com.yudas1337.recognizeface.network.Value
 import com.yudas1337.recognizeface.network.config.RetrofitBuilder
 import okhttp3.MediaType
@@ -14,16 +19,16 @@ import java.io.File
 
 class ApiService(private val context: Context) {
 
-    fun getStudents(rfid: String){
-        val call: Call<Value> = RetrofitBuilder.builder(context).doAttendance(rfid)
+    fun getStudents(){
+        val call: Call<Value> = RetrofitBuilder.builder(context).getStudents()
 
-        // Enqueue the call to run it asynchronously
         call.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
-                // Handle the response
                 if (response.isSuccessful) {
-                    val value = response.body()?.value
-                    // Do something with the result
+                    val responseData = response.body()?.result
+                    val dbHelper = DBHelper(context, null)
+                    DBManager(dbHelper).insertStudentsFromJson(responseData.toString())
+                    Toast.makeText(context, "Berhasil", Toast.LENGTH_SHORT).show()
                 } else {
                     Log.d("connFailure", "Gagal")
                 }

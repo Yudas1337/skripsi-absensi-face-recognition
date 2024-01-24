@@ -1,6 +1,5 @@
 package com.yudas1337.recognizeface.network
 
-import com.yudas1337.recognizeface.constants.URL
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.GET
@@ -17,7 +16,5 @@ interface Request {
     ): Call<Value>
 
     @GET("students")
-    fun doAttendance(
-        rfid: String
-    ): Call<Value>
+    fun getStudents(): Call<Value>
 }

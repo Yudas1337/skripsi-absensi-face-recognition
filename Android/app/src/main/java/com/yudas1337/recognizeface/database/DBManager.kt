@@ -1,9 +1,11 @@
 package com.yudas1337.recognizeface.database
 
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
 
 class DBManager(private val dbHelper: DBHelper) {
+
     fun insertStudentsFromJson(jsonData: String) {
         try {
             val jsonArray = JSONArray(jsonData)
@@ -21,14 +23,13 @@ class DBManager(private val dbHelper: DBHelper) {
                             "updated_at" to jsonObject.getString("updated_at"),
                         )
                 dbHelper.insertData(Table.students, data)
+
+                Log.d("berhasil", "${dbHelper.getStudents()}")
             }
 
         }
         catch (e: Exception){
                     e.printStackTrace()
-        }
-        finally {
-            dbHelper.close()
         }
     }
 
