@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION) {
@@ -13,6 +14,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
+        db.execSQL("DROP TABLE IF EXISTS " + Table.students)
         onCreate(db)
     }
 
@@ -36,8 +38,6 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     fun getStudents(): Cursor? {
 
         val db = this.readableDatabase
-
-//        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null)
 
         return db.rawQuery("SELECT * FROM students", null)
     }

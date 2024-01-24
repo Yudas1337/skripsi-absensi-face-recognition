@@ -1,12 +1,10 @@
 package com.yudas1337.recognizeface.services
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import android.widget.Toast
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.DBManager
-import com.yudas1337.recognizeface.network.Result
 import com.yudas1337.recognizeface.network.Value
 import com.yudas1337.recognizeface.network.config.RetrofitBuilder
 import okhttp3.MediaType
@@ -27,8 +25,8 @@ class ApiService(private val context: Context) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
                     val dbHelper = DBHelper(context, null)
-                    DBManager(dbHelper).insertStudentsFromJson(responseData.toString())
-                    Toast.makeText(context, "Berhasil", Toast.LENGTH_SHORT).show()
+                    DBManager(dbHelper).insertStudentsFromJson(responseData)
+                    Toast.makeText(context, "Berhasil ${responseData?.size}", Toast.LENGTH_SHORT).show()
                 } else {
                     Log.d("connFailure", "Gagal")
                 }
