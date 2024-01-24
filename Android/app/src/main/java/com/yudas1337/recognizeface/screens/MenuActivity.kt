@@ -1,6 +1,5 @@
 package com.yudas1337.recognizeface.screens
 
-import VoiceHelper
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -11,6 +10,7 @@ import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.PackageHelper
+import com.yudas1337.recognizeface.helpers.VoiceHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
 
 class MenuActivity : AppCompatActivity(), LifecycleObserver {

@@ -21,23 +21,39 @@
             android:layout_height="match_parent" />
 
         <LinearLayout
-            android:layout_width="165dp"
-            android:layout_height="31dp"
-            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="80dp"
-            android:background="@drawable/time_bg"
-            android:visibility="@{result.hasFace ? View.VISIBLE : View.GONE}"
             android:gravity="center">
 
-            <TextView
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:drawablePadding="10dp"
-                android:drawableStart="@drawable/clock"
-                android:text='@{String.valueOf(result.time) + "ms"}'
-                android:textColor="#ffffff"/>
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/face_position_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"
+                    android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/clock"
+                    android:text='Posisikan Wajah ke Dalam Frame'
+                    android:textColor="#ffffff"/>
+
+                <TextView
+                    android:id="@+id/time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/face_position_text"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/time_bg"
+                    android:drawablePadding="10dp"
+                    android:gravity="center"
+                    android:text='Melakukan Pemindaian.. '
+                    android:textColor="#ffffff"
+                    android:textSize="17sp" />
+            </RelativeLayout>
 
         </LinearLayout>
 

@@ -3,9 +3,10 @@
 package com.yudas1337.recognizeface.screens
 
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
@@ -13,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
@@ -64,6 +64,11 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     private var working: Boolean = false
 
     private lateinit var timer: CountDownTimer
+    private var stableTime: Long = 3000
+
+    private var isReal: Boolean? = null
+
+    private lateinit var originalBitmap: Bitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +96,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     private fun requestPermission() = requestPermissions(permissions, permissionReqCode)
 
     private fun processImageByteArray(data: ByteArray) {
+
         val inputImage = InputImage.fromByteArray(
             data,
             previewWidth,
@@ -112,9 +118,40 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                 runOnUiThread {
                     binding.graphicOverlay.clear()
                     if (faces.isNotEmpty()) {
-                        val face = faces[0]
-                        val faceBox = FaceBox(binding.graphicOverlay, face, Rect(0, 0, previewWidth, previewHeight))
-                        binding.graphicOverlay.add(faceBox)
+                        // mendeteksi wajah hanya dan diharuskan 1 saja
+                        if(faces.size == 1){
+                            val face = faces[0]
+                            val faceBox = FaceBox(binding.graphicOverlay, face, Rect(0, 0, previewWidth, previewHeight))
+                            binding.graphicOverlay.add(faceBox)
+
+                            if (stableTime.toInt() == 3000) {
+//                                timer.start()
+                            }
+//                            stableTime -= 1000
+
+                            // cek timer dan liveness
+                            if (stableTime <= 0 && isReal == true) {
+                                Toast.makeText(this, "sudah selesai", Toast.LENGTH_SHORT).show()
+                            }
+
+                            // cek liveness
+                            if(isReal == true){
+                                binding.timeText.visibility = View.VISIBLE
+                                binding.facePositionText.text = "Posisikan Wajah ke Dalam Frame"
+                            } else{
+//                                resetTimer()
+                                binding.facePositionText.text = "Spoofing Terdeteksi"
+                                binding.timeText.visibility = View.GONE
+                            }
+
+                        } else{
+                            binding.facePositionText.text = "Hanya 1 wajah yang diperbolehkan.."
+                        }
+
+                    } else{
+                        binding.facePositionText.text = "Wajah tidak Terdeteksi"
+//                        resetTimer()
+                        binding.timeText.visibility = View.GONE
                     }
                 }
 
@@ -125,21 +162,30 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             }
     }
 
+    private fun startTimer(){
+        timer = object: CountDownTimer(stableTime, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                //
+            }
+
+            override fun onFinish() {
+                //
+            }
+        }
+    }
+
+    private fun resetTimer() {
+        timer.cancel()
+        stableTime = 3000
+
+    }
+
+
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.result = DetectionResult()
 
-        timer = object: CountDownTimer(15000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-
-            }
-
-            override fun onFinish() {
-
-            }
-        }
-
-
+//        startTimer()
         calculateSize()
 
         binding.surface.holder.let {
@@ -175,11 +221,11 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                 binding.result = result.updateLocation(rect)
 
                                 if(result.confidence > result.threshold){
-                                    FaceBox.updateColor(true)
-                                    timer.start()
+                                    isReal = true
+                                    FaceBox.updateColor(isReal!!)
                                 } else{
-                                    FaceBox.updateColor(false)
-                                    timer.cancel()
+                                    isReal = false
+                                    FaceBox.updateColor(isReal!!)
                                 }
 
                                 binding.rectView.postInvalidate()
@@ -193,7 +239,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                     try {
                         camera = Camera.open(cameraId)
                     } catch (e: Exception) {
-                        cameraId = Camera.CameraInfo.CAMERA_FACING_BACK
+                        cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT
                         camera = Camera.open(cameraId)
                     }
 
@@ -206,7 +252,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
                 override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
 
-                    Log.d("formatnya", "adalah $p1")
                     if (p0.surface == null) return
 
                     if (camera == null) return
@@ -251,11 +296,11 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     private fun calculateBoxLocationOnScreen(left: Int, top: Int, right: Int, bottom: Int): Rect {
         return  Rect(
-                    (left * factorX).toInt(),
-                    (top * factorY).toInt(),
-                    (right * factorX).toInt(),
-                    (bottom * factorY).toInt()
-                )
+            (left * factorX).toInt(),
+            (top * factorY).toInt(),
+            (right * factorX).toInt(),
+            (bottom * factorY).toInt()
+        )
     }
 
 
@@ -321,7 +366,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     companion object {
         const val tag = "MainActivity"
-//      const val defaultThreshold = 0.915F
+        //      const val defaultThreshold = 0.915F
         const val defaultThreshold = 0.60F
 
         val permissions: Array<String> = arrayOf(Manifest.permission.CAMERA)
