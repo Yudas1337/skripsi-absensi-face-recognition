@@ -16,4 +16,15 @@ class Result {
     internal var role: String? = null
     internal var created_at: String? = null
     internal var updated_at: String? = null
+
+
+    internal var day: String? = null
+    internal var checkin_starts: String? = null
+    internal var checkin_ends: String? = null
+    internal var break_starts: String? = null
+    internal var break_ends: String? = null
+    internal var return_starts: String? = null
+    internal var return_ends: String? = null
+    internal var checkout_starts: String? = null
+    internal var checkout_ends: String? = null
 }
