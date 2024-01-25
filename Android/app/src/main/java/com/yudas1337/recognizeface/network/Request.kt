@@ -17,4 +17,7 @@ interface Request {
 
     @GET("students")
     fun getStudents(): Call<Value>
+
+    @GET("entry-time")
+    fun getSchedules(): Call<Value>
 }

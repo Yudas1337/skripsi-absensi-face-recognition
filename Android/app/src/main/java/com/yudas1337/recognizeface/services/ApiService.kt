@@ -2,7 +2,6 @@ package com.yudas1337.recognizeface.services
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.DBManager
 import com.yudas1337.recognizeface.network.Value
@@ -26,7 +25,6 @@ class ApiService(private val context: Context) {
                     val responseData = response.body()?.result
                     val dbHelper = DBHelper(context, null)
                     DBManager(dbHelper).insertStudentsFromJson(responseData)
-                    Toast.makeText(context, "Berhasil ${responseData?.size}", Toast.LENGTH_SHORT).show()
                 } else {
                     Log.d("connFailure", "Gagal")
                 }
@@ -36,6 +34,27 @@ class ApiService(private val context: Context) {
                 Log.d("connFailure", "Gagal")
             }
         })
+    }
+
+    fun getSchedules(){
+        val call: Call<Value> = RetrofitBuilder.builder(context).getSchedules()
+
+        call.enqueue(object : Callback<Value> {
+            override fun onResponse(call: Call<Value>, response: Response<Value>) {
+                if (response.isSuccessful) {
+                    val responseData = response.body()?.result
+                    val dbHelper = DBHelper(context, null)
+                    DBManager(dbHelper).insertSchedulesFromJson(responseData)
+                } else {
+                    Log.d("connFailure", "Gagal")
+                }
+            }
+
+            override fun onFailure(call: Call<Value>, t: Throwable) {
+                Log.d("connFailure", "Gagal")
+            }
+        })
+
     }
 
     fun recognizeFaceApi(imageFile: File) {

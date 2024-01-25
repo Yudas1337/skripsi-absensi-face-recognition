@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION) {
@@ -33,6 +32,21 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         }
 
         db.insert(tableName, null, values)
+    }
+
+    fun countTableData(table: String): Int {
+        val query = "SELECT COUNT(*) FROM $table"
+        val db = this.readableDatabase
+        val cursor = db.rawQuery(query, null)
+        var total = 0
+
+        cursor.use {
+            if (it.moveToFirst()) {
+                total = it.getInt(0)
+            }
+        }
+
+        return total
     }
 
     fun getStudents(): Cursor? {

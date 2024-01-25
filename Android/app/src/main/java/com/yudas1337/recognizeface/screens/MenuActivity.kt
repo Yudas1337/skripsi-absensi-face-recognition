@@ -26,8 +26,6 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
-        val dbHelper = DBHelper(this, null)
-        val timestamp = PackageHelper.timestamp
         syncMenu = findViewById(R.id.sync_menu)
         presentCard = findViewById(R.id.present_card)
         userCard = findViewById(R.id.user_card)

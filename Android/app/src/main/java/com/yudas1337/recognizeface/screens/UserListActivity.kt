@@ -8,6 +8,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.databinding.ActivityUserListBinding
 import com.yudas1337.recognizeface.services.ApiService
 
@@ -20,7 +21,13 @@ class UserListActivity : AppCompatActivity() {
         binding = ActivityUserListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val dbHelper = DBHelper(this, null)
+
         ApiService(this).getStudents()
+
+        if(dbHelper.countTableData("schedules") == 0){
+            ApiService(this).getSchedules()
+        }
 
         val buttonBack = findViewById<Button>(R.id.btn_bck)
 
