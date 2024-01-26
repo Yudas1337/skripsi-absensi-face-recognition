@@ -41,7 +41,6 @@ class DBManager(private val dbHelper: DBHelper) {
         try {
             if (jsonData != null) {
                 for (i in jsonData.indices) {
-                    Log.d("berhasil nama", "${jsonData[i].day}")
                     val data: Map<String, Any?> = mapOf(
                         "day" to jsonData[i].day,
                         "checkin_starts" to jsonData[i].checkin_starts,

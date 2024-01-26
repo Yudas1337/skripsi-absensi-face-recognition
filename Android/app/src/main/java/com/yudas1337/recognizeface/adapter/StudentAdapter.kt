@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import com.squareup.picasso.Picasso
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.network.Result
-import kotlinx.android.synthetic.main.student_adapter.view.email
 import kotlinx.android.synthetic.main.student_adapter.view.name
 import kotlinx.android.synthetic.main.student_adapter.view.school
 import kotlinx.android.synthetic.main.student_adapter.view.student_photo
@@ -34,16 +33,10 @@ class StudentAdapter(private val context: Context, private val results: List<Res
         fun setData(result: Result)
         {
             itemView.name!!.text = result.name
-            itemView.email!!.text = result.email
 
             itemView.school!!.text = result.school
             Log.d("debug", "debug: " + result.photo)
             Picasso.get().load(result.photo).into(itemView.student_photo)
-//            Picasso.with(context)
-//                .load(result.photo)
-//                .into(itemView.student_photo)
-//
-//            Picasso.with(context).isLoggingEnabled = true
         }
 
 
