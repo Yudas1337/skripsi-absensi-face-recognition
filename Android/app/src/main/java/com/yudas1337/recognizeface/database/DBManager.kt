@@ -28,7 +28,10 @@ class DBManager(private val dbHelper: DBHelper) {
                             "updated_at" to jsonObject.getString("updated_at"),
                         )
                 dbHelper.insertData(Table.students, data)
+                Log.d("insert", "siswa ke $i")
+
             }
+
         }
         catch (e: Exception){
             e.printStackTrace()
@@ -52,8 +55,8 @@ class DBManager(private val dbHelper: DBHelper) {
                     "checkout_ends" to jsonObject.getString("checkout_ends")
                 )
                 dbHelper.insertData(Table.schedules, data)
+                Log.d("insert", "jadwal ke $i")
             }
-
         }
         catch (e: Exception){
             e.printStackTrace()

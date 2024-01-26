@@ -2,6 +2,7 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -23,7 +24,9 @@ class UserListActivity : AppCompatActivity() {
 
         val dbHelper = DBHelper(this, null)
 
-        ApiService(this).getStudents()
+        if(dbHelper.countTableData("students") == 0){
+            ApiService(this).getStudents()
+        }
 
         if(dbHelper.countTableData("schedules") == 0){
             ApiService(this).getSchedules()
