@@ -46,8 +46,10 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refreshmodules"
-        android:layout_width="650dp"
-        android:layout_height="399dp"
+        android:layout_width="match_parent"
+        android:layout_height="373dp"
+        android:layout_marginHorizontal="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/btn_bck"

@@ -48,7 +48,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="6dp" />
+                android:layout_height="12dp" />
 
             <TextView
                 android:id="@+id/name"
@@ -57,13 +57,6 @@
                 android:textColor="@color/black"
                 android:textSize="18dp"
                 android:textStyle="bold"
-                android:text="TextView" />
-
-            <TextView
-                android:id="@+id/email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#181818"
                 android:text="TextView" />
         </LinearLayout>
     </LinearLayout>
