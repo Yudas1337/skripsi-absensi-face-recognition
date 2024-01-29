@@ -18,7 +18,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     }
 
 
-    fun insertData(tableName: String, data: Map<String, Any>){
+    fun insertData(tableName: String, data: Map<String, Any?>){
 
         val values = ContentValues()
         val db = this.writableDatabase

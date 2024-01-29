@@ -9,29 +9,27 @@ class DBManager(private val dbHelper: DBHelper) {
 
     fun insertStudentsFromJson(jsonData: List<Result>?) {
         try {
-            val jsonArray = JSONArray(jsonData)
-            for (i in 0 until jsonArray.length()) {
-                val jsonObject: JSONObject = jsonArray.getJSONObject(i)
-                val data = mapOf(
-                            "id" to  jsonObject.getInt("id"),
-                            "name" to jsonObject.getString("name"),
-                            "email" to jsonObject.getString("email"),
-                            "photo" to jsonObject.getString("photo"),
-                            "national_student_number" to jsonObject.getString("national_student_number"),
-                            "classroom" to jsonObject.getInt("classroom"),
-                            "school" to jsonObject.getString("school"),
-                            "rfid" to jsonObject.getString("rfid"),
-                            "gender" to jsonObject.getString("gender"),
-                            "address" to jsonObject.getString("address"),
-                            "phone_number" to jsonObject.getString("phone_number"),
-                            "created_at" to jsonObject.getString("created_at"),
-                            "updated_at" to jsonObject.getString("updated_at"),
-                        )
-                dbHelper.insertData(Table.students, data)
-                Log.d("insert", "siswa ke $i")
-
+            if (jsonData != null) {
+                for (i in jsonData.indices) {
+                    val data: Map<String, Any?> = mapOf(
+                        "id" to  jsonData[i].id?.toInt(),
+                        "name" to jsonData[i].name,
+                        "email" to jsonData[i].email,
+                        "photo" to jsonData[i].photo,
+                        "national_student_number" to jsonData[i].national_student_number,
+                        "classroom" to jsonData[i].classroom?.toInt(),
+                        "school" to jsonData[i].school,
+                        "rfid" to jsonData[i].rfid,
+                        "gender" to jsonData[i].gender,
+                        "address" to jsonData[i].address,
+                        "phone_number" to jsonData[i].phone_number,
+                        "created_at" to jsonData[i].created_at,
+                        "updated_at" to jsonData[i].updated_at,
+                    )
+                    dbHelper.insertData(Table.students, data)
+                    Log.d("berhasil tambah", "Berhasil tambah data ke $i")
+                }
             }
-
         }
         catch (e: Exception){
             e.printStackTrace()
@@ -39,30 +37,28 @@ class DBManager(private val dbHelper: DBHelper) {
     }
 
     fun insertSchedulesFromJson(jsonData: List<Result>?){
+        Log.d("berhasil", "Berhasil memanggil")
         try {
-            val jsonArray = JSONArray(jsonData)
-            for (i in 0 until jsonArray.length()) {
-                val jsonObject: JSONObject = jsonArray.getJSONObject(i)
-                val data = mapOf(
-                    "day" to jsonObject.getString("day"),
-                    "checkin_starts" to jsonObject.getString("checkin_starts"),
-                    "checkin_ends" to jsonObject.getString("checkin_ends"),
-                    "break_starts" to jsonObject.getString("break_starts"),
-                    "break_ends" to jsonObject.getString("break_ends"),
-                    "return_starts" to jsonObject.getString("return_starts"),
-                    "return_ends" to jsonObject.getString("return_ends"),
-                    "checkout_starts" to jsonObject.getString("checkout_starts"),
-                    "checkout_ends" to jsonObject.getString("checkout_ends")
-                )
-                dbHelper.insertData(Table.schedules, data)
-                Log.d("insert", "jadwal ke $i")
+            if (jsonData != null) {
+                for (i in jsonData.indices) {
+                    Log.d("berhasil nama", "${jsonData[i].day}")
+                    val data: Map<String, Any?> = mapOf(
+                        "day" to jsonData[i].day,
+                        "checkin_starts" to jsonData[i].checkin_starts,
+                        "checkin_ends" to jsonData[i].checkin_ends,
+                        "break_starts" to jsonData[i].break_starts,
+                        "break_ends" to jsonData[i].break_ends,
+                        "return_starts" to jsonData[i].return_starts,
+                        "return_ends" to jsonData[i].return_ends,
+                        "checkout_starts" to jsonData[i].checkout_starts,
+                        "checkout_ends" to jsonData[i].checkout_ends
+                    )
+                    dbHelper.insertData(Table.schedules, data)
+                }
             }
         }
         catch (e: Exception){
             e.printStackTrace()
         }
     }
-
-
-
 }

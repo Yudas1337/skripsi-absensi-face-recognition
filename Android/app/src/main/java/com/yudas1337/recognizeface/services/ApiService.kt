@@ -23,8 +23,13 @@ class ApiService(private val context: Context) {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
+                    responseData.let {
+                        Log.d("Perintah baru", "${it?.get(0)?.email}")
+                    }
+                    Log.d("baru haha", "$responseData")
                     val dbHelper = DBHelper(context, null)
                     DBManager(dbHelper).insertStudentsFromJson(responseData)
+                    Log.d("connSuccess", "Berhasil")
                 } else {
                     Log.d("connFailure", "Gagal")
                 }
