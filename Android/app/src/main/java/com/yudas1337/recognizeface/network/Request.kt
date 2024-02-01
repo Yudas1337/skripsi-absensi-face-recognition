@@ -20,4 +20,7 @@ interface Request {
 
     @GET("entry-time")
     fun getSchedules(): Call<Value>
+
+    @GET("employees")
+    fun getEmployees(): Call<Value>
 }

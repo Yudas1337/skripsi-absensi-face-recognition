@@ -16,6 +16,10 @@ class Result {
     internal var role: String? = null
     internal var created_at: String? = null
     internal var updated_at: String? = null
+    internal var id_number: String? = null
+    internal var position: String? = null
+    internal var wages: String? = null
+    internal var date_of_birth: String? = null
 
 
     internal var day: String? = null
