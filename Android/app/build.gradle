@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId "com.yudas1337.recognizeface"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdk 33
         versionCode 1
         versionName "0.2"
 
