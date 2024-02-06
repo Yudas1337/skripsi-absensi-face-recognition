@@ -23,19 +23,17 @@ class UserListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_user_list)
 
         val dbHelper = DBHelper(this, null)
-        ApiService(this).getStudents()
-        ApiService(this).getSchedules()
-        ApiService(this).getEmployees()
-        if(dbHelper.countTableData("students") == 0){
 
+        if(dbHelper.countTableData("students") == 0){
+            ApiService(this).getStudents()
         }
 
         if(dbHelper.countTableData("schedules") == 0){
-
+            ApiService(this).getSchedules()
         }
 
         if(dbHelper.countTableData("employees") == 0){
-
+            ApiService(this).getEmployees()
         }
 
         val dataList = mutableListOf<Result>()
