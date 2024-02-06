@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId "com.yudas1337.recognizeface"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdk 33
         versionCode 1
         versionName "0.2"
 
@@ -98,7 +98,6 @@ dependencies {
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
-
 //    implementation 'com.google.android.material:material:1.11.0'
 
     testImplementation 'junit:junit:4.13'
