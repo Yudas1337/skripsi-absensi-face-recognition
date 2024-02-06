@@ -7,6 +7,8 @@ class Table {
     companion object{
         const val students = "students"
         const val schedules = "schedules"
+        const val attendances = "attendances"
+        const val employees = "employees"
 
         fun setupTables(db: SQLiteDatabase){
             db.execSQL("CREATE TABLE IF NOT EXISTS $students (" +
@@ -36,6 +38,23 @@ class Table {
                     "return_ends TEXT, " +
                     "checkout_starts TEXT, " +
                     "checkout_ends TEXT" +
+                    ")")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS $employees (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT, " +
+                    "email TEXT, " +
+                    "national_identity_number TEXT, " +
+                    "phone_number TEXT, " +
+                    "position TEXT, " +
+                    "photo TEXT, " +
+                    "gender TEXT, " +
+                    "salary INTEGER, " +
+                    "rfid TEXT, " +
+                    "address TEXT, " +
+                    "date_of_birth TEXT, " +
+                    "created_at TEXT, " +
+                    "updated_at TEXT" +
                     ")")
         }
     }

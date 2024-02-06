@@ -6,29 +6,32 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.DisplayMetrics
-import android.view.Surface
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.yudas1337.recognizeface.DetectionResult
 import com.yudas1337.recognizeface.EngineWrapper
-import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.SetThresholdDialogFragment
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
 import com.yudas1337.recognizeface.detection.FaceBox
+import com.yudas1337.recognizeface.recognize.FileReader
+import com.yudas1337.recognizeface.recognize.FrameAnalyser
+import com.yudas1337.recognizeface.recognize.LoadFace
+import com.yudas1337.recognizeface.recognize.model.FaceNetModel
+import com.yudas1337.recognizeface.recognize.model.Models
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
@@ -68,7 +71,25 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     private var isReal: Boolean? = null
 
-    private lateinit var originalBitmap: Bitmap
+    private lateinit var frameAnalyser  : FrameAnalyser
+    private lateinit var faceNetModel : FaceNetModel
+    private lateinit var fileReader : FileReader
+    private lateinit var loadFace: LoadFace
+
+    // <----------------------- User controls --------------------------->
+
+    // Use the device's GPU to perform faster computations.
+    // Refer https://www.tensorflow.org/lite/performance/gpu
+    private val useGpu = true
+
+    // Use XNNPack to accelerate inference.
+    // Refer https://blog.tensorflow.org/2020/07/accelerating-tensorflow-lite-xnnpack-integration.html
+    private val useXNNPack = true
+
+    // Default is Models.FACENET ; Quantized models are faster
+    private val modelInfo = Models.FACENET
+
+    // <---------------------------------------------------------------->
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +115,24 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     @TargetApi(Build.VERSION_CODES.M)
     private fun requestPermission() = requestPermissions(permissions, permissionReqCode)
+
+    private fun startTimer(){
+        timer = object: CountDownTimer(stableTime, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+
+            }
+
+            override fun onFinish() {
+                //
+            }
+        }
+    }
+
+    private fun resetTimer() {
+        timer.cancel()
+        stableTime = 3000
+
+    }
 
     private fun processImageByteArray(data: ByteArray) {
 
@@ -125,13 +164,27 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                             binding.graphicOverlay.add(faceBox)
 
                             if (stableTime.toInt() == 3000) {
-//                                timer.start()
+                                timer.start()
                             }
-//                            stableTime -= 1000
+                            stableTime -= 1000
 
                             // cek timer dan liveness
                             if (stableTime <= 0 && isReal == true) {
                                 Toast.makeText(this, "sudah selesai", Toast.LENGTH_SHORT).show()
+
+                                // Crop the face from the input image
+                                val frameBitmap = Bitmap.createBitmap(
+                                    inputImage.width,
+                                    inputImage.height,
+                                    Bitmap.Config.ARGB_8888
+                                )
+//
+//                                frameBitmap.copyPixelsFromBuffer( image.planes[0].buffer )
+//                                frameBitmap = BitmapUtils.rotateBitmap( frameBitmap , image.imageInfo.rotationDegrees.toFloat() )
+
+                                CoroutineScope( Dispatchers.Default ).launch {
+                                    frameAnalyser.runModel(face, frameBitmap )
+                                }
                             }
 
                             // cek liveness
@@ -162,31 +215,21 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             }
     }
 
-    private fun startTimer(){
-        timer = object: CountDownTimer(stableTime, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                //
-            }
-
-            override fun onFinish() {
-                //
-            }
-        }
-    }
-
-    private fun resetTimer() {
-        timer.cancel()
-        stableTime = 3000
-
-    }
-
 
     private fun init() {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         binding.result = DetectionResult()
 
-//        startTimer()
-        calculateSize()
+        faceNetModel = FaceNetModel( this , modelInfo , useGpu , useXNNPack )
+        frameAnalyser = FrameAnalyser(this, faceNetModel)
+        fileReader = FileReader(faceNetModel)
+
+        startTimer()
+
+//        loadFace = LoadFace(this, frameAnalyser)
+
+//        loadFace.loadListFaces()
 
         binding.surface.holder.let {
             it.setFormat(ImageFormat.NV21)
@@ -211,24 +254,15 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                 )
                                 result.threshold = threshold
 
-                                val rect = calculateBoxLocationOnScreen(
-                                    result.left,
-                                    result.top,
-                                    result.right,
-                                    result.bottom
-                                )
-
-                                binding.result = result.updateLocation(rect)
-
                                 if(result.confidence > result.threshold){
                                     isReal = true
                                     FaceBox.updateColor(isReal!!)
+                                    Log.i("liveness", "ASLI ${result.confidence}")
                                 } else{
                                     isReal = false
                                     FaceBox.updateColor(isReal!!)
+                                    Log.i("liveness", "PALSU ${result.confidence}")
                                 }
-
-                                binding.rectView.postInvalidate()
                                 working = false
                             }
                         }
@@ -274,7 +308,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                     camera?.startPreview()
                     camera?.setPreviewCallback(this)
 
-                    setCameraDisplayOrientation()
                 }
 
                 override fun surfaceDestroyed(p0: SurfaceHolder) {
@@ -285,45 +318,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             })
         }
 
-    }
 
-    private fun calculateSize() {
-        val dm = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(dm)
-        screenWidth = dm.widthPixels
-        screenHeight = dm.heightPixels
-    }
-
-    private fun calculateBoxLocationOnScreen(left: Int, top: Int, right: Int, bottom: Int): Rect {
-        return  Rect(
-            (left * factorX).toInt(),
-            (top * factorY).toInt(),
-            (right * factorX).toInt(),
-            (bottom * factorY).toInt()
-        )
-    }
-
-
-    private fun setCameraDisplayOrientation() {
-        val info = Camera.CameraInfo()
-        Camera.getCameraInfo(cameraId, info)
-        val rotation = windowManager.defaultDisplay.rotation
-        var degrees = 0
-        when (rotation) {
-            Surface.ROTATION_0 -> degrees = 0
-            Surface.ROTATION_90 -> degrees = 90
-            Surface.ROTATION_180 -> degrees = 180
-            Surface.ROTATION_270 -> degrees = 270
-        }
-        var result: Int
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (info.orientation + degrees) % 360
-            result = (360 - result) % 360 // compensate the mirror
-
-        } else {  // back-facing
-            result = (info.orientation - degrees + 360) % 360
-        }
-        camera!!.setDisplayOrientation(result)
     }
 
     fun setting(@Suppress("UNUSED_PARAMETER") view: View) =

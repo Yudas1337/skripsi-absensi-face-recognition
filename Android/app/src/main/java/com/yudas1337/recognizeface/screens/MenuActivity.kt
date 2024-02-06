@@ -14,12 +14,10 @@ import com.yudas1337.recognizeface.helpers.VoiceHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
 
 class MenuActivity : AppCompatActivity(), LifecycleObserver {
-    private lateinit var networkConnection: NetworkConnection
     private lateinit var presentCard: CardView
     private lateinit var userCard: CardView
     private lateinit var syncMenu: CardView
     private lateinit var presentDayCard: CardView
-    private var isInternetAvailable: Boolean = false
     private var voiceHelper: VoiceHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,19 +32,10 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
         voiceHelper = VoiceHelper.getInstance(this)
         voiceHelper!!.initializeTextToSpeech(this)
 
-        networkConnection = NetworkConnection(applicationContext)
-        lifecycle.addObserver(this)
-        networkConnection.observe(this){ isInternetAvailable = it }
 
         syncMenu.setOnClickListener {
-            if(isInternetAvailable){
-                AlertHelper.internetAvailable(this,
-                    { Toast.makeText(this, "OK CONFIRM", Toast.LENGTH_SHORT).show() },
-                    { Toast.makeText(this, "GAJADI", Toast.LENGTH_SHORT).show() }
-                )
-            } else{
-                AlertHelper.internetNotAvailable(this)
-            }
+            startActivity(Intent(this, SyncActivity::class.java))
+            finish()
         }
 
         presentCard.setOnClickListener {
@@ -66,7 +55,6 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
 
     override fun onDestroy() {
         super.onDestroy()
-        networkConnection.clearObserver()
         voiceHelper!!.stopAndShutdown()
     }
 }

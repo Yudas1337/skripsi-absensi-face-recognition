@@ -17,7 +17,7 @@ import java.io.File
 class ApiService(private val context: Context) {
 
     fun getStudents(){
-        val call: Call<Value> = RetrofitBuilder.builder(context).getStudents()
+        val call = RetrofitBuilder.builder(context).getStudents()
 
         call.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
@@ -27,12 +27,12 @@ class ApiService(private val context: Context) {
                     DBManager(dbHelper).insertStudentsFromJson(responseData)
                     Log.d("connSuccess", "Berhasil")
                 } else {
-                    Log.d("connFailure", "Gagal")
+                    Log.e("connFailure", "Gagal")
                 }
             }
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
-                Log.d("connFailure", "Gagal")
+                Log.e("connFailure", "Gagal")
             }
         })
     }
@@ -55,6 +55,10 @@ class ApiService(private val context: Context) {
                 Log.d("connFailure", "Gagal")
             }
         })
+
+    }
+
+    fun getEmployees(){
 
     }
 

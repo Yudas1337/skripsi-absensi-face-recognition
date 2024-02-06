@@ -16,4 +16,13 @@ object RetrofitBuilder {
 
         return retrofit.create(Request::class.java)
     }
+
+    fun employeeBuilder(context: Context): Request{
+        val retrofit = Retrofit.Builder()
+            .baseUrl(URL.IP_PEGAWAI)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        return retrofit.create(Request::class.java)
+    }
 }

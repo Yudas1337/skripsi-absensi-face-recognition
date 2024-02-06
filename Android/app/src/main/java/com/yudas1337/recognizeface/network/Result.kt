@@ -13,7 +13,6 @@ class Result {
     internal var gender: String? = null
     internal var address: String? = null
     internal var phone_number: String? = null
-    internal var role: String? = null
     internal var created_at: String? = null
     internal var updated_at: String? = null
 

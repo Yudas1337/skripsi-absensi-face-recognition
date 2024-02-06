@@ -2,7 +2,6 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,24 +15,26 @@ import kotlinx.android.synthetic.main.activity_user_list.recyclermodules
 
 class UserListActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityUserListBinding
     private var results: List<Result>? = ArrayList()
     private var viewAdapter: StudentAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityUserListBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_user_list)
 
         val dbHelper = DBHelper(this, null)
-        if(dbHelper.countTableData("schedules") == 0){
-            ApiService(this).getSchedules()
-        }
+
         if(dbHelper.countTableData("students") == 0){
             ApiService(this).getStudents()
         }
+
+        if(dbHelper.countTableData("schedules") == 0){
+            ApiService(this).getSchedules()
+        }
+
+
         val dataList = mutableListOf<Result>()
-        val cursor = dbHelper.getStudents();
+        val cursor = dbHelper.getStudents()
         cursor?.use {
             if (it.moveToFirst()) {
                 val idColumnIndex = it.getColumnIndex("id")

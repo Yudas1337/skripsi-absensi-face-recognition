@@ -35,9 +35,8 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     }
 
     fun countTableData(table: String): Int {
-        val query = "SELECT COUNT(*) FROM $table"
         val db = this.readableDatabase
-        val cursor = db.rawQuery(query, null)
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM $table", null)
         var total = 0
 
         cursor.use {
@@ -47,6 +46,11 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         }
 
         return total
+    }
+
+    fun findUsersByRfid(table: String, rfid: String): Cursor? {
+        val db = this.readableDatabase
+        return db.rawQuery("SELECT * FROM $table WHERE rfid = ?", arrayOf(rfid))
     }
 
     fun getStudents(): Cursor? {

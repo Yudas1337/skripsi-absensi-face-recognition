@@ -20,10 +20,16 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
         <activity
-            android:screenOrientation="landscape"
+            android:name=".screens.TestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.SyncActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.UserListActivity"
             android:exported="false"
-            android:label="@string/title_activity_user_list" />
+            android:label="@string/title_activity_user_list"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".screens.ScanActivity"
             android:exported="false"
@@ -37,6 +43,7 @@
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
+            android:exported="true"
             android:name=".screens.intro.SplashActivity"
             android:screenOrientation="landscape">
             <intent-filter>

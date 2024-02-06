@@ -14,6 +14,23 @@ class AlertHelper {
                 .show()
         }
 
+        fun serializedFaces(context: Context, confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
+            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Serialized Data")
+                .setContentText("Existing image data was found on this device. Would you like to load it?")
+                .setConfirmText("RESCAN")
+                .setCancelText("LOAD")
+                .setConfirmClickListener { sDialog ->
+                    confirmClickListener.invoke()
+                    sDialog.dismissWithAnimation()
+                }
+                .setCancelClickListener { sDialog ->
+                    cancelClickListener.invoke()
+                    sDialog.cancel()
+                }
+                .show()
+        }
+
         fun internetAvailable(context: Context, confirmClickListener: () -> Unit, cancelClickListener: () -> Unit) {
             SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Terdeteksi Internet")

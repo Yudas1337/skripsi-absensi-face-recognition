@@ -27,7 +27,6 @@ class DBManager(private val dbHelper: DBHelper) {
                         "updated_at" to jsonData[i].updated_at,
                     )
                     dbHelper.insertData(Table.students, data)
-                    Log.d("berhasil tambah", "Berhasil tambah data ke $i")
                 }
             }
         }
@@ -37,7 +36,6 @@ class DBManager(private val dbHelper: DBHelper) {
     }
 
     fun insertSchedulesFromJson(jsonData: List<Result>?){
-        Log.d("berhasil", "Berhasil memanggil")
         try {
             if (jsonData != null) {
                 for (i in jsonData.indices) {

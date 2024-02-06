@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Face Recognition</string>
+    <string name="app_name">Presensi Hummatech</string>
     <string name="real_face">Real</string>
     <string name="fake_face">Fake</string>
     <string name="set_threshold_dialog_title">Threshold Configuration</string>
