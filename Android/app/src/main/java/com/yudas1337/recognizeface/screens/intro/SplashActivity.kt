@@ -7,9 +7,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleObserver
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
 import com.yudas1337.recognizeface.screens.MenuActivity
+import com.yudas1337.recognizeface.services.ApiService
 
 class SplashActivity : AppCompatActivity(), LifecycleObserver {
     private var splashTimeout = 2000
@@ -17,11 +19,12 @@ class SplashActivity : AppCompatActivity(), LifecycleObserver {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
+        val dbHelper = DBHelper(this, null)
         networkConnection = NetworkConnection(applicationContext)
         lifecycle.addObserver(this)
         networkConnection.observe(this){
             if(it){
+                this.fetchData(dbHelper)
                 splashTimeout = 500
                 AlertHelper.internetAvailable(this,
                     {
@@ -42,6 +45,20 @@ class SplashActivity : AppCompatActivity(), LifecycleObserver {
             startActivity(Intent(this, MenuActivity::class.java))
             finish()
         }, splashTimeout.toLong())
+    }
+
+    private fun fetchData(dbHelper: DBHelper){
+        if(dbHelper.countTableData("students") == 0){
+            ApiService(this).getStudents()
+        }
+
+        if(dbHelper.countTableData("schedules") == 0){
+            ApiService(this).getSchedules()
+        }
+
+        if(dbHelper.countTableData("employees") == 0){
+            ApiService(this).getEmployees()
+        }
     }
 
     override fun onDestroy() {

@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.database.DBHelper
+import com.yudas1337.recognizeface.services.ScanService
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -28,6 +29,9 @@ class ScanActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scan)
 
         relativeOne = findViewById(R.id.relative_1)
+        copyRight = findViewById(R.id.cr_2)
+        rfidController = findViewById(R.id.rfidController)
+        btnSubmit = findViewById(R.id.btn_submit)
 
         relativeOne.setOnClickListener{
             backService()
@@ -35,9 +39,6 @@ class ScanActivity : AppCompatActivity() {
 
         val dbHelper = DBHelper(this, null)
 
-        copyRight = findViewById(R.id.cr_2)
-        rfidController = findViewById(R.id.rfidController)
-        btnSubmit = findViewById(R.id.btn_submit)
         val currentYear = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy"))
         val copyrightText = "$currentYear Hummatech All Rights Reserved."
         copyRight.text = copyrightText
@@ -45,32 +46,7 @@ class ScanActivity : AppCompatActivity() {
         btnSubmit.setOnClickListener {
             val RFID_CARD = rfidController.text.toString()
             if (RFID_CARD.isNotEmpty()) {
-                val students = dbHelper.findUsersByRfid("students", RFID_CARD)
-                val employees = dbHelper.findUsersByRfid("employees", RFID_CARD)
-
-                if (students != null && students.moveToFirst()) {
-                    val indexName = students.getColumnIndex("name")
-                    val name = students.getString(indexName)
-
-                    startActivity(Intent(this@ScanActivity, MainActivity::class.java)
-                        .putExtra("rfid", RFID_CARD)
-                        .putExtra("name", name))
-
-                    students.close()
-                    dbHelper.close()
-                } else if(employees != null && employees.moveToFirst()) {
-                    val indexName = employees.getColumnIndex("name")
-                    val name = employees.getString(indexName)
-
-                    startActivity(Intent(this@ScanActivity, MainActivity::class.java)
-                        .putExtra("rfid", RFID_CARD)
-                        .putExtra("name", name))
-
-                    employees.close()
-                    dbHelper.close()
-                } else{
-                    Toast.makeText(this, "Kartu tidak terdaftar", Toast.LENGTH_SHORT).show()
-                }
+                ScanService(this).handleScan(RFID_CARD)
             } else {
                 Toast.makeText(this@ScanActivity, "Harap Scan Kartu Anda", Toast.LENGTH_SHORT).show()
             }

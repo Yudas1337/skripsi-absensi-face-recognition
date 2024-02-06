@@ -33,9 +33,8 @@ class StudentAdapter(private val context: Context, private val results: List<Res
         fun setData(result: Result)
         {
             itemView.name!!.text = result.name
-
             itemView.school!!.text = result.school
-            Log.d("debug", "debug: " + result.photo)
+
             Picasso.get()
                 .load(result.photo)
                 .placeholder(R.drawable.ic_students)

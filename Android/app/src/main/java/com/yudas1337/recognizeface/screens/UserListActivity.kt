@@ -24,18 +24,6 @@ class UserListActivity : AppCompatActivity() {
 
         val dbHelper = DBHelper(this, null)
 
-        if(dbHelper.countTableData("students") == 0){
-            ApiService(this).getStudents()
-        }
-
-        if(dbHelper.countTableData("schedules") == 0){
-            ApiService(this).getSchedules()
-        }
-
-        if(dbHelper.countTableData("employees") == 0){
-            ApiService(this).getEmployees()
-        }
-
         val dataList = mutableListOf<Result>()
         val cursor = dbHelper.getStudents()
         cursor?.use {
@@ -54,8 +42,7 @@ class UserListActivity : AppCompatActivity() {
                         a.email = it.getString(emailColumnIndex)
                         a.photo = it.getString(photoColumnIndex)
                         a.school = it.getString(schoolColumnIndex)
-                        var myData = a;
-                        dataList.add(myData)
+                        dataList.add(a)
                     }
                 } while (it.moveToNext())
             }
