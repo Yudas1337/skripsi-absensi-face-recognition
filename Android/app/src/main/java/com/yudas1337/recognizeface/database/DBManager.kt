@@ -12,12 +12,12 @@ class DBManager(private val dbHelper: DBHelper) {
             if (jsonData != null) {
                 for (i in jsonData.indices) {
                     val data: Map<String, Any?> = mapOf(
-                        "id" to  jsonData[i].id?.toInt(),
+                        "id" to  jsonData[i].id,
                         "name" to jsonData[i].name,
                         "email" to jsonData[i].email,
                         "photo" to jsonData[i].photo,
                         "national_student_number" to jsonData[i].national_student_number,
-                        "classroom" to jsonData[i].classroom?.toInt(),
+                        "classroom" to jsonData[i].classroom,
                         "school" to jsonData[i].school,
                         "rfid" to jsonData[i].rfid,
                         "gender" to jsonData[i].gender,
@@ -64,13 +64,15 @@ class DBManager(private val dbHelper: DBHelper) {
             if (jsonData != null) {
                 for (i in jsonData.indices) {
                     val data: Map<String, Any?> = mapOf(
+                        "uuid" to jsonData[i].id,
                         "name" to jsonData[i].name,
                         "email" to jsonData[i].email,
-                        "id_number" to jsonData[i].id_number,
+                        "national_identity_number" to jsonData[i].national_identity_number,
+                        "phone_number" to jsonData[i].phone_number,
                         "position" to jsonData[i].position,
                         "photo" to jsonData[i].photo,
                         "gender" to jsonData[i].gender,
-                        "wages" to jsonData[i].wages,
+                        "salary" to jsonData[i].salary,
                         "rfid" to jsonData[i].rfid,
                         "address" to jsonData[i].address,
                         "date_of_birth" to jsonData[i].date_of_birth,

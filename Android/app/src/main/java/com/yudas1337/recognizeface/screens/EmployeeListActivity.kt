@@ -34,13 +34,13 @@ class EmployeeListActivity : AppCompatActivity() {
 
                 do {
                     if (idColumnIndex >= 0 && nameColumnIndex >= 0) {
-                        var a = Result()
-                        a.id = it.getInt(idColumnIndex)
+                        val a = Result()
+                        a.id = it.getString(idColumnIndex)
                         a.name = it.getString(nameColumnIndex)
                         a.email = it.getString(emailColumnIndex)
                         a.photo = it.getString(photoColumnIndex)
                         a.position = it.getString(positionColumnIndex)
-                        var myData = a;
+                        val myData = a;
                         dataList.add(myData)
                     }
                 } while (it.moveToNext())

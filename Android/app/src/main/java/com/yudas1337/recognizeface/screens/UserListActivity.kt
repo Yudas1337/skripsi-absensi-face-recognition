@@ -2,13 +2,13 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.adapter.StudentAdapter
 import com.yudas1337.recognizeface.database.DBHelper
-import com.yudas1337.recognizeface.databinding.ActivityUserListBinding
 import com.yudas1337.recognizeface.network.Result
 import com.yudas1337.recognizeface.services.ApiService
 import kotlinx.android.synthetic.main.activity_user_list.recyclermodules
@@ -23,17 +23,19 @@ class UserListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_user_list)
 
         val dbHelper = DBHelper(this, null)
-
+        ApiService(this).getStudents()
+        ApiService(this).getSchedules()
+        ApiService(this).getEmployees()
         if(dbHelper.countTableData("students") == 0){
-            ApiService(this).getStudents()
+
         }
 
         if(dbHelper.countTableData("schedules") == 0){
-            ApiService(this).getSchedules()
+
         }
 
         if(dbHelper.countTableData("employees") == 0){
-            ApiService(this).getEmployees()
+
         }
 
         val dataList = mutableListOf<Result>()
@@ -48,8 +50,8 @@ class UserListActivity : AppCompatActivity() {
 
                 do {
                     if (idColumnIndex >= 0 && nameColumnIndex >= 0) {
-                        var a = Result()
-                        a.id = it.getInt(idColumnIndex)
+                        val a = Result()
+                        a.id = it.getString(idColumnIndex)
                         a.name = it.getString(nameColumnIndex)
                         a.email = it.getString(emailColumnIndex)
                         a.photo = it.getString(photoColumnIndex)

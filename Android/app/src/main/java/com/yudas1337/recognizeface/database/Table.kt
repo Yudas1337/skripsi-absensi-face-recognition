@@ -42,6 +42,7 @@ class Table {
 
             db.execSQL("CREATE TABLE IF NOT EXISTS $employees (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "uuid TEXT, " +
                     "name TEXT, " +
                     "email TEXT, " +
                     "national_identity_number TEXT, " +
@@ -55,14 +56,6 @@ class Table {
                     "date_of_birth TEXT, " +
                     "created_at TEXT, " +
                     "updated_at TEXT" +
-                    "id_number TEXT, " +
-                    "position TEXT, " +
-                    "photo TEXT, " +
-                    "gender TEXT, " +
-                    "wages TEXT, " +
-                    "rfid TEXT, " +
-                    "address TEXT, " +
-                    "date_of_birth TEXT" +
                     ")")
         }
     }

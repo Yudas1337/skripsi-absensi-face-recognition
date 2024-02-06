@@ -18,21 +18,21 @@ class ApiService(private val context: Context) {
 
     fun getStudents(){
         val call = RetrofitBuilder.builder(context).getStudents()
-
         call.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
+                    Log.d("connSuccess", responseData.toString())
                     val dbHelper = DBHelper(context, null)
                     DBManager(dbHelper).insertStudentsFromJson(responseData)
-                    Log.d("connSuccess", "Berhasil")
+                    Log.d("connSuccess", "Berhasil Insert")
                 } else {
-                    Log.e("connFailure", "Gagal")
+                    Log.e("connFailure", "Gagal siswa")
                 }
             }
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
-                Log.e("connFailure", "Gagal")
+                Log.e("connFailure", "Gagal siswa ${t.message}")
             }
         })
     }
@@ -47,12 +47,12 @@ class ApiService(private val context: Context) {
                     val dbHelper = DBHelper(context, null)
                     DBManager(dbHelper).insertSchedulesFromJson(responseData)
                 } else {
-                    Log.d("connFailure", "Gagal")
+                    Log.d("connFailure", "Gagal jadwal")
                 }
             }
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
-                Log.d("connFailure", "Gagal")
+                Log.d("connFailure", "Gagal jadwal ${t.message}")
             }
         })
 
@@ -68,12 +68,12 @@ class ApiService(private val context: Context) {
                     val dbHelper = DBHelper(context, null)
                     DBManager(dbHelper).insertEmployeesFromJson(responseData)
                 } else {
-                    Log.d("connFailure", "Gagal")
+                    Log.d("connFailure", "Gagal pegawai")
                 }
             }
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
-                Log.d("connFailure", "Gagal")
+                Log.d("connFailure", "Gagal pegawai ${t.message}")
             }
         })  
     }
