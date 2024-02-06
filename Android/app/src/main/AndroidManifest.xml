@@ -20,11 +20,13 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
         <activity
-            android:name=".screens.TestActivity"
-            android:exported="false" />
-        <activity
             android:name=".screens.SyncActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".screens.EmployeeListActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".screens.UserListActivity"
             android:exported="false"

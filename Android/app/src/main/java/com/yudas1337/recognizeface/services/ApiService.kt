@@ -58,8 +58,24 @@ class ApiService(private val context: Context) {
 
     }
 
-    fun getEmployees(){
+    fun getEmployees() {
+        val call: Call<Value> = RetrofitBuilder.employeeBuilder(context).getEmployees()
 
+        call.enqueue(object : Callback<Value> {
+            override fun onResponse(call: Call<Value>, response: Response<Value>) {
+                if (response.isSuccessful) {
+                    val responseData = response.body()?.result
+                    val dbHelper = DBHelper(context, null)
+                    DBManager(dbHelper).insertEmployeesFromJson(responseData)
+                } else {
+                    Log.d("connFailure", "Gagal")
+                }
+            }
+
+            override fun onFailure(call: Call<Value>, t: Throwable) {
+                Log.d("connFailure", "Gagal")
+            }
+        })  
     }
 
     fun recognizeFaceApi(imageFile: File) {

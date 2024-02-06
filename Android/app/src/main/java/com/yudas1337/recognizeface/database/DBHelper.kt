@@ -60,6 +60,13 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         return db.rawQuery("SELECT * FROM students", null)
     }
 
+    fun getEmployees(): Cursor? {
+
+        val db = this.readableDatabase
+
+        return db.rawQuery("SELECT * FROM employees", null)
+    }
+
     companion object{
 
         private const val DATABASE_NAME = "db_attendance"

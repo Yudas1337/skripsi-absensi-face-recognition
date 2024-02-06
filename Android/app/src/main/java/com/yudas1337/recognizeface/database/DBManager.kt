@@ -58,4 +58,29 @@ class DBManager(private val dbHelper: DBHelper) {
             e.printStackTrace()
         }
     }
+
+    fun insertEmployeesFromJson(jsonData: List<Result>?){
+        try {
+            if (jsonData != null) {
+                for (i in jsonData.indices) {
+                    val data: Map<String, Any?> = mapOf(
+                        "name" to jsonData[i].name,
+                        "email" to jsonData[i].email,
+                        "id_number" to jsonData[i].id_number,
+                        "position" to jsonData[i].position,
+                        "photo" to jsonData[i].photo,
+                        "gender" to jsonData[i].gender,
+                        "wages" to jsonData[i].wages,
+                        "rfid" to jsonData[i].rfid,
+                        "address" to jsonData[i].address,
+                        "date_of_birth" to jsonData[i].date_of_birth,
+                    )
+                    dbHelper.insertData(Table.employees, data)
+                }
+            }
+        }
+        catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
 }

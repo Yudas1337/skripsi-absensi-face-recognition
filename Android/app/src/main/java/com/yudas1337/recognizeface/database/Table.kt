@@ -55,6 +55,14 @@ class Table {
                     "date_of_birth TEXT, " +
                     "created_at TEXT, " +
                     "updated_at TEXT" +
+                    "id_number TEXT, " +
+                    "position TEXT, " +
+                    "photo TEXT, " +
+                    "gender TEXT, " +
+                    "wages TEXT, " +
+                    "rfid TEXT, " +
+                    "address TEXT, " +
+                    "date_of_birth TEXT" +
                     ")")
         }
     }
