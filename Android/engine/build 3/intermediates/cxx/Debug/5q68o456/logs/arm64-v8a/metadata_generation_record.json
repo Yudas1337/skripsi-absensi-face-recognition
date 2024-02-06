@@ -1,0 +1,44 @@
+[
+  {
+    "level_": 0,
+    "message_": "Start JSON generation. Platform version: 21 min SDK version: arm64-v8a",
+    "file_": "/Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1472515814
+  },
+  {
+    "level_": 0,
+    "message_": "JSON \u0027/Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/.cxx/Debug/5q68o456/arm64-v8a/android_gradle_build.json\u0027 was up-to-date",
+    "file_": "/Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -712283788
+  },
+  {
+    "level_": 0,
+    "message_": "JSON generation completed without problems",
+    "file_": "/Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -369809735
+  }
+]

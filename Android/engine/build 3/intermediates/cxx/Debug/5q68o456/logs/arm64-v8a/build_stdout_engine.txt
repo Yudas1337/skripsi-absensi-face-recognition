@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/.cxx/Debug/5q68o456/arm64-v8a'
+ninja: no work to do.

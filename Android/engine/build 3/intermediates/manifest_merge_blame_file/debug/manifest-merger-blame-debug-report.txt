@@ -1,0 +1,8 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.yudas1337.engine" >
+4
+5    <uses-sdk android:minSdkVersion="21" />
+5-->/Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+6
+7</manifest>
