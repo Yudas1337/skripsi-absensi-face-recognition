@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/lato_bold"
-        android:text="Daftar Pengguna"
+        android:text="Daftar Siswa"
         android:textColor="@color/text_color_header"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -46,11 +46,19 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="450dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:ignore="MissingConstraints">
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclermodules"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="0dp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -76,7 +84,7 @@
                 android:id="@+id/imageView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_students" />
+                app:srcCompat="@drawable/baseline_supervisor_account_24_active" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -89,6 +97,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/buttonEmployee"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -101,7 +110,7 @@
                 android:id="@+id/imageView6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/baseline_potrait_24" />
+                app:srcCompat="@drawable/baseline_co_present_24_nonactive" />
 
             <TextView
                 android:id="@+id/textView4"

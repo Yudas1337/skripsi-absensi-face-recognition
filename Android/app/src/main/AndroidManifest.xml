@@ -20,11 +20,11 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
         <activity
-            android:name=".screens.SyncActivity"
+            android:name=".screens.EmployeeListActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".screens.EmployeeListActivity"
+            android:name=".screens.SyncActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
@@ -45,8 +45,8 @@
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
-            android:exported="true"
             android:name=".screens.intro.SplashActivity"
+            android:exported="true"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

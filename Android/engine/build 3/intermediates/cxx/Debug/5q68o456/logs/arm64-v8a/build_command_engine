@@ -1,0 +1,4 @@
+/Users/femasakbarfathurohim/Library/Android/sdk/cmake/3.22.1/bin/ninja \
+  -C \
+  /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/.cxx/Debug/5q68o456/arm64-v8a \
+  engine

@@ -3,6 +3,7 @@ package com.yudas1337.recognizeface.screens
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.yudas1337.recognizeface.R
@@ -52,6 +53,11 @@ class UserListActivity : AppCompatActivity() {
         viewAdapter = results?.let { StudentAdapter(this, it) }
         recyclermodules!!.adapter = viewAdapter
 
+        val buttonEmployee = findViewById<LinearLayout>(R.id.buttonEmployee)
+        buttonEmployee.setOnClickListener {
+            startActivity(Intent(this, EmployeeListActivity::class.java))
+            finish()
+        }
 
         val buttonBack = findViewById<Button>(R.id.btn_bck)
 

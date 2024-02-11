@@ -1,0 +1,7 @@
+ninja: Entering directory `/Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/.cxx/Debug/5q68o456/armeabi-v7a'
+[1/6] Building CXX object CMakeFiles/engine.dir/face_detector_jni.cpp.o
+[2/6] Building CXX object CMakeFiles/engine.dir/live_jni.cpp.o
+[3/6] Building CXX object CMakeFiles/engine.dir/detection/face_detector.cpp.o
+[4/6] Building CXX object CMakeFiles/engine.dir/img_process.cpp.o
+[5/6] Building CXX object CMakeFiles/engine.dir/live/live.cpp.o
+[6/6] Linking CXX shared library /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/distribution/armeabi-v7a/libengine.so

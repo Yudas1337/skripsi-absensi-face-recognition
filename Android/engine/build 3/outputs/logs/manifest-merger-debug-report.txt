@@ -1,0 +1,25 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml:1:1-72
+INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml:1:1-72
+INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml:1:1-72
+	package
+		INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+		ADDED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml:1:1-72
+		INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml:1:11-69
+uses-sdk
+INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+		ADDED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+		INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+		ADDED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
+		INJECTED from /Users/femasakbarfathurohim/Documents/GitHub/skripsi-absensi-face-recognition/Android/engine/src/main/AndroidManifest.xml
