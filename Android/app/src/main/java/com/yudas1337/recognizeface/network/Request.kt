@@ -23,4 +23,7 @@ interface Request {
 
     @GET("employees")
     fun getEmployees(): Call<Value>
+
+    @GET("limit")
+    fun getAttendanceLimit(): Call<Value>
 }

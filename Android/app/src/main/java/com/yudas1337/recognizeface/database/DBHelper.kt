@@ -48,6 +48,32 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         return total
     }
 
+    fun getScheduleDay(day: String): Cursor {
+        val db = this.readableDatabase
+        return db.rawQuery("SELECT * FROM schedules WHERE day = ? ", arrayOf(day))
+    }
+
+    fun getAttendanceLimit(): Long? {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM attendance_rule", null);
+
+        var minute: Long? = null
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val minuteIndex = it.getColumnIndex("minute")
+                minute = cursor.getString(minuteIndex).toLong()
+            }
+        }
+
+        return minute
+    }
+
+    fun getTodayAttendance(userId: String, date: String): Cursor {
+        val db = this.readableDatabase
+        return db.rawQuery("SELECT * FROM attendances WHERE user_id = ? AND date(created_at) = ?", arrayOf(userId, date))
+    }
+
     fun findUsersByRfid(table: String, rfid: String): Cursor? {
         val db = this.readableDatabase
         return db.rawQuery("SELECT * FROM $table WHERE rfid = ?", arrayOf(rfid))

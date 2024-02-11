@@ -36,7 +36,7 @@ class StudentAdapter(private val context: Context, private val results: List<Res
             itemView.school!!.text = result.school
 
             Picasso.get()
-                .load(result.photo)
+                .load(R.drawable.ic_students)
                 .placeholder(R.drawable.ic_students)
                 .into(itemView.student_photo)
         }

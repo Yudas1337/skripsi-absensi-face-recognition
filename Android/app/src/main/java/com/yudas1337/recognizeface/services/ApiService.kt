@@ -78,6 +78,27 @@ class ApiService(private val context: Context) {
         })  
     }
 
+    fun getAttendanceLimit(){
+        val call: Call<Value> = RetrofitBuilder.builder(context).getAttendanceLimit()
+
+        call.enqueue(object : Callback<Value> {
+            override fun onResponse(call: Call<Value>, response: Response<Value>) {
+                if (response.isSuccessful) {
+                    val responseData = response.body()?.result
+                    val dbHelper = DBHelper(context, null)
+                    DBManager(dbHelper).insertAttendanceLimitFromJson(responseData)
+                } else {
+                    Log.d("connFailure", "Gagal limit absensi")
+                }
+            }
+
+            override fun onFailure(call: Call<Value>, t: Throwable) {
+                Log.d("connFailure", "Gagal limit absensi ${t.message}")
+            }
+        })
+
+    }
+
     fun recognizeFaceApi(imageFile: File) {
         // Create a request body with the file and content type
         val requestFile: RequestBody =

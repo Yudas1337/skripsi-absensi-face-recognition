@@ -21,6 +21,7 @@ class Result {
     internal var salary: String? = null
     internal var date_of_birth: String? = null
 
+    internal var minute: String? = null
 
     internal var day: String? = null
     internal var checkin_starts: String? = null

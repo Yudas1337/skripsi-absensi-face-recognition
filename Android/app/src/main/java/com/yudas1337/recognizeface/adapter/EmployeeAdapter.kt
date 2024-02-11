@@ -28,6 +28,7 @@ class EmployeeAdapter(private val context: Context, private val results: List<Re
     override fun getItemCount(): Int {
         return results.size
     }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
         fun setData(result: Result)
@@ -41,8 +42,6 @@ class EmployeeAdapter(private val context: Context, private val results: List<Re
 
 
         override fun onClick(view: View) {
-
-
         }
     }
 }

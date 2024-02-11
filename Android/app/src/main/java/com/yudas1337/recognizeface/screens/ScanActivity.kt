@@ -46,7 +46,7 @@ class ScanActivity : AppCompatActivity() {
         btnSubmit.setOnClickListener {
             val RFID_CARD = rfidController.text.toString()
             if (RFID_CARD.isNotEmpty()) {
-                ScanService(this).handleScan(RFID_CARD)
+                ScanService(this, DBHelper(this, null)).handleScan(RFID_CARD)
             } else {
                 Toast.makeText(this@ScanActivity, "Harap Scan Kartu Anda", Toast.LENGTH_SHORT).show()
             }

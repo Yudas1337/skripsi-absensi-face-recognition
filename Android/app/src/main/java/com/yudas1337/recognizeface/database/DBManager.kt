@@ -1,9 +1,6 @@
 package com.yudas1337.recognizeface.database
 
-import android.util.Log
 import com.yudas1337.recognizeface.network.Result
-import org.json.JSONArray
-import org.json.JSONObject
 
 class DBManager(private val dbHelper: DBHelper) {
 
@@ -78,6 +75,22 @@ class DBManager(private val dbHelper: DBHelper) {
                         "date_of_birth" to jsonData[i].date_of_birth,
                     )
                     dbHelper.insertData(Table.employees, data)
+                }
+            }
+        }
+        catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
+
+    fun insertAttendanceLimitFromJson(jsonData: List<Result>?){
+        try {
+            if (jsonData != null) {
+                for (i in jsonData.indices) {
+                    val data: Map<String, Any?> = mapOf(
+                        "minute" to jsonData[i].minute,
+                    )
+                    dbHelper.insertData(Table.attendance_rule, data)
                 }
             }
         }

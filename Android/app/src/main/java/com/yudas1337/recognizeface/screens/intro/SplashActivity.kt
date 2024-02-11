@@ -59,6 +59,10 @@ class SplashActivity : AppCompatActivity(), LifecycleObserver {
         if(dbHelper.countTableData("employees") == 0){
             ApiService(this).getEmployees()
         }
+
+        if(dbHelper.countTableData("attendance_rule") == 0){
+            ApiService(this).getAttendanceLimit()
+        }
     }
 
     override fun onDestroy() {

@@ -2,7 +2,6 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -10,7 +9,6 @@ import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.adapter.StudentAdapter
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.network.Result
-import com.yudas1337.recognizeface.services.ApiService
 import kotlinx.android.synthetic.main.activity_user_list.recyclermodules
 
 class UserListActivity : AppCompatActivity() {
