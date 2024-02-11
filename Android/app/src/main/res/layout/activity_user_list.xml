@@ -21,10 +21,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-
-
-
     <Button
         android:id="@+id/btn_bck"
         android:layout_height="wrap_content"
@@ -65,7 +61,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="288dp"
         android:layout_height="62dp"
-        android:background="@color/cardview_light_background"
+        android:background="@drawable/rounded_bg"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

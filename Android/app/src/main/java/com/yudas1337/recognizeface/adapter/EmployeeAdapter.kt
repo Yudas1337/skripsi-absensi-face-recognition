@@ -9,13 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.network.Result
-import kotlinx.android.synthetic.main.student_adapter.view.name
-import kotlinx.android.synthetic.main.student_adapter.view.school
-import kotlinx.android.synthetic.main.student_adapter.view.student_photo
+import kotlinx.android.synthetic.main.employee_adapter.view.employee_photo
+import kotlinx.android.synthetic.main.employee_adapter.view.name
+import kotlinx.android.synthetic.main.employee_adapter.view.position
 
 class EmployeeAdapter(private val context: Context, private val results: List<Result>) : RecyclerView.Adapter<EmployeeAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.student_adapter, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.employee_adapter, parent, false)
 
         return ViewHolder(v)
     }
@@ -35,9 +35,9 @@ class EmployeeAdapter(private val context: Context, private val results: List<Re
         {
             itemView.name!!.text = result.name
 
-            itemView.school!!.text = result.school
+            itemView.position!!.text = result.position
             Log.d("debug", "debug: " + result.photo)
-            Picasso.get().load(result.photo).into(itemView.student_photo)
+            Picasso.get().load(result.photo).into(itemView.employee_photo)
         }
 
 

@@ -30,6 +30,7 @@ class EmployeeListActivity : AppCompatActivity() {
                 val emailColumnIndex = it.getColumnIndex("email")
                 val photoColumnIndex = it.getColumnIndex("photo")
                 val nationalIdentityNumberColumnIndex = it.getColumnIndex("national_identity_number")
+                val positionColumnIndex = it.getColumnIndex("position")
 
                 do {
                     if (idColumnIndex >= 0 && nameColumnIndex >= 0) {
@@ -38,6 +39,7 @@ class EmployeeListActivity : AppCompatActivity() {
                         a.name = it.getString(nameColumnIndex)
                         a.email = it.getString(emailColumnIndex)
                         a.photo = it.getString(photoColumnIndex)
+                        a.position = it.getString(positionColumnIndex)
                         a.national_identity_number = it.getString(nationalIdentityNumberColumnIndex)
                         dataList.add(a)
                     }

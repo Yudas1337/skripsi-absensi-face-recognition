@@ -7,7 +7,7 @@
     android:id="@+id/relativebungkus"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="6dp"
+    app:cardCornerRadius="12dp"
     app:cardElevation="6dp"
     tools:ignore="MissingConstraints">
 
@@ -37,20 +37,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/school"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="18dp"
-                android:textStyle="bold"
-                android:text="SMK MUH BANYUWANGI" />
-
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="12dp" />
-
-            <TextView
                 android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -58,6 +44,19 @@
                 android:textSize="18dp"
                 android:textStyle="bold"
                 android:text="TextView" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+            <TextView
+                android:id="@+id/school"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:text="SMK MUH BANYUWANGI" />
         </LinearLayout>
     </LinearLayout>
 
