@@ -5,6 +5,9 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.widget.Toast
+import com.yudas1337.recognizeface.helpers.AlertHelper
+import com.yudas1337.recognizeface.helpers.VoiceHelper
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION) {
@@ -17,6 +20,9 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         onCreate(db)
     }
 
+    fun updateOrCreateAttendances(){
+
+    }
 
     fun insertData(tableName: String, data: Map<String, Any?>){
 
@@ -31,7 +37,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
             }
         }
 
-        db.insert(tableName, null, values)
+        db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
     fun countTableData(table: String): Int {
@@ -67,6 +73,22 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         }
 
         return minute
+    }
+
+    fun insertDetailAttendance(context: Context, tableName: String, data: Map<String, Any?>, voiceHelper: VoiceHelper): Boolean{
+        val db = this.readableDatabase
+        val attendanceId = data["attendance_id"].toString()
+        val status = data["status"].toString()
+
+        val query = db.rawQuery("SELECT * FROM detail_attendances WHERE attendance_id = ? AND status = ?", arrayOf(attendanceId, status))
+
+        return if(query.moveToFirst()){
+            AlertHelper.runVoiceAndToast(voiceHelper, context, "Anda sudah absen pada jam ini")
+            false
+        } else{
+            insertData(tableName, data)
+            true
+        }
     }
 
     fun getTodayAttendance(userId: String, date: String): Cursor {

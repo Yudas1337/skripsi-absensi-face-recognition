@@ -4,9 +4,11 @@ import android.database.Cursor
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Locale
 
 class CalendarHelper {
@@ -33,6 +35,14 @@ class CalendarHelper {
         // 08:15:00
         fun getAttendanceHours(): String {
             return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+        }
+
+        // 2024-92-11 08:15:00
+        fun getAttendanceTimestamps(): String{
+            return SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+                    .parse(Date().toString())
+                )
         }
 
         @RequiresApi(Build.VERSION_CODES.O)

@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.database.DBHelper
+import com.yudas1337.recognizeface.helpers.AlertHelper
+import com.yudas1337.recognizeface.helpers.VoiceHelper
 import com.yudas1337.recognizeface.services.ScanService
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -22,6 +24,7 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var rfidController : EditText
     private lateinit var copyRight: TextView
     private lateinit var btnSubmit: Button
+    private var voiceHelper: VoiceHelper? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +35,9 @@ class ScanActivity : AppCompatActivity() {
         copyRight = findViewById(R.id.cr_2)
         rfidController = findViewById(R.id.rfidController)
         btnSubmit = findViewById(R.id.btn_submit)
+
+        voiceHelper = VoiceHelper.getInstance(this)
+        voiceHelper!!.initializeTextToSpeech(this)
 
         relativeOne.setOnClickListener{
             backService()
@@ -46,9 +52,12 @@ class ScanActivity : AppCompatActivity() {
         btnSubmit.setOnClickListener {
             val RFID_CARD = rfidController.text.toString()
             if (RFID_CARD.isNotEmpty()) {
-                ScanService(this, DBHelper(this, null)).handleScan(RFID_CARD)
+                val pDialog = AlertHelper.progressDialog(this)
+                ScanService(this, DBHelper(this, null), voiceHelper!!).handleScan(RFID_CARD)
+                pDialog.dismissWithAnimation()
+                rfidController.text.clear()
             } else {
-                Toast.makeText(this@ScanActivity, "Harap Scan Kartu Anda", Toast.LENGTH_SHORT).show()
+                AlertHelper.runVoiceAndToast(voiceHelper!!, this, "Harap Scan Kartu Anda")
             }
         }
 
@@ -62,5 +71,10 @@ class ScanActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         backService()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        voiceHelper!!.stopAndShutdown()
     }
 }

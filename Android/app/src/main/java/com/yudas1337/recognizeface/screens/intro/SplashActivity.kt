@@ -26,13 +26,17 @@ class SplashActivity : AppCompatActivity(), LifecycleObserver {
             if(it){
                 this.fetchData(dbHelper)
                 splashTimeout = 500
-                AlertHelper.internetAvailable(this,
-                    {
-                        Toast.makeText(this, "OK CONFIRM", Toast.LENGTH_SHORT).show()
-                        nextActivity()
-                    },
-                    { nextActivity() }
-                )
+                if(dbHelper.countTableData("attendances") == 0){
+                    AlertHelper.internetAvailable(this,
+                        {
+                            Toast.makeText(this, "OK CONFIRM", Toast.LENGTH_SHORT).show()
+                            nextActivity()
+                        },
+                        { nextActivity() }
+                    )
+                } else{
+                    nextActivity()
+                }
             } else{
                 nextActivity()
             }

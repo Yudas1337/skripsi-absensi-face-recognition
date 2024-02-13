@@ -5,5 +5,10 @@ object AttendanceStatus {
     const val SICK_STATUS = "sakit"
     const val ALFA_STATUS = "alpha"
     const val PERMIT_STATUS = "izin"
+
+    const val PRESENT = "present"
+    const val BREAK = "break"
+    const val RETURN_BREAK = "return_break"
+    const val RETURN = "return"
 }
 

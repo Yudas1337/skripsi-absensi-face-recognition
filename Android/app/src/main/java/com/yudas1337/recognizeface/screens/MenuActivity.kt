@@ -7,18 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleObserver
 import com.yudas1337.recognizeface.R
-import com.yudas1337.recognizeface.database.DBHelper
-import com.yudas1337.recognizeface.helpers.AlertHelper
-import com.yudas1337.recognizeface.helpers.PackageHelper
-import com.yudas1337.recognizeface.helpers.VoiceHelper
-import com.yudas1337.recognizeface.network.NetworkConnection
 
 class MenuActivity : AppCompatActivity(), LifecycleObserver {
     private lateinit var presentCard: CardView
     private lateinit var userCard: CardView
     private lateinit var syncMenu: CardView
     private lateinit var presentDayCard: CardView
-    private var voiceHelper: VoiceHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +22,6 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
         presentCard = findViewById(R.id.present_card)
         userCard = findViewById(R.id.user_card)
         presentDayCard = findViewById(R.id.present_day)
-
-        voiceHelper = VoiceHelper.getInstance(this)
-        voiceHelper!!.initializeTextToSpeech(this)
 
 
         syncMenu.setOnClickListener {
@@ -49,12 +40,12 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
         }
 
         presentDayCard.setOnClickListener {
-            voiceHelper!!.runVoice("Presensi Berhasil")
+            startActivity(Intent(this, AttendanceTodayActivity::class.java))
+            finish()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        voiceHelper!!.stopAndShutdown()
     }
 }

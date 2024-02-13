@@ -10,13 +10,15 @@ import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.constants.AttendanceStatus
 import com.yudas1337.recognizeface.constants.Role
 import com.yudas1337.recognizeface.database.DBHelper
+import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.CalendarHelper
 import com.yudas1337.recognizeface.helpers.PackageHelper
+import com.yudas1337.recognizeface.helpers.VoiceHelper
 import com.yudas1337.recognizeface.screens.MainActivity
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import java.time.LocalTime
 
-class ScanService(private val context: Context, private val dbHelper: DBHelper) {
+class ScanService(private val context: Context, private val dbHelper: DBHelper, private val voiceHelper: VoiceHelper) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun handleScan(rfid: String) {
@@ -30,7 +32,6 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper) 
             val id = students.getString(indexId)
 
             if(handleAttendances(id, Role.SISWA)){
-                startActivity(context, rfid, name)
                 students.close()
                 dbHelper.close()
             }
@@ -40,15 +41,12 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper) 
             val indexId = employees.getColumnIndex("uuid")
             val id = employees.getString(indexId)
 
-            if(handleAttendances(id, Role.PEGAWAI)){
-                startActivity(context, rfid, name)
+            startActivity(context, rfid, name)
 
-                employees.close()
-                dbHelper.close()
-            }
-
+            employees.close()
+            dbHelper.close()
         } else{
-            Toast.makeText(context, "Kartu tidak terdaftar", Toast.LENGTH_SHORT).show()
+            AlertHelper.runVoiceAndToast(voiceHelper, context, "Kartu tidak terdaftar")
         }
     }
 
@@ -62,64 +60,105 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper) 
         val day = dbHelper.getScheduleDay(CalendarHelper.getToday())
 
         if(day.moveToFirst()){
-
             val getLimit = dbHelper.getAttendanceLimit()?.let { CalendarHelper.addLimitAttendance(day, it) }
-
             var attendance = getCurrentAttendance(id, dbHelper)
 
             // cek apakah belum absen masuk hari ini di pagi hari
             if(!attendance.moveToFirst()){
-                // cek apakah dia telat atau tidak
+//                 cek apakah dia telat atau tidak
                 if(CalendarHelper.getAttendanceHours() > getLimit.toString()){
-                    Toast.makeText(context, "Gagal absen karena telat masuk pagi", Toast.LENGTH_SHORT).show()
+                    AlertHelper.runVoiceAndToast(voiceHelper, context, "Gagal absen karena telat masuk pagi")
                     return false
                 }
+
                 val data: Map<String, Any?> = mapOf(
                     "user_id" to id,
                     "status" to AttendanceStatus.DEFAULT_ATTENDANCE_STATUS,
                     "role" to role,
-                    "created_at" to PackageHelper.timestamp,
-                    "updated_at" to PackageHelper.timestamp
+                    "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                    "updated_at" to CalendarHelper.getAttendanceTimestamps()
                 )
                 dbHelper.insertData("attendances", data)
             }
 
             attendance = getCurrentAttendance(id, dbHelper)
 
-            val hours = CalendarHelper.convertToLocalTime(CalendarHelper.getAttendanceHours())
-            val indexCheckinStarts = day.getColumnIndex("checkin_starts")
-            val indexCheckinEnds = day.getColumnIndex("checkin_ends")
-            val indexBreakStarts = day.getColumnIndex("break_starts")
-            val indexBreakEnds = day.getColumnIndex("break_ends")
-            val indexReturnStarts = day.getColumnIndex("return_starts")
-            val indexReturnEnds = day.getColumnIndex("return_ends")
-            val indexCheckoutStarts = day.getColumnIndex("checkout_starts")
-            val indexCheckoutEnds = day.getColumnIndex("checkout_ends")
+            if(attendance.moveToFirst()){
+                val hours = CalendarHelper.convertToLocalTime(CalendarHelper.getAttendanceHours())
+                val indexCheckinStarts = day.getColumnIndex("checkin_starts")
+                val indexCheckinEnds = day.getColumnIndex("checkin_ends")
+                val indexBreakStarts = day.getColumnIndex("break_starts")
+                val indexBreakEnds = day.getColumnIndex("break_ends")
+                val indexReturnStarts = day.getColumnIndex("return_starts")
+                val indexReturnEnds = day.getColumnIndex("return_ends")
+                val indexCheckoutStarts = day.getColumnIndex("checkout_starts")
+                val indexCheckoutEnds = day.getColumnIndex("checkout_ends")
 
-            val checkinStarts = CalendarHelper.convertToLocalTime(day.getString(indexCheckinStarts))
-            val checkinEnds = CalendarHelper.convertToLocalTime(day.getString(indexCheckinEnds))
-            val breakStarts = CalendarHelper.convertToLocalTime(day.getString(indexBreakStarts))
-            val breakEnds = CalendarHelper.convertToLocalTime(day.getString(indexBreakEnds))
-            val returnStarts = CalendarHelper.convertToLocalTime(day.getString(indexReturnStarts))
-            val returnEnds = CalendarHelper.convertToLocalTime(day.getString(indexReturnEnds))
-            val checkoutStarts = CalendarHelper.convertToLocalTime(day.getString(indexCheckoutStarts))
-            val checkoutEnds = CalendarHelper.convertToLocalTime(day.getString(indexCheckoutEnds))
+                val checkinStarts = CalendarHelper.convertToLocalTime(day.getString(indexCheckinStarts))
+                val checkinEnds = CalendarHelper.convertToLocalTime(day.getString(indexCheckinEnds))
+                val breakStarts = CalendarHelper.convertToLocalTime(day.getString(indexBreakStarts))
+                val breakEnds = CalendarHelper.convertToLocalTime(day.getString(indexBreakEnds))
+                val returnStarts = CalendarHelper.convertToLocalTime(day.getString(indexReturnStarts))
+                val returnEnds = CalendarHelper.convertToLocalTime(day.getString(indexReturnEnds))
+                val checkoutStarts = CalendarHelper.convertToLocalTime(day.getString(indexCheckoutStarts))
+                val checkoutEnds = CalendarHelper.convertToLocalTime(day.getString(indexCheckoutEnds))
 
-            if (isBetween(checkinStarts, checkinEnds, hours)) {
-                Log.d("absennya", "pagi Absen berada di rentang antara 07:00:00 dan 08:00:00")
-            } else if(isBetween(breakStarts, breakEnds, hours)){
-                Log.d("absennya", "istirahat Absen berada di rentang antara 11:00:00 dan 12:00:00")
-            } else if(isBetween(returnStarts, returnEnds, hours)){
-                Log.d("absennya", "istirahat Absen berada di rentang antara 12:30:00 dan 13:00:00")
-            } else if(isBetween(checkoutStarts, checkoutEnds, hours)){
-                Log.d("absennya", "istirahat Absen berada di rentang antara 16:00:00 dan 20:00:00")
-            } else {
-                Log.d("absennya", "Tidak tersedia jam absen")
-                Toast.makeText(context, "Jam absen tidak tersedia", Toast.LENGTH_SHORT).show()
+                val indexAttendanceId = attendance.getColumnIndex("id")
+                val attendanceId = attendance.getString(indexAttendanceId)
+
+                if (isBetween(checkinStarts, checkinEnds, hours)) {
+                    // absen pagi antara jam 07.00 - 08.15 (toleransi 15 menit)
+                    if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+                            "attendance_id" to attendanceId,
+                            "status" to AttendanceStatus.PRESENT,
+                            "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                            "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                        ), voiceHelper)){
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen pagi")
+                    }
+                    return true
+                } else if(isBetween(breakStarts, breakEnds, hours)){
+                    // absen istirahat antara jam 11.00 - 12.00
+                    if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+                            "attendance_id" to attendanceId,
+                            "status" to AttendanceStatus.BREAK,
+                            "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                            "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                        ), voiceHelper)){
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen istirahat")
+                    }
+                    return true
+                } else if(isBetween(returnStarts, returnEnds, hours)){
+                    // absen kembali antara jam 12.30 - 13.00
+                    if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+                            "attendance_id" to attendanceId,
+                            "status" to AttendanceStatus.RETURN_BREAK,
+                            "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                            "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                        ), voiceHelper)){
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen kembali")
+                    }
+                    return true
+                } else if(isBetween(checkoutStarts, checkoutEnds, hours)){
+                    // absen pulang antara jam 16.00 - 20.00
+                    if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+                            "attendance_id" to attendanceId,
+                            "status" to AttendanceStatus.RETURN,
+                            "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                            "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                        ), voiceHelper)){
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen pulang")
+                    }
+                    return true
+                } else {
+                    AlertHelper.runVoiceAndToast(voiceHelper, context, "Jam absen tidak tersedia")
+                }
+
+                return false
             }
         } else{
             // cek jika pada hari itu tidak ada jam absen
-            Toast.makeText(context, "Tidak ada jam absen hari ini", Toast.LENGTH_SHORT).show()
+            AlertHelper.runVoiceAndToast(voiceHelper, context, "Tidak ada jam absen hari ini")
         }
 
         return false

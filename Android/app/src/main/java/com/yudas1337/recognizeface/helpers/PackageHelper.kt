@@ -6,7 +6,6 @@ import java.util.UUID
 class PackageHelper {
 
     companion object{
-         val timestamp = Date().toString()
          val uuid = UUID.randomUUID().toString()
     }
 }
