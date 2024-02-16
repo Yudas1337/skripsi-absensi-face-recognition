@@ -20,10 +20,6 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         onCreate(db)
     }
 
-    fun updateOrCreateAttendances(){
-
-    }
-
     fun insertData(tableName: String, data: Map<String, Any?>){
 
         val values = ContentValues()
@@ -113,6 +109,37 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         val db = this.readableDatabase
 
         return db.rawQuery("SELECT * FROM employees", null)
+    }
+
+    fun truncateTables(tableNames: Array<String>) {
+        val db = this.writableDatabase
+
+        tableNames.forEach { tableName ->
+            db.execSQL("DELETE FROM $tableName")
+        }
+    }
+
+    fun syncAttendances(): Cursor {
+        val db = this.writableDatabase
+
+        return db.rawQuery("SELECT\n" +
+                "    attendances.user_id,\n" +
+                "    attendances.status,\n" +
+                "    attendances.created_at,\n" +
+                "    attendances.updated_at,\n" +
+                "    json_group_array(\n" +
+                "        json_object(\n" +
+                "            'status', detail_attendances.status,\n" +
+                "            'created_at', detail_attendances.created_at,\n" +
+                "            'updated_at', detail_attendances.updated_at\n" +
+                "        )\n" +
+                "    ) AS detail_attendances\n" +
+                "FROM\n" +
+                "    attendances\n" +
+                "LEFT JOIN\n" +
+                "    detail_attendances ON attendances.id = detail_attendances.attendance_id\n" +
+                "GROUP BY\n" +
+                "    attendances.id", null)
     }
 
     companion object{

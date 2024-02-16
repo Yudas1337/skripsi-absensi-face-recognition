@@ -4,6 +4,9 @@ package com.yudas1337.recognizeface.screens
 
 import android.Manifest
 import android.annotation.TargetApi
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageFormat
@@ -12,11 +15,15 @@ import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.provider.DocumentsContract
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCaller
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.documentfile.provider.DocumentFile
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -363,7 +370,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         const val tag = "MainActivity"
         //      const val defaultThreshold = 0.915F
         const val defaultThreshold = 0.60F
-
+        private const val REQUEST_CODE_CHOOSE_DIRECTORY = 123
         val permissions: Array<String> = arrayOf(Manifest.permission.CAMERA)
         const val permissionReqCode = 1
     }

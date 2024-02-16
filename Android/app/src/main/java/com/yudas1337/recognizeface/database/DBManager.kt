@@ -1,12 +1,71 @@
 package com.yudas1337.recognizeface.database
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.os.Handler
+import android.util.Log
+import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.Result
+import com.yudas1337.recognizeface.screens.SyncActivity
 
-class DBManager(private val dbHelper: DBHelper) {
+class DBManager(private val dbHelper: DBHelper,
+                private val context: Context,
+                private val sharedPreferences: SharedPreferences?) {
 
-    fun insertStudentsFromJson(jsonData: List<Result>?) {
+    private var processedDataCount: Int = 0
+
+    fun insertEmployeesFromJson(jsonData: List<Result>?){
         try {
             if (jsonData != null) {
+                val totalData = SharedPref.getInt(sharedPreferences, "totalEmployees")
+                processedDataCount = 0
+
+                Log.d("percentage", "awalnya $processedDataCount")
+
+                for (i in jsonData.indices) {
+                    val data: Map<String, Any?> = mapOf(
+                        "uuid" to jsonData[i].id,
+                        "name" to jsonData[i].name,
+                        "email" to jsonData[i].email,
+                        "national_identity_number" to jsonData[i].national_identity_number,
+                        "phone_number" to jsonData[i].phone_number,
+                        "position" to jsonData[i].position,
+                        "photo" to jsonData[i].photo,
+                        "gender" to jsonData[i].gender,
+                        "salary" to jsonData[i].salary,
+                        "rfid" to jsonData[i].rfid,
+                        "address" to jsonData[i].address,
+                        "date_of_birth" to jsonData[i].date_of_birth,
+                    )
+                    dbHelper.insertData(Table.employees, data)
+
+                    if(context is SyncActivity){
+                        processedDataCount++
+                        val progressPercent = (processedDataCount.toDouble() / totalData.toDouble() * 100).toInt()
+
+                        context.runOnUiThread {
+                            if(progressPercent == 100){
+                                context.pDialog.dismissWithAnimation()
+                                AlertHelper.successDialog(context, contentText = "Sinkronisasi Pengguna Berhasil")
+                            } else{
+                                context.pDialog.titleText = "Loading $progressPercent% of 100"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
+
+     fun insertStudentsFromJson(jsonData: List<Result>?) {
+        try {
+            if (jsonData != null) {
+                val totalData = SharedPref.getInt(sharedPreferences, "totalStudents")
+                processedDataCount = 0
+
                 for (i in jsonData.indices) {
                     val data: Map<String, Any?> = mapOf(
                         "id" to  jsonData[i].id,
@@ -23,8 +82,21 @@ class DBManager(private val dbHelper: DBHelper) {
                         "created_at" to jsonData[i].created_at,
                         "updated_at" to jsonData[i].updated_at,
                     )
+
                     dbHelper.insertData(Table.students, data)
+
+                    if(context is SyncActivity){
+                        processedDataCount++
+                        val progressPercent = (processedDataCount.toDouble() / totalData.toDouble() * 100).toInt()
+
+                        context.runOnUiThread {
+                            if(progressPercent < 100){
+                                context.pDialog.titleText = "Loading $progressPercent% of 100"
+                            }
+                        }
+                    }
                 }
+
             }
         }
         catch (e: Exception){
@@ -56,33 +128,6 @@ class DBManager(private val dbHelper: DBHelper) {
         }
     }
 
-    fun insertEmployeesFromJson(jsonData: List<Result>?){
-        try {
-            if (jsonData != null) {
-                for (i in jsonData.indices) {
-                    val data: Map<String, Any?> = mapOf(
-                        "uuid" to jsonData[i].id,
-                        "name" to jsonData[i].name,
-                        "email" to jsonData[i].email,
-                        "national_identity_number" to jsonData[i].national_identity_number,
-                        "phone_number" to jsonData[i].phone_number,
-                        "position" to jsonData[i].position,
-                        "photo" to jsonData[i].photo,
-                        "gender" to jsonData[i].gender,
-                        "salary" to jsonData[i].salary,
-                        "rfid" to jsonData[i].rfid,
-                        "address" to jsonData[i].address,
-                        "date_of_birth" to jsonData[i].date_of_birth,
-                    )
-                    dbHelper.insertData(Table.employees, data)
-                }
-            }
-        }
-        catch (e: Exception){
-            e.printStackTrace()
-        }
-    }
-
     fun insertAttendanceLimitFromJson(jsonData: List<Result>?){
         try {
             if (jsonData != null) {
@@ -91,6 +136,12 @@ class DBManager(private val dbHelper: DBHelper) {
                         "minute" to jsonData[i].minute,
                     )
                     dbHelper.insertData(Table.attendance_rule, data)
+
+                    if(context is SyncActivity){
+                        context.pDialog.dismissWithAnimation()
+                        AlertHelper.successDialog(context, contentText = "Sinkronisasi Jadwal Berhasil")
+                    }
+
                 }
             }
         }

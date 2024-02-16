@@ -2,8 +2,10 @@ package com.yudas1337.recognizeface.services
 
 import android.content.Context
 import android.util.Log
+import com.yudas1337.recognizeface.constants.ConstShared
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.DBManager
+import com.yudas1337.recognizeface.database.SharedPref
 import com.yudas1337.recognizeface.network.Value
 import com.yudas1337.recognizeface.network.config.RetrofitBuilder
 import okhttp3.MediaType
@@ -22,10 +24,14 @@ class ApiService(private val context: Context) {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
-                    Log.d("connSuccess", responseData.toString())
                     val dbHelper = DBHelper(context, null)
-                    DBManager(dbHelper).insertStudentsFromJson(responseData)
-                    Log.d("connSuccess", "Berhasil Insert")
+
+                    val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
+                    response.body()?.total?.let {
+                        SharedPref.putInt(sharedPreferences, "totalStudents", it)
+                    }
+
+                    DBManager(dbHelper, context, sharedPreferences).insertStudentsFromJson(responseData)
                 } else {
                     Log.e("connFailure", "Gagal siswa")
                 }
@@ -33,6 +39,32 @@ class ApiService(private val context: Context) {
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
                 Log.e("connFailure", "Gagal siswa ${t.message}")
+            }
+        })
+    }
+
+    fun getEmployees() {
+        val call: Call<Value> = RetrofitBuilder.employeeBuilder(context).getEmployees()
+
+        call.enqueue(object : Callback<Value> {
+            override fun onResponse(call: Call<Value>, response: Response<Value>) {
+                if (response.isSuccessful) {
+                    val responseData = response.body()?.result
+                    val dbHelper = DBHelper(context, null)
+
+                    val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
+                    response.body()?.total?.let {
+                        SharedPref.putInt(sharedPreferences, "totalEmployees", it)
+                    }
+
+                    DBManager(dbHelper, context, sharedPreferences).insertEmployeesFromJson(responseData)
+                } else {
+                    Log.d("connFailure", "Gagal pegawai")
+                }
+            }
+
+            override fun onFailure(call: Call<Value>, t: Throwable) {
+                Log.d("connFailure", "Gagal pegawai ${t.message}")
             }
         })
     }
@@ -45,7 +77,7 @@ class ApiService(private val context: Context) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
                     val dbHelper = DBHelper(context, null)
-                    DBManager(dbHelper).insertSchedulesFromJson(responseData)
+                    DBManager(dbHelper, context, null).insertSchedulesFromJson(responseData)
                 } else {
                     Log.d("connFailure", "Gagal jadwal")
                 }
@@ -58,26 +90,6 @@ class ApiService(private val context: Context) {
 
     }
 
-    fun getEmployees() {
-        val call: Call<Value> = RetrofitBuilder.employeeBuilder(context).getEmployees()
-
-        call.enqueue(object : Callback<Value> {
-            override fun onResponse(call: Call<Value>, response: Response<Value>) {
-                if (response.isSuccessful) {
-                    val responseData = response.body()?.result
-                    val dbHelper = DBHelper(context, null)
-                    DBManager(dbHelper).insertEmployeesFromJson(responseData)
-                } else {
-                    Log.d("connFailure", "Gagal pegawai")
-                }
-            }
-
-            override fun onFailure(call: Call<Value>, t: Throwable) {
-                Log.d("connFailure", "Gagal pegawai ${t.message}")
-            }
-        })  
-    }
-
     fun getAttendanceLimit(){
         val call: Call<Value> = RetrofitBuilder.builder(context).getAttendanceLimit()
 
@@ -86,7 +98,7 @@ class ApiService(private val context: Context) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
                     val dbHelper = DBHelper(context, null)
-                    DBManager(dbHelper).insertAttendanceLimitFromJson(responseData)
+                    DBManager(dbHelper, context, null).insertAttendanceLimitFromJson(responseData)
                 } else {
                     Log.d("connFailure", "Gagal limit absensi")
                 }
@@ -96,6 +108,10 @@ class ApiService(private val context: Context) {
                 Log.d("connFailure", "Gagal limit absensi ${t.message}")
             }
         })
+
+    }
+
+    fun syncAttendances(){
 
     }
 

@@ -7,4 +7,7 @@ open class Value {
 
     var result: List<Result>? = null
         internal set
+
+    var total: Int? = null
+        internal set
 }

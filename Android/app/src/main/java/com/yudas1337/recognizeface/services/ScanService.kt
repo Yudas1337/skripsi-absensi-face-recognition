@@ -4,15 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.os.Build
-import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.constants.AttendanceStatus
 import com.yudas1337.recognizeface.constants.Role
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.CalendarHelper
-import com.yudas1337.recognizeface.helpers.PackageHelper
 import com.yudas1337.recognizeface.helpers.VoiceHelper
 import com.yudas1337.recognizeface.screens.MainActivity
 import kotlinx.coroutines.ObsoleteCoroutinesApi

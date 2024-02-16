@@ -52,7 +52,8 @@ class ScanActivity : AppCompatActivity() {
         btnSubmit.setOnClickListener {
             val RFID_CARD = rfidController.text.toString()
             if (RFID_CARD.isNotEmpty()) {
-                val pDialog = AlertHelper.progressDialog(this)
+                val pDialog = AlertHelper.progressDialog(this, "Loading")
+                pDialog.show()
                 ScanService(this, DBHelper(this, null), voiceHelper!!).handleScan(RFID_CARD)
                 pDialog.dismissWithAnimation()
                 rfidController.text.clear()

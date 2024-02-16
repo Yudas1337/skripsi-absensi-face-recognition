@@ -24,8 +24,11 @@
     <string name="cr_2">2024 Hummatech All Rights Reserved.</string>
 
     <string name="back_button">Kembali</string>
-    <string name="title_activity_user_list">UserListActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+
+    <string name="sync_menu_1">Sinkronisasi Pengguna</string>
+    <string name="sync_menu_2">Sinkronisasi Jadwal Presensi</string>
+    <string name="sync_menu_3">Sinkronisasi Presensi</string>
+    <string name="sync_menu_4">Sinkronisasi Wajah</string>
+
+    <string name="title_activity_user_list">Activity User List</string>
 </resources>

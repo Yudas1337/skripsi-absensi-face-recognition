@@ -1,35 +1,114 @@
 package com.yudas1337.recognizeface.screens
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.LifecycleObserver
+import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
+import com.yudas1337.recognizeface.services.ApiService
+import com.yudas1337.recognizeface.services.SyncService
 
 class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
+    private lateinit var btnBack: Button
+    private lateinit var firstMenu: LinearLayout
+    private lateinit var secondMenu: LinearLayout
+    private lateinit var thirdMenu: LinearLayout
+    private lateinit var fourthMenu: LinearLayout
+
     private lateinit var networkConnection: NetworkConnection
     private var isInternetAvailable: Boolean = false
+
+    lateinit var pDialog: SweetAlertDialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sync)
 
-        networkConnection = NetworkConnection(applicationContext)
+        btnBack = findViewById(R.id.btn_bck)
+        firstMenu = findViewById(R.id.menu_1)
+        secondMenu = findViewById(R.id.menu_2)
+        thirdMenu = findViewById(R.id.menu_3)
+        fourthMenu = findViewById(R.id.menu_4)
+
+        networkConnection = NetworkConnection(this)
         lifecycle.addObserver(this)
         networkConnection.observe(this){ isInternetAvailable = it }
 
+        pDialog = AlertHelper.progressDialog(this, percentageProgress)
 
-        if(isInternetAvailable){
-        } else{
-            AlertHelper.internetNotAvailable(this)
+        val dbHelper = DBHelper(this, null)
+        val service = ApiService(this)
+
+
+        firstMenu.setOnClickListener {
+            if(isInternetAvailable){
+                AlertHelper.doSync(this) {
+                    pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                    pDialog.show()
+                    SyncService(this, dbHelper).syncUsers()
+                }
+            } else{
+                AlertHelper.internetNotAvailable(this)
+            }
         }
+
+        secondMenu.setOnClickListener {
+            if(isInternetAvailable){
+                AlertHelper.doSync(this){
+                    pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                    pDialog.show()
+                    SyncService(this, dbHelper).syncSchedules()
+                }
+
+            } else{
+                AlertHelper.internetNotAvailable(this)
+            }
+        }
+
+        thirdMenu.setOnClickListener {
+            if(isInternetAvailable){
+                SyncService(this, dbHelper).syncAttendances()
+                Toast.makeText(this, "Menu 3", Toast.LENGTH_SHORT).show()
+            } else{
+                AlertHelper.internetNotAvailable(this)
+            }
+        }
+
+        fourthMenu.setOnClickListener {
+            Toast.makeText(this, "Menu 4", Toast.LENGTH_SHORT).show()
+        }
+
+        btnBack.setOnClickListener{
+            backService()
+        }
+    }
+
+    companion object{
+        var percentageProgress = "Loading.."
+    }
+
+    private fun backService(){
+        startActivity(Intent(this@SyncActivity, MenuActivity::class.java))
+        finish()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        backService()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        networkConnection.clearObserver()
+        if(networkConnection.isInitialized){
+            networkConnection.clearObserver()
+        }
     }
 }

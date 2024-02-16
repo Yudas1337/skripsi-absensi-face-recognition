@@ -15,6 +15,9 @@ interface Request {
         rfid: String
     ): Call<Value>
 
+    @POST("sync")
+    fun syncAttendances(attendances: ArrayList<String>): Call<Value>
+
     @GET("students")
     fun getStudents(): Call<Value>
 

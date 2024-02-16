@@ -20,7 +20,7 @@ class SplashActivity : AppCompatActivity(), LifecycleObserver {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         val dbHelper = DBHelper(this, null)
-        networkConnection = NetworkConnection(applicationContext)
+        networkConnection = NetworkConnection(this)
         lifecycle.addObserver(this)
         networkConnection.observe(this){
             if(it){
@@ -71,6 +71,8 @@ class SplashActivity : AppCompatActivity(), LifecycleObserver {
 
     override fun onDestroy() {
         super.onDestroy()
-        networkConnection.clearObserver()
+        if(networkConnection.isInitialized){
+            networkConnection.clearObserver()
+        }
     }
 }

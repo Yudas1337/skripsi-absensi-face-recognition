@@ -1,10 +1,31 @@
 package com.yudas1337.recognizeface.services
 
-import android.util.Log
+import android.content.Context
+import android.os.Handler
+import com.yudas1337.recognizeface.database.DBHelper
 
-class SyncService {
+class SyncService(private val context: Context, private val dbHelper: DBHelper) {
 
-    fun SynchronizeAttendance(){
-        Log.d("sync", "Sync!")
+    fun syncUsers() {
+        dbHelper.truncateTables(arrayOf("students", "employees"))
+        ApiService(context).getStudents()
+
+        Handler().postDelayed({
+            ApiService(context).getEmployees()
+        }, 2000L)
+
+    }
+
+    fun syncSchedules(){
+        dbHelper.truncateTables(arrayOf("schedules", "attendance_rule"))
+        ApiService(context).getSchedules()
+
+        Handler().postDelayed({
+            ApiService(context).getAttendanceLimit()
+        }, 2000L)
+    }
+
+    fun syncAttendances(){
+        dbHelper.truncateTables(arrayOf("attendances", "detail_attendances"))
     }
 }

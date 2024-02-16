@@ -37,7 +37,7 @@ class AlertHelper {
         fun internetAvailable(context: Context, confirmClickListener: () -> Unit, cancelClickListener: () -> Unit) {
             SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Terdeteksi Internet")
-                .setContentText("Apa anda ingin melakukan sinkronisasi?")
+                .setContentText("Ingin melakukan sinkronisasi?")
                 .setConfirmText("Sinkronisasi")
                 .setCancelText("Batal")
                 .setConfirmClickListener { sDialog ->
@@ -51,14 +51,36 @@ class AlertHelper {
                 .show()
         }
 
-        fun progressDialog(context: Context): SweetAlertDialog {
+        fun doSync(context: Context, confirmClickListener: () -> Unit){
+            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Lakukan Sinkronisasi?")
+                .setContentText("Klik Ok untuk menjalankan")
+                .setConfirmText("Ok")
+                .setCancelText("Batal")
+                .setConfirmClickListener { sDialog ->
+                    confirmClickListener.invoke()
+                    sDialog.dismissWithAnimation()
+                }
+                .setCancelClickListener { sDialog ->
+                    sDialog.cancel()
+                }
+                .show()
+        }
+
+        fun progressDialog(context: Context, titleText: String): SweetAlertDialog {
             val pDialog = SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE)
             pDialog.progressHelper.barColor = Color.parseColor("#A5DC86")
-            pDialog.titleText = "Loading"
+            pDialog.titleText = titleText
             pDialog.setCancelable(false)
-            pDialog.show()
 
             return pDialog
+        }
+
+        fun successDialog(context: Context, titleText: String = "Berhasil", contentText: String) {
+            SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .show()
         }
 
         fun runVoiceAndToast(voiceHelper: VoiceHelper, context: Context, text: String){
