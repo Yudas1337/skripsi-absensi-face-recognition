@@ -67,7 +67,7 @@
                 android:layout_height="60dp"
 
                 android:layout_gravity="center"
-                android:src="@drawable/ic_students" />
+                android:src="@drawable/profile" />
 
             <Space
                 android:layout_width="match_parent"
@@ -86,12 +86,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Lihat Sinkronisasi"
-                android:textSize="18px" />
+                android:background="@drawable/rounded_blue_bg"
+                android:layout_height="30dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="Jalankan Sinkronasi"
+                    android:textSize="32px" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -107,7 +113,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_time" />
+                android:src="@drawable/clock" />
 
             <Space
                 android:layout_width="match_parent"
@@ -126,12 +132,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Lihat Sinkronisasi"
-                android:textSize="18px" />
+                android:background="@drawable/rounded_blue_bg"
+                android:layout_height="30dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="Jalankan Sinkronasi"
+                    android:textSize="32px" />
+            </LinearLayout>
+
 
         </LinearLayout>
 
@@ -148,7 +161,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_date" />
+                android:src="@drawable/date" />
 
             <Space
                 android:layout_width="match_parent"
@@ -167,12 +180,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Lihat Sinkronisasi"
-                android:textSize="18px" />
+                android:background="@drawable/rounded_blue_bg"
+                android:layout_height="30dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="Jalankan Sinkronasi"
+                    android:textSize="32px" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -188,7 +207,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_face" />
+                android:src="@drawable/face" />
 
             <Space
                 android:layout_width="match_parent"
@@ -207,12 +226,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Lihat Sinkronisasi"
-                android:textSize="18px" />
+                android:background="@drawable/rounded_blue_bg"
+                android:layout_height="30dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="Jalankan Sinkronasi"
+                    android:textSize="32px" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
