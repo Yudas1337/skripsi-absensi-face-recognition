@@ -40,15 +40,16 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:ignore="MissingConstraints" />
 
-<!--    Isi -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
 
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:ignore="MissingConstraints">
@@ -88,15 +89,16 @@
             <LinearLayout
                 android:id="@+id/menu_1"
                 android:layout_width="match_parent"
-                android:background="@drawable/rounded_blue_bg"
-                android:layout_height="30dp">
+                android:layout_height="28dp"
+                android:background="@drawable/rounded_blue_bg">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:textColor="@color/white"
                     android:text="Jalankan Sinkronasi"
-                    android:textSize="32px" />
+                    android:textColor="@color/white"
+                    android:textSize="24px" />
             </LinearLayout>
         </LinearLayout>
 
@@ -134,15 +136,16 @@
             <LinearLayout
                 android:id="@+id/menu_2"
                 android:layout_width="match_parent"
-                android:background="@drawable/rounded_blue_bg"
-                android:layout_height="30dp">
+                android:layout_height="28dp"
+                android:background="@drawable/rounded_blue_bg">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:textColor="@color/white"
                     android:text="Jalankan Sinkronasi"
-                    android:textSize="32px" />
+                    android:textColor="@color/white"
+                    android:textSize="24px" />
             </LinearLayout>
 
 
@@ -182,15 +185,16 @@
             <LinearLayout
                 android:id="@+id/menu_3"
                 android:layout_width="match_parent"
-                android:background="@drawable/rounded_blue_bg"
-                android:layout_height="30dp">
+                android:layout_height="28dp"
+                android:background="@drawable/rounded_blue_bg">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:textColor="@color/white"
                     android:text="Jalankan Sinkronasi"
-                    android:textSize="32px" />
+                    android:textColor="@color/white"
+                    android:textSize="24px" />
             </LinearLayout>
 
         </LinearLayout>
@@ -228,15 +232,16 @@
             <LinearLayout
                 android:id="@+id/menu_4"
                 android:layout_width="match_parent"
-                android:background="@drawable/rounded_blue_bg"
-                android:layout_height="30dp">
+                android:layout_height="28dp"
+                android:background="@drawable/rounded_blue_bg">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:textColor="@color/white"
                     android:text="Jalankan Sinkronasi"
-                    android:textSize="32px" />
+                    android:textColor="@color/white"
+                    android:textSize="24px" />
             </LinearLayout>
         </LinearLayout>
 

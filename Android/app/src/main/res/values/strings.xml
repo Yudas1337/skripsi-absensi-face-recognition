@@ -25,10 +25,10 @@
 
     <string name="back_button">Kembali</string>
 
-    <string name="sync_menu_1">Sinkronisasi Pengguna</string>
-    <string name="sync_menu_2">Sinkronisasi Jadwal Presensi</string>
-    <string name="sync_menu_3">Sinkronisasi Presensi</string>
-    <string name="sync_menu_4">Sinkronisasi Wajah Pegawai</string>
+    <string name="sync_menu_1">Sinkronisasi\nPengguna</string>
+    <string name="sync_menu_2">Sinkronisasi\nJadwal Presensi</string>
+    <string name="sync_menu_3">Sinkronisasi\nPresensi</string>
+    <string name="sync_menu_4">Sinkronisasi\nWajah Pegawai</string>
 
     <string name="title_activity_user_list">Activity User List</string>
 </resources>
