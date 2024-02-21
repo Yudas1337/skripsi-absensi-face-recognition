@@ -2,7 +2,6 @@ package com.yudas1337.recognizeface.database
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Handler
 import android.util.Log
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.Result

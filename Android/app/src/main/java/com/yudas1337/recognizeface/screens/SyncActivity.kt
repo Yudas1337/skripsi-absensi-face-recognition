@@ -1,18 +1,26 @@
 package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.LifecycleObserver
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.constants.ConstShared
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
-import com.yudas1337.recognizeface.services.ApiService
+import com.yudas1337.recognizeface.recognize.FileReader
+import com.yudas1337.recognizeface.recognize.FrameAnalyser
+import com.yudas1337.recognizeface.recognize.LoadFace
+import com.yudas1337.recognizeface.recognize.model.FaceNetModel
+import com.yudas1337.recognizeface.recognize.model.Models
 import com.yudas1337.recognizeface.services.SyncService
 
 class SyncActivity : AppCompatActivity(), LifecycleObserver {
@@ -27,6 +35,30 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
     private var isInternetAvailable: Boolean = false
 
     lateinit var pDialog: SweetAlertDialog
+
+    private lateinit var frameAnalyser  : FrameAnalyser
+    private lateinit var faceNetModel : FaceNetModel
+    private lateinit var fileReader : FileReader
+    private lateinit var loadFace: LoadFace
+
+    private var isInitialized : Boolean = false
+
+    private lateinit var sharedPreferences: SharedPreferences
+
+    // <----------------------- User controls --------------------------->
+
+    // Use the device's GPU to perform faster computations.
+    // Refer https://www.tensorflow.org/lite/performance/gpu
+    private val useGpu = true
+
+    // Use XNNPack to accelerate inference.
+    // Refer https://blog.tensorflow.org/2020/07/accelerating-tensorflow-lite-xnnpack-integration.html
+    private val useXNNPack = true
+
+    // Default is Models.FACENET ; Quantized models are faster
+    private val modelInfo = Models.FACENET
+
+    // <---------------------------------------------------------------->
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +77,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         pDialog = AlertHelper.progressDialog(this, percentageProgress)
 
         val dbHelper = DBHelper(this, null)
-        val service = ApiService(this)
-
 
         firstMenu.setOnClickListener {
             if(isInternetAvailable){
@@ -83,12 +113,45 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         }
 
         fourthMenu.setOnClickListener {
-            Toast.makeText(this, "Menu 4", Toast.LENGTH_SHORT).show()
+
+            if(!isInitialized){
+
+                pDialog = AlertHelper.progressDialog(this, "Load Model..")
+                pDialog.show()
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    faceNetModel = FaceNetModel( this , modelInfo , useGpu , useXNNPack )
+                    frameAnalyser = FrameAnalyser(this, faceNetModel)
+                    fileReader = FileReader(faceNetModel)
+
+                    // Tutup dialog setelah proses selesai
+                    pDialog.dismissWithAnimation()
+                    isInitialized = true
+                    LoadFaceDirectory()
+                }, 2000)
+            } else{
+                LoadFaceDirectory()
+            }
+
+
         }
 
         btnBack.setOnClickListener{
             backService()
         }
+    }
+
+    private fun LoadFaceDirectory(){
+        sharedPreferences = getSharedPreferences(ConstShared.fileName, MODE_PRIVATE)
+
+        loadFace = LoadFace(this, frameAnalyser, sharedPreferences)
+        loadFace.loadListFaces(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        loadFace.launchDocumentTree(requestCode, resultCode, data, fileReader, this)
     }
 
     companion object{

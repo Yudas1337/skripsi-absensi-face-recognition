@@ -54,7 +54,6 @@
         tools:ignore="MissingConstraints">
 
         <LinearLayout
-            android:id="@+id/menu_1"
             android:layout_width="200dp"
             android:layout_height="300dp"
             android:layout_marginEnd="8dp"
@@ -87,6 +86,7 @@
                 android:layout_height="100dp" />
 
             <LinearLayout
+                android:id="@+id/menu_1"
                 android:layout_width="match_parent"
                 android:background="@drawable/rounded_blue_bg"
                 android:layout_height="30dp">
@@ -101,7 +101,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/menu_2"
             android:layout_width="200dp"
             android:layout_height="300dp"
             android:layout_marginEnd="8dp"
@@ -133,6 +132,7 @@
                 android:layout_height="100dp" />
 
             <LinearLayout
+                android:id="@+id/menu_2"
                 android:layout_width="match_parent"
                 android:background="@drawable/rounded_blue_bg"
                 android:layout_height="30dp">
@@ -149,7 +149,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/menu_3"
             android:layout_width="200dp"
             android:layout_height="300dp"
             android:layout_marginEnd="8dp"
@@ -181,6 +180,7 @@
                 android:layout_height="100dp" />
 
             <LinearLayout
+                android:id="@+id/menu_3"
                 android:layout_width="match_parent"
                 android:background="@drawable/rounded_blue_bg"
                 android:layout_height="30dp">
@@ -196,7 +196,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/menu_4"
             android:layout_width="200dp"
             android:layout_height="300dp"
             android:background="@drawable/rounded_bg"
@@ -227,6 +226,7 @@
                 android:layout_height="100dp" />
 
             <LinearLayout
+                android:id="@+id/menu_4"
                 android:layout_width="match_parent"
                 android:background="@drawable/rounded_blue_bg"
                 android:layout_height="30dp">

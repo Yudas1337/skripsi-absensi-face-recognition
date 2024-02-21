@@ -1,6 +1,8 @@
 package com.yudas1337.recognizeface.database
 
 import android.content.SharedPreferences
+import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.recognize.LoadFace
 
 class SharedPref {
 
@@ -11,6 +13,10 @@ class SharedPref {
 
         fun putInt(sharedPreferences: SharedPreferences, key: String, value: Int) {
             sharedPreferences.edit().putInt(key, value).apply()
+        }
+
+        fun putBoolean(sharedPreferences: SharedPreferences, key: String, value: Boolean) {
+            sharedPreferences.edit().putBoolean(key,value).apply()
         }
 
         fun getString(sharedPreferences: SharedPreferences?, key: String, defaultValue: String = ""): String {
@@ -27,6 +33,14 @@ class SharedPref {
             }
 
             return defaultValue
+        }
+
+        fun isSerializedDataStored(sharedPreferences: SharedPreferences, key: String, defaultValue: Boolean = false): Boolean {
+            return sharedPreferences.getBoolean(key , defaultValue)
+        }
+
+        fun clearData(sharedPreferences: SharedPreferences, key: String){
+            sharedPreferences.edit().remove(key).apply()
         }
     }
 }

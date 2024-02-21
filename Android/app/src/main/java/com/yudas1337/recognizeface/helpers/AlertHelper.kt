@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.widget.Toast
 import cn.pedant.SweetAlert.SweetAlertDialog
 
-
 class AlertHelper {
 
     companion object{
@@ -14,23 +13,6 @@ class AlertHelper {
                 .setTitleText("Internet tidak tersedia")
                 .setContentText("Sinkronisasi dapat dijalankan jika internet tersedia")
                 .setConfirmText("Ok")
-                .show()
-        }
-
-        fun serializedFaces(context: Context, confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
-            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText("Serialized Data")
-                .setContentText("Existing image data was found on this device. Would you like to load it?")
-                .setConfirmText("RESCAN")
-                .setCancelText("LOAD")
-                .setConfirmClickListener { sDialog ->
-                    confirmClickListener.invoke()
-                    sDialog.dismissWithAnimation()
-                }
-                .setCancelClickListener { sDialog ->
-                    cancelClickListener.invoke()
-                    sDialog.cancel()
-                }
                 .show()
         }
 
@@ -82,6 +64,54 @@ class AlertHelper {
                 .setContentText(contentText)
                 .show()
         }
+
+        fun errorDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
+            SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .setConfirmText(positiveButton)
+                .setCancelText(negativeButton)
+                .setConfirmClickListener { sDialog ->
+                    confirmClickListener.invoke()
+                    sDialog.dismissWithAnimation()
+                }
+                .setCancelClickListener { sDialog ->
+                    cancelClickListener.invoke()
+                    sDialog.cancel()
+                }
+                .show()
+        }
+
+        fun selectDirectoryDialog(context: Context, titleText: String, contentText: String, confirmText: String, confirmClickListener: () -> Unit){
+            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .setConfirmText(confirmText)
+                .showCancelButton(false)
+                .setConfirmClickListener { sDialog ->
+                    confirmClickListener.invoke()
+                    sDialog.dismissWithAnimation()
+                }
+                .show()
+        }
+
+        fun warningDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
+            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .setConfirmText(positiveButton)
+                .setCancelText(negativeButton)
+                .setConfirmClickListener { sDialog ->
+                    confirmClickListener.invoke()
+                    sDialog.dismissWithAnimation()
+                }
+                .setCancelClickListener { sDialog ->
+                    cancelClickListener.invoke()
+                    sDialog.cancel()
+                }
+                .show()
+        }
+
 
         fun runVoiceAndToast(voiceHelper: VoiceHelper, context: Context, text: String){
             voiceHelper.runVoice(text)

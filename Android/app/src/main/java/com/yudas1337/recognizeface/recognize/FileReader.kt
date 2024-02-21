@@ -105,6 +105,7 @@ class FileReader( private var faceNetModel: FaceNetModel) {
         numImages = 0
         numImagesWithNoFaces = 0
         data.clear()
+        imageData.clear()
     }
 
 }

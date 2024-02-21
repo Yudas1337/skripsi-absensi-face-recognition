@@ -79,24 +79,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     private var isReal: Boolean? = null
 
     private lateinit var frameAnalyser  : FrameAnalyser
-    private lateinit var faceNetModel : FaceNetModel
-    private lateinit var fileReader : FileReader
-    private lateinit var loadFace: LoadFace
-
-    // <----------------------- User controls --------------------------->
-
-    // Use the device's GPU to perform faster computations.
-    // Refer https://www.tensorflow.org/lite/performance/gpu
-    private val useGpu = true
-
-    // Use XNNPack to accelerate inference.
-    // Refer https://blog.tensorflow.org/2020/07/accelerating-tensorflow-lite-xnnpack-integration.html
-    private val useXNNPack = true
-
-    // Default is Models.FACENET ; Quantized models are faster
-    private val modelInfo = Models.FACENET
-
-    // <---------------------------------------------------------------->
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -228,15 +210,11 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         setContentView(binding.root)
         binding.result = DetectionResult()
 
-        faceNetModel = FaceNetModel( this , modelInfo , useGpu , useXNNPack )
-        frameAnalyser = FrameAnalyser(this, faceNetModel)
-        fileReader = FileReader(faceNetModel)
+//        faceNetModel = FaceNetModel( this , modelInfo , useGpu , useXNNPack )
+//        frameAnalyser = FrameAnalyser(this, faceNetModel)
+//        fileReader = FileReader(faceNetModel)
 
         startTimer()
-
-//        loadFace = LoadFace(this, frameAnalyser)
-
-//        loadFace.loadListFaces()
 
         binding.surface.holder.let {
             it.setFormat(ImageFormat.NV21)
