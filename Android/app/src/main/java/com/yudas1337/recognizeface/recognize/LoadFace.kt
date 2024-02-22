@@ -133,11 +133,12 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
             close()
         }
 
+        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_FACES, frameAnalyser.faceList.size)
         SharedPref.putBoolean(sharedPreferences, ConstShared.SHARED_PREF_IS_DATA_STORED_KEY , true)
     }
 
 
-    private fun loadSerializedImageData() : ArrayList<Pair<String,FloatArray>> {
+     fun loadSerializedImageData() : ArrayList<Pair<String,FloatArray>> {
         val serializedDataFile = File(context.filesDir , ConstShared.SERIALIZED_DATA_FILENAME )
         val objectInputStream = ObjectInputStream(FileInputStream( serializedDataFile ) )
         val data = objectInputStream.readObject() as ArrayList<Pair<String,FloatArray>>
@@ -160,6 +161,7 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
             showSelectDirectoryDialog(activity)
         }
         else {
+
             AlertHelper.warningDialogWithButton(context, "Data Wajah ditemukan",
                 "Data wajah sudah terdaftar. Apa anda ingin menggantinya?",
                 "Ganti Data",

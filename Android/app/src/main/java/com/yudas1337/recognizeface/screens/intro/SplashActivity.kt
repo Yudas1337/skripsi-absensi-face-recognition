@@ -1,5 +1,6 @@
 package com.yudas1337.recognizeface.screens.intro
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -13,9 +14,11 @@ import com.yudas1337.recognizeface.network.NetworkConnection
 import com.yudas1337.recognizeface.screens.MenuActivity
 import com.yudas1337.recognizeface.services.ApiService
 
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity(), LifecycleObserver {
     private var splashTimeout = 2000
     private lateinit var networkConnection: NetworkConnection
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)

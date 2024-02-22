@@ -9,14 +9,18 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Environment
 import android.provider.DocumentsContract
 import android.util.Log
+import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
@@ -30,8 +34,11 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.yudas1337.recognizeface.DetectionResult
 import com.yudas1337.recognizeface.EngineWrapper
 import com.yudas1337.recognizeface.SetThresholdDialogFragment
+import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.ModelControl
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
 import com.yudas1337.recognizeface.detection.FaceBox
+import com.yudas1337.recognizeface.recognize.BitmapUtils
 import com.yudas1337.recognizeface.recognize.FileReader
 import com.yudas1337.recognizeface.recognize.FrameAnalyser
 import com.yudas1337.recognizeface.recognize.LoadFace
@@ -43,6 +50,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
 @ObsoleteCoroutinesApi
@@ -79,6 +88,8 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     private var isReal: Boolean? = null
 
     private lateinit var frameAnalyser  : FrameAnalyser
+    private lateinit var faceNetModel : FaceNetModel
+    private lateinit var loadFace: LoadFace
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,7 +135,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     }
 
     private fun processImageByteArray(data: ByteArray) {
-
         val inputImage = InputImage.fromByteArray(
             data,
             previewWidth,
@@ -159,20 +169,40 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
                             // cek timer dan liveness
                             if (stableTime <= 0 && isReal == true) {
-                                Toast.makeText(this, "sudah selesai", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(this, "sudah selesai", Toast.LENGTH_SHORT).show()
+                                val frameBitmap = inputImage.bitmapInternal?.let {
+                                    BitmapUtils.cropRectFromBitmap(
+                                        it, face.boundingBox)
+                                }
 
-                                // Crop the face from the input image
-                                val frameBitmap = Bitmap.createBitmap(
-                                    inputImage.width,
-                                    inputImage.height,
-                                    Bitmap.Config.ARGB_8888
-                                )
+                                // Mendapatkan direktori "Downloads"
+                                val downloadsDirectory = Environment.getExternalStoragePublicDirectory(
+                                    Environment.DIRECTORY_DOWNLOADS)
+                                val file = File(downloadsDirectory, "main_cropped.jpg")
+
+                                try {
+                                    // Membuat output stream
+                                    val outputStream = FileOutputStream(file)
+
+                                    // Menyimpan bitmap ke file JPEG dengan kualitas 100
+                                    frameBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+
+                                    // Menutup output stream
+                                    outputStream.close()
+
+                                    // Memberi tahu pengguna bahwa gambar telah disimpan
+                                    Log.d("wajahnya", "Gambar disimpan di ${file.absolutePath}")
+                                } catch (e: IOException) {
+                                    // Handle kesalahan jika gagal menyimpan gambar
+                                    e.printStackTrace()
+                                }
+
 //
 //                                frameBitmap.copyPixelsFromBuffer( image.planes[0].buffer )
 //                                frameBitmap = BitmapUtils.rotateBitmap( frameBitmap , image.imageInfo.rotationDegrees.toFloat() )
 
                                 CoroutineScope( Dispatchers.Default ).launch {
-                                    frameAnalyser.runModel(face, frameBitmap )
+//                                    frameAnalyser.runModel(face, frameBitmap)
                                 }
                             }
 
@@ -210,9 +240,11 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         setContentView(binding.root)
         binding.result = DetectionResult()
 
-//        faceNetModel = FaceNetModel( this , modelInfo , useGpu , useXNNPack )
-//        frameAnalyser = FrameAnalyser(this, faceNetModel)
-//        fileReader = FileReader(faceNetModel)
+        faceNetModel = FaceNetModel( this , ModelControl.modelInfo , ModelControl.useGpu , ModelControl.useXNNPack )
+        frameAnalyser = FrameAnalyser(this, faceNetModel)
+
+        loadFace = LoadFace(this, frameAnalyser, getSharedPreferences(ConstShared.fileName, MODE_PRIVATE))
+        frameAnalyser.faceList = loadFace.loadSerializedImageData()
 
         startTimer()
 
@@ -302,8 +334,20 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                 }
             })
         }
+    }
 
+    private fun setCameraDisplayOrientation(): Int {
+        val info = Camera.CameraInfo()
+        Camera.getCameraInfo(cameraId, info)
+        var degrees = 0
+        when (windowManager.defaultDisplay.rotation) {
+            Surface.ROTATION_0 -> degrees = 0
+            Surface.ROTATION_90 -> degrees = 90
+            Surface.ROTATION_180 -> degrees = 180
+            Surface.ROTATION_270 -> degrees = 270
+        }
 
+        return degrees
     }
 
     fun setting(@Suppress("UNUSED_PARAMETER") view: View) =

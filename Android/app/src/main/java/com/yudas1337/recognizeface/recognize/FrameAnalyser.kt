@@ -47,6 +47,7 @@ class FrameAnalyser( context: Context ,
 
       suspend fun runModel(faces: Face, cameraFrameBitmap: Bitmap ){
         withContext( Dispatchers.Default ) {
+
             t1 = System.currentTimeMillis()
             val predictions = ArrayList<Prediction>()
             try {
@@ -69,6 +70,7 @@ class FrameAnalyser( context: Context ,
                     // of that cluster and ArrayList<Float> would represent the collection of all
                     // L2 norms/ cosine distances.
                     for ( i in 0 until faceList.size ) {
+
                         // If this cluster ( i.e an ArrayList with a specific key ) does not exist,
                         // initialize a new one.
                         if ( nameScoreHashmap[ faceList[ i ].first ] == null ) {
@@ -95,7 +97,8 @@ class FrameAnalyser( context: Context ,
 
                     // Compute the average of all scores norms for each cluster.
                     val avgScores = nameScoreHashmap.values.map{ scores -> scores.toFloatArray().average() }
-                    Log.i( "averageScore", "Average score for each user : $nameScoreHashmap" )
+                    Log.d("wajahnya", "sizenya ${faceList.size}")
+                    Log.d( "wajahnya", "Average score for each user : $nameScoreHashmap" )
 
                     val names = nameScoreHashmap.keys.toTypedArray()
                     nameScoreHashmap.clear()
@@ -107,18 +110,20 @@ class FrameAnalyser( context: Context ,
                             names[ avgScores.indexOf( avgScores.maxOrNull()!! ) ]
                         }
                         else {
+                            Log.d("wajahnya", "unknown")
                             "Unknown"
                         }
                     } else {
                         // In case of L2 norm, choose the lowest value.
                         if ( avgScores.minOrNull()!! > model.model.l2Threshold ) {
+                            Log.d("wajahnya", "unknown")
                             "Unknown"
                         }
                         else {
                             names[ avgScores.indexOf( avgScores.minOrNull()!! ) ]
                         }
                     }
-                    Log.i( "personIdentified","Person identified as $bestScoreUserName" )
+                    Log.d( "wajahnya","Person identified as $bestScoreUserName" )
                     predictions.add(
                         Prediction(
                             faces.boundingBox,
@@ -128,6 +133,7 @@ class FrameAnalyser( context: Context ,
                     )
                 }
                 else {
+                    Log.d("wajahnya", "ada masker")
                     // Inform the user to remove the mask
                     predictions.add(
                         Prediction(

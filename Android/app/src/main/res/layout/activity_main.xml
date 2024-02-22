@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="17sp"
                     android:drawablePadding="10dp"
-                    android:drawableStart="@drawable/clock"
+                    android:drawableStart="@drawable/ic_clock_main"
                     android:text='Posisikan Wajah ke Dalam Frame'
                     android:textColor="#ffffff"/>
 

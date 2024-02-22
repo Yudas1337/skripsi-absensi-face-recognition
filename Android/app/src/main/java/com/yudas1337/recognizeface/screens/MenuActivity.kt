@@ -1,12 +1,15 @@
 package com.yudas1337.recognizeface.screens
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleObserver
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.database.SharedPref
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
 
@@ -17,6 +20,8 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
     private lateinit var presentDayCard: CardView
 
     private lateinit var networkConnection: NetworkConnection
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +34,8 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
 
         networkConnection = NetworkConnection(this)
         lifecycle.addObserver(this)
+
+        sharedPreferences = getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
 
         syncMenu.setOnClickListener {
             networkConnection.observe(this){
@@ -43,8 +50,10 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
         }
 
         presentCard.setOnClickListener {
-            startActivity(Intent(this, ScanActivity::class.java))
-            finish()
+            if(fetchAvailableData()){
+                startActivity(Intent(this, ScanActivity::class.java))
+                finish()
+            }
         }
 
         userCard.setOnClickListener{
@@ -56,6 +65,30 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
             startActivity(Intent(this, AttendanceTodayActivity::class.java))
             finish()
         }
+    }
+
+    private fun fetchAvailableData(): Boolean {
+        if(SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_STUDENTS)  == 0){
+            AlertHelper.errorDialog(this, contentText = "Data siswa masih kosong. Silahkan sinkronisasi ulang!")
+            return false
+        }
+
+        if(SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_EMPLOYEES) == 0){
+            AlertHelper.errorDialog(this, contentText = "Data pegawai masih kosong. Silahkan sinkronisasi ulang!")
+            return false
+        }
+
+        if(SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_SCHEDULES) == 0 && SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_LIMIT) == 0){
+            AlertHelper.errorDialog(this, contentText = "Data jadwal masih kosong. Silahkan sinkronisasi ulang!")
+            return false
+        }
+
+        if(SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_FACES) == 0){
+            AlertHelper.errorDialog(this, contentText = "Data wajah pegawai masih kosong. Silahkan sinkronisasi ulang!")
+            return false
+        }
+
+        return true
     }
 
     override fun onDestroy() {

@@ -65,6 +65,13 @@ class AlertHelper {
                 .show()
         }
 
+        fun errorDialog(context: Context, titleText: String = "Gagal", contentText: String) {
+            SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .show()
+        }
+
         fun errorDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
             SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
                 .setTitleText(titleText)

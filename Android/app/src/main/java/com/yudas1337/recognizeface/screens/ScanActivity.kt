@@ -8,12 +8,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.VoiceHelper
+import com.yudas1337.recognizeface.services.ApiService
 import com.yudas1337.recognizeface.services.ScanService
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -25,6 +25,7 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var copyRight: TextView
     private lateinit var btnSubmit: Button
     private var voiceHelper: VoiceHelper? = null
+    private lateinit var dbHelper: DBHelper
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,18 +44,20 @@ class ScanActivity : AppCompatActivity() {
             backService()
         }
 
-        val dbHelper = DBHelper(this, null)
+        dbHelper = DBHelper(this, null)
 
         val currentYear = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy"))
         val copyrightText = "$currentYear Hummatech All Rights Reserved."
         copyRight.text = copyrightText
+
+        fetchData()
 
         btnSubmit.setOnClickListener {
             val RFID_CARD = rfidController.text.toString()
             if (RFID_CARD.isNotEmpty()) {
                 val pDialog = AlertHelper.progressDialog(this, "Loading")
                 pDialog.show()
-                ScanService(this, DBHelper(this, null), voiceHelper!!).handleScan(RFID_CARD)
+                ScanService(this, dbHelper, voiceHelper!!).handleScan(RFID_CARD)
                 pDialog.dismissWithAnimation()
                 rfidController.text.clear()
             } else {
@@ -62,6 +65,24 @@ class ScanActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun fetchData(){
+        if(dbHelper.countTableData("students") == 0){
+            ApiService(this).getStudents()
+        }
+
+        if(dbHelper.countTableData("schedules") == 0){
+            ApiService(this).getSchedules()
+        }
+
+        if(dbHelper.countTableData("employees") == 0){
+            ApiService(this).getEmployees()
+        }
+
+        if(dbHelper.countTableData("attendance_rule") == 0){
+            ApiService(this).getAttendanceLimit()
+        }
     }
 
     private fun backService(){

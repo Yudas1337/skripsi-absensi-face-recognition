@@ -27,10 +27,9 @@ class BitmapUtils {
             if ( (rect.top + height ) > source.height ){
                 height = source.height - rect.top
             }
-            val croppedBitmap = Bitmap.createBitmap( source , rect.left , rect.top , width , height )
-            // Uncomment the below line if you want to save the input image.
-            // BitmapUtils.saveBitmap( context , croppedBitmap , "source" )
-            return croppedBitmap
+
+            return Bitmap.createBitmap( source , rect.left , rect.top , width , height )
+
         }
 
 

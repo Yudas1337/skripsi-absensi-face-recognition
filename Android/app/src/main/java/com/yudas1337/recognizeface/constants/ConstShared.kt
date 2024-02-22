@@ -9,4 +9,19 @@ object ConstShared {
 
     // Shared Pref key to check if the data was stored.
     const val SHARED_PREF_IS_DATA_STORED_KEY = "is_data_stored"
+
+    // shared pref for total employees
+    const val TOTAL_EMPLOYEES = "totalEmployees"
+
+    // shared pref for total students
+    const val TOTAL_STUDENTS = "totalStudents"
+
+    // shared pref for total schedules
+    const val TOTAL_SCHEDULES = "totalSchedules"
+
+    // shared pref for limit
+    const val TOTAL_LIMIT = "totalLimit"
+
+    // shared pref for list faces
+    const val TOTAL_FACES = "totalFaces"
 }

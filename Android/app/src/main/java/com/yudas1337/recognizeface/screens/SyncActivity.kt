@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleObserver
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.ModelControl
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
@@ -44,21 +45,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
     private var isInitialized : Boolean = false
 
     private lateinit var sharedPreferences: SharedPreferences
-
-    // <----------------------- User controls --------------------------->
-
-    // Use the device's GPU to perform faster computations.
-    // Refer https://www.tensorflow.org/lite/performance/gpu
-    private val useGpu = true
-
-    // Use XNNPack to accelerate inference.
-    // Refer https://blog.tensorflow.org/2020/07/accelerating-tensorflow-lite-xnnpack-integration.html
-    private val useXNNPack = true
-
-    // Default is Models.FACENET ; Quantized models are faster
-    private val modelInfo = Models.FACENET
-
-    // <---------------------------------------------------------------->
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,17 +106,17 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
                 pDialog.show()
 
                 Handler(Looper.getMainLooper()).postDelayed({
-                    faceNetModel = FaceNetModel( this , modelInfo , useGpu , useXNNPack )
+                    faceNetModel = FaceNetModel( this , ModelControl.modelInfo , ModelControl.useGpu , ModelControl.useXNNPack )
                     frameAnalyser = FrameAnalyser(this, faceNetModel)
                     fileReader = FileReader(faceNetModel)
 
                     // Tutup dialog setelah proses selesai
                     pDialog.dismissWithAnimation()
                     isInitialized = true
-                    LoadFaceDirectory()
+                    loadFaceDirectory()
                 }, 2000)
             } else{
-                LoadFaceDirectory()
+                loadFaceDirectory()
             }
 
 
@@ -141,7 +127,7 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         }
     }
 
-    private fun LoadFaceDirectory(){
+    private fun loadFaceDirectory(){
         sharedPreferences = getSharedPreferences(ConstShared.fileName, MODE_PRIVATE)
 
         loadFace = LoadFace(this, frameAnalyser, sharedPreferences)

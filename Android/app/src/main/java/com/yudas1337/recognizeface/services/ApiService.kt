@@ -28,7 +28,7 @@ class ApiService(private val context: Context) {
 
                     val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
                     response.body()?.total?.let {
-                        SharedPref.putInt(sharedPreferences, "totalStudents", it)
+                        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_STUDENTS, it)
                     }
 
                     DBManager(dbHelper, context, sharedPreferences).insertStudentsFromJson(responseData)
@@ -54,7 +54,7 @@ class ApiService(private val context: Context) {
 
                     val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
                     response.body()?.total?.let {
-                        SharedPref.putInt(sharedPreferences, "totalEmployees", it)
+                        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_EMPLOYEES, it)
                     }
 
                     DBManager(dbHelper, context, sharedPreferences).insertEmployeesFromJson(responseData)
@@ -77,7 +77,13 @@ class ApiService(private val context: Context) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
                     val dbHelper = DBHelper(context, null)
-                    DBManager(dbHelper, context, null).insertSchedulesFromJson(responseData)
+
+                    val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
+                    response.body()?.total?.let {
+                        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_SCHEDULES, it)
+                    }
+
+                    DBManager(dbHelper, context, sharedPreferences).insertSchedulesFromJson(responseData)
                 } else {
                     Log.d("connFailure", "Gagal jadwal")
                 }
@@ -98,7 +104,13 @@ class ApiService(private val context: Context) {
                 if (response.isSuccessful) {
                     val responseData = response.body()?.result
                     val dbHelper = DBHelper(context, null)
-                    DBManager(dbHelper, context, null).insertAttendanceLimitFromJson(responseData)
+
+                    val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
+                    response.body()?.total?.let {
+                        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_LIMIT, it)
+                    }
+
+                    DBManager(dbHelper, context, sharedPreferences).insertAttendanceLimitFromJson(responseData)
                 } else {
                     Log.d("connFailure", "Gagal limit absensi")
                 }
