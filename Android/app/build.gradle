@@ -119,7 +119,6 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.11.0'
     implementation 'org.tensorflow:tensorflow-lite-gpu-api:2.11.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.4.2'
-    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc2'
 
     implementation 'com.google.mlkit:face-detection:16.1.5'
 

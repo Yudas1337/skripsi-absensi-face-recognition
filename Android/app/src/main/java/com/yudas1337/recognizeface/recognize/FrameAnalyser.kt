@@ -4,8 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.mlkit.vision.face.Face
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.yudas1337.recognizeface.recognize.model.FaceNetModel
 import com.yudas1337.recognizeface.recognize.model.MaskDetectionModel
 import kotlinx.coroutines.Dispatchers
@@ -16,11 +14,6 @@ import kotlin.math.sqrt
 class FrameAnalyser( context: Context ,
                      private var model: FaceNetModel
 ) {
-
-    private val realTimeOpts = FaceDetectorOptions.Builder()
-        .setPerformanceMode( FaceDetectorOptions.PERFORMANCE_MODE_FAST )
-        .build()
-    private val detector = FaceDetection.getClient(realTimeOpts)
 
     private val nameScoreHashmap = HashMap<String,ArrayList<Float>>()
     private var subject = FloatArray( model.embeddingDim )
@@ -54,17 +47,18 @@ class FrameAnalyser( context: Context ,
                 // Crop the frame using face.boundingBox.
                 // Convert the cropped Bitmap to a ByteBuffer.
                 // Finally, feed the ByteBuffer to the FaceNet model.
-                val croppedBitmap = BitmapUtils.cropRectFromBitmap( cameraFrameBitmap , faces.boundingBox )
-                subject = model.getFaceEmbedding( croppedBitmap )
+//                val croppedBitmap = BitmapUtils.cropRectFromBitmap( cameraFrameBitmap , faces.boundingBox )
+                subject = model.getFaceEmbedding( cameraFrameBitmap )
 
                 // Perform face mask detection on the cropped frame Bitmap.
                 var maskLabel = ""
                 if ( isMaskDetectionOn ) {
-                    maskLabel = maskDetectionModel.detectMask( croppedBitmap )
+                    maskLabel = maskDetectionModel.detectMask( cameraFrameBitmap )
                 }
 
                 // Continue with the recognition if the user is not wearing a face mask
                 if (maskLabel == maskDetectionModel.NO_MASK) {
+                    Log.d("wajahnya", "tidak ada masker")
                     // Perform clustering ( grouping )
                     // Store the clusters in a HashMap. Here, the key would represent the 'name'
                     // of that cluster and ArrayList<Float> would represent the collection of all
@@ -97,7 +91,6 @@ class FrameAnalyser( context: Context ,
 
                     // Compute the average of all scores norms for each cluster.
                     val avgScores = nameScoreHashmap.values.map{ scores -> scores.toFloatArray().average() }
-                    Log.d("wajahnya", "sizenya ${faceList.size}")
                     Log.d( "wajahnya", "Average score for each user : $nameScoreHashmap" )
 
                     val names = nameScoreHashmap.keys.toTypedArray()
@@ -146,9 +139,9 @@ class FrameAnalyser( context: Context ,
             }
             catch ( e : Exception ) {
                 // If any exception occurs with this box and continue with the next boxes.
-                Log.e( "Model" , "Exception in FrameAnalyser : ${e.message}" )
+                Log.e( "wajahnya" , "Exception in FrameAnalyser : ${e.message}" )
             }
-            Log.e( "Performance" , "Inference time -> ${System.currentTimeMillis() - t1}")
+            Log.e( "wajahnya" , "Inference time -> ${System.currentTimeMillis() - t1}")
         }
     }
 

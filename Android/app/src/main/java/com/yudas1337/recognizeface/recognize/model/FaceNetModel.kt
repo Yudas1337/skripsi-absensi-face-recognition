@@ -2,7 +2,6 @@ package com.yudas1337.recognizeface.recognize.model
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.SystemClock
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
@@ -45,7 +44,7 @@ class FaceNetModel( context : Context ,
             // See -> https://www.tensorflow.org/lite/performance/gpu#android
             if ( useGpu ) {
                 if ( CompatibilityList().isDelegateSupportedOnThisDevice ) {
-//                    addDelegate( GpuDelegate( CompatibilityList().bestOptionsForThisDevice ))
+                    addDelegate( GpuDelegate( CompatibilityList().bestOptionsForThisDevice ))
                 }
             }
             else {
@@ -71,6 +70,8 @@ class FaceNetModel( context : Context ,
         val t1 = System.currentTimeMillis()
         val faceNetModelOutputs = Array( 1 ){ FloatArray( embeddingDim ) }
         interpreter.run( inputs, faceNetModelOutputs )
+
+
         Log.i( "Performance" , "${model.name} Inference Speed in ms : ${System.currentTimeMillis() - t1}")
         return faceNetModelOutputs
     }

@@ -15,6 +15,9 @@ import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.constants.ConstShared
 import com.yudas1337.recognizeface.database.SharedPref
 import com.yudas1337.recognizeface.helpers.AlertHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -82,6 +85,7 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
             if (!errorFound) {
                 dialog = AlertHelper.progressDialog(context, "Parsing Image to TFlite Model")
                 dialog.show()
+
                 fileReader.run(images, fileReaderCallback)
                 faceSize = images.size
                 Log.d("wajahnya", "Terdeteksi $faceSize wajah gambar ...")

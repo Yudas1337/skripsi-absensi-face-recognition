@@ -2,6 +2,7 @@ package com.yudas1337.recognizeface.recognize
 
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -18,7 +19,6 @@ class FileReader( private var faceNetModel: FaceNetModel) {
         .setPerformanceMode( FaceDetectorOptions.PERFORMANCE_MODE_FAST )
         .build()
     private val detector = FaceDetection.getClient( realTimeOpts )
-    private val defaultScope = CoroutineScope( Dispatchers.Default )
     private val mainScope = CoroutineScope( Dispatchers.Main )
     private var numImagesWithNoFaces = 0
     private var imageCounter = 0

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -21,8 +22,14 @@ import com.yudas1337.recognizeface.recognize.FileReader
 import com.yudas1337.recognizeface.recognize.FrameAnalyser
 import com.yudas1337.recognizeface.recognize.LoadFace
 import com.yudas1337.recognizeface.recognize.model.FaceNetModel
-import com.yudas1337.recognizeface.recognize.model.Models
 import com.yudas1337.recognizeface.services.SyncService
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
@@ -45,6 +52,10 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
     private var isInitialized : Boolean = false
 
     private lateinit var sharedPreferences: SharedPreferences
+
+    private val defaultScope = CoroutineScope( Dispatchers.Default )
+
+    val deferred = CompletableDeferred<Unit>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,31 +112,35 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         fourthMenu.setOnClickListener {
 
             if(!isInitialized){
-
                 pDialog = AlertHelper.progressDialog(this, "Load Model..")
                 pDialog.show()
 
-                Handler(Looper.getMainLooper()).postDelayed({
-                    faceNetModel = FaceNetModel( this , ModelControl.modelInfo , ModelControl.useGpu , ModelControl.useXNNPack )
-                    frameAnalyser = FrameAnalyser(this, faceNetModel)
-                    fileReader = FileReader(faceNetModel)
-
-                    // Tutup dialog setelah proses selesai
-                    pDialog.dismissWithAnimation()
-                    isInitialized = true
-                    loadFaceDirectory()
-                }, 2000)
+                GlobalScope.launch(Dispatchers.Default) {
+                    initializeModels()
+                    deferred.complete(Unit)
+                    withContext(Dispatchers.Main) {
+                        pDialog.dismissWithAnimation()
+                        isInitialized = true
+                        loadFaceDirectory()
+                    }
+                }
             } else{
                 loadFaceDirectory()
             }
-
-
         }
 
         btnBack.setOnClickListener{
             backService()
         }
     }
+
+    private suspend fun initializeModels(): Unit = defaultScope.async {
+        faceNetModel = FaceNetModel(this@SyncActivity, ModelControl.modelInfo, ModelControl.useGpu, ModelControl.useXNNPack)
+        frameAnalyser = FrameAnalyser(this@SyncActivity, faceNetModel)
+        fileReader = FileReader(faceNetModel)
+
+        Unit
+    }.await()
 
     private fun loadFaceDirectory(){
         sharedPreferences = getSharedPreferences(ConstShared.fileName, MODE_PRIVATE)

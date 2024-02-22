@@ -4,13 +4,9 @@ package com.yudas1337.recognizeface.screens
 
 import android.Manifest
 import android.annotation.TargetApi
-import android.app.Activity
-import android.app.AlertDialog
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
@@ -18,16 +14,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
-import android.provider.DocumentsContract
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultCaller
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.documentfile.provider.DocumentFile
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -38,12 +30,9 @@ import com.yudas1337.recognizeface.constants.ConstShared
 import com.yudas1337.recognizeface.constants.ModelControl
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
 import com.yudas1337.recognizeface.detection.FaceBox
-import com.yudas1337.recognizeface.recognize.BitmapUtils
-import com.yudas1337.recognizeface.recognize.FileReader
 import com.yudas1337.recognizeface.recognize.FrameAnalyser
 import com.yudas1337.recognizeface.recognize.LoadFace
 import com.yudas1337.recognizeface.recognize.model.FaceNetModel
-import com.yudas1337.recognizeface.recognize.model.Models
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -51,7 +40,6 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 @ObsoleteCoroutinesApi
@@ -170,40 +158,48 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                             // cek timer dan liveness
                             if (stableTime <= 0 && isReal == true) {
 //                                Toast.makeText(this, "sudah selesai", Toast.LENGTH_SHORT).show()
-                                val frameBitmap = inputImage.bitmapInternal?.let {
-                                    BitmapUtils.cropRectFromBitmap(
-                                        it, face.boundingBox)
+
+                                val downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                                val file = File(downloadsDirectory, "cropped.png")
+
+                                if (file.exists()) {
+                                    try {
+                                        val bitmap: Bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                                        CoroutineScope( Dispatchers.Default ).launch {
+                                            frameAnalyser.runModel(face, bitmap)
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.d("wajahnya", "Gagal membaca bitmap dari file", e)
+                                    }
+                                } else {
+                                    Log.d("wajahnya", "File cropped.png tidak ditemukan")
                                 }
 
-                                // Mendapatkan direktori "Downloads"
-                                val downloadsDirectory = Environment.getExternalStoragePublicDirectory(
-                                    Environment.DIRECTORY_DOWNLOADS)
-                                val file = File(downloadsDirectory, "main_cropped.jpg")
-
-                                try {
-                                    // Membuat output stream
-                                    val outputStream = FileOutputStream(file)
-
-                                    // Menyimpan bitmap ke file JPEG dengan kualitas 100
-                                    frameBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-
-                                    // Menutup output stream
-                                    outputStream.close()
-
-                                    // Memberi tahu pengguna bahwa gambar telah disimpan
-                                    Log.d("wajahnya", "Gambar disimpan di ${file.absolutePath}")
-                                } catch (e: IOException) {
-                                    // Handle kesalahan jika gagal menyimpan gambar
-                                    e.printStackTrace()
-                                }
+//                                try {
+//                                    // Membuat output stream
+//                                    val outputStream = FileOutputStream(file)
+//
+//                                    // Menyimpan bitmap ke file JPEG dengan kualitas 100
+//                                    frameBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+//
+//                                    // Menutup output stream
+//                                    outputStream.close()
+//
+//                                    // Memberi tahu pengguna bahwa gambar telah disimpan
+//                                    Log.d("wajahnya", "Gambar disimpan di ${file.absolutePath}")
+//                                } catch (e: IOException) {
+//                                    // Handle kesalahan jika gagal menyimpan gambar
+//                                    e.printStackTrace()
+//                                }
 
 //
 //                                frameBitmap.copyPixelsFromBuffer( image.planes[0].buffer )
 //                                frameBitmap = BitmapUtils.rotateBitmap( frameBitmap , image.imageInfo.rotationDegrees.toFloat() )
 
                                 CoroutineScope( Dispatchers.Default ).launch {
-//                                    frameAnalyser.runModel(face, frameBitmap)
+//                                    frameAnalyser.runModel(face, bitmap)
                                 }
+
                             }
 
                             // cek liveness
