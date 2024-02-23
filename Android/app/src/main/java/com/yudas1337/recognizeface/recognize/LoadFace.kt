@@ -69,10 +69,7 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
                         Log.d("wajahnya","Found ${doc.listFiles().size} images in $name directory")
                     } else {
                         errorFound = true
-                        AlertHelper.errorDialogWithButton(context, "Parsing Error",
-                            "Tidak ditemukan list gambar wajah atau struktur folder salah", "RESELECT", "CANCEL",
-                            { launchChooseDirectoryIntent(activity) },
-                            {})
+                        Log.e("error", "tidak ditemukan list gambar wajah atau struktur folder salah")
                     }
                 }
             } else {
@@ -85,7 +82,6 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
             if (!errorFound) {
                 dialog = AlertHelper.progressDialog(context, "Parsing Image to TFlite Model")
                 dialog.show()
-
                 fileReader.run(images, fileReaderCallback)
                 faceSize = images.size
                 Log.d("wajahnya", "Terdeteksi $faceSize wajah gambar ...")

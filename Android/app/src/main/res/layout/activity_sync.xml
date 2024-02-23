@@ -5,7 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/menu_bg"
+    android:background="@drawable/sync_bg"
     android:paddingTop="?attr/actionBarSize">
 
     <TextView
@@ -200,7 +200,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/menu_4"
             android:layout_width="200dp"
             android:layout_height="300dp"
             android:background="@drawable/rounded_bg"
@@ -231,6 +230,7 @@
                 android:layout_height="100dp" />
 
             <LinearLayout
+                android:id="@+id/menu_4"
                 android:layout_width="match_parent"
                 android:layout_height="28dp"
                 android:background="@drawable/rounded_blue_bg">

@@ -192,10 +192,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 //                                    e.printStackTrace()
 //                                }
 
-//
-//                                frameBitmap.copyPixelsFromBuffer( image.planes[0].buffer )
-//                                frameBitmap = BitmapUtils.rotateBitmap( frameBitmap , image.imageInfo.rotationDegrees.toFloat() )
-
                                 CoroutineScope( Dispatchers.Default ).launch {
 //                                    frameAnalyser.runModel(face, bitmap)
                                 }
@@ -212,8 +208,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                 binding.timeText.visibility = View.GONE
                             }
 
-                        } else{
-                            binding.facePositionText.text = "Hanya 1 wajah yang diperbolehkan.."
                         }
 
                     } else{
@@ -330,20 +324,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                 }
             })
         }
-    }
-
-    private fun setCameraDisplayOrientation(): Int {
-        val info = Camera.CameraInfo()
-        Camera.getCameraInfo(cameraId, info)
-        var degrees = 0
-        when (windowManager.defaultDisplay.rotation) {
-            Surface.ROTATION_0 -> degrees = 0
-            Surface.ROTATION_90 -> degrees = 90
-            Surface.ROTATION_180 -> degrees = 180
-            Surface.ROTATION_270 -> degrees = 270
-        }
-
-        return degrees
     }
 
     fun setting(@Suppress("UNUSED_PARAMETER") view: View) =

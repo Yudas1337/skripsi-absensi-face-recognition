@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.lifecycleScope
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.constants.ConstShared
@@ -18,6 +19,7 @@ import com.yudas1337.recognizeface.constants.ModelControl
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
+import com.yudas1337.recognizeface.recognize.CustomDispatcher
 import com.yudas1337.recognizeface.recognize.FileReader
 import com.yudas1337.recognizeface.recognize.FrameAnalyser
 import com.yudas1337.recognizeface.recognize.LoadFace
@@ -27,9 +29,11 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
 
 class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
@@ -53,9 +57,7 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    private val defaultScope = CoroutineScope( Dispatchers.Default )
-
-    val deferred = CompletableDeferred<Unit>()
+    private val deferred = CompletableDeferred<Unit>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,7 +116,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
             if(!isInitialized){
                 pDialog = AlertHelper.progressDialog(this, "Load Model..")
                 pDialog.show()
-
                 GlobalScope.launch(Dispatchers.Default) {
                     initializeModels()
                     deferred.complete(Unit)
@@ -134,13 +135,11 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         }
     }
 
-    private suspend fun initializeModels(): Unit = defaultScope.async {
+    private suspend fun initializeModels(): Unit = withContext(CustomDispatcher.dispatcher) {
         faceNetModel = FaceNetModel(this@SyncActivity, ModelControl.modelInfo, ModelControl.useGpu, ModelControl.useXNNPack)
         frameAnalyser = FrameAnalyser(this@SyncActivity, faceNetModel)
         fileReader = FileReader(faceNetModel)
-
-        Unit
-    }.await()
+    }
 
     private fun loadFaceDirectory(){
         sharedPreferences = getSharedPreferences(ConstShared.fileName, MODE_PRIVATE)

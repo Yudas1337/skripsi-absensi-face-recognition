@@ -71,7 +71,6 @@ class FaceNetModel( context : Context ,
         val faceNetModelOutputs = Array( 1 ){ FloatArray( embeddingDim ) }
         interpreter.run( inputs, faceNetModelOutputs )
 
-
         Log.i( "Performance" , "${model.name} Inference Speed in ms : ${System.currentTimeMillis() - t1}")
         return faceNetModelOutputs
     }

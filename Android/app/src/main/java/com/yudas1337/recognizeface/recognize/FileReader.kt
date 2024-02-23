@@ -2,7 +2,6 @@ package com.yudas1337.recognizeface.recognize
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -29,8 +28,6 @@ class FileReader( private var faceNetModel: FaceNetModel) {
     // imageData will be provided to the MainActivity via ProcessCallback ( see the run() method below ) and finally,
     // used by the FrameAnalyser class.
     private val imageData = ArrayList<Pair<String,FloatArray>>()
-
-
 
     // Given the Bitmaps, extract face embeddings from then and deliver the processed embedding to ProcessCallback.
     fun run( data : ArrayList<Pair<String,Bitmap>> , callback: ProcessCallback ) {
@@ -90,7 +87,7 @@ class FileReader( private var faceNetModel: FaceNetModel) {
     }
 
     // Suspend function for running the FaceNet model
-    private suspend fun getEmbedding(image: Bitmap, bbox : Rect ) : FloatArray = withContext( Dispatchers.Default ) {
+    private suspend fun getEmbedding(image: Bitmap, bbox : Rect ) : FloatArray = withContext(CustomDispatcher.dispatcher) {
         return@withContext faceNetModel.getFaceEmbedding(
             BitmapUtils.cropRectFromBitmap(
                 image,

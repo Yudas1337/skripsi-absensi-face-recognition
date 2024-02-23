@@ -39,7 +39,9 @@ class FrameAnalyser( context: Context ,
     // <-------------------------------------------------------->
 
       suspend fun runModel(faces: Face, cameraFrameBitmap: Bitmap ){
-        withContext( Dispatchers.Default ) {
+        withContext( Dispatchers.Main ) {
+            val thread = Thread.currentThread()
+            Log.d("wajahnya", "thread di dalam with context ${thread.name}")
 
             t1 = System.currentTimeMillis()
             val predictions = ArrayList<Prediction>()
@@ -55,6 +57,9 @@ class FrameAnalyser( context: Context ,
                 if ( isMaskDetectionOn ) {
                     maskLabel = maskDetectionModel.detectMask( cameraFrameBitmap )
                 }
+
+                val thread2 = Thread.currentThread()
+                Log.d("wajahnya", "thread di dalam try ${thread2.name}")
 
                 // Continue with the recognition if the user is not wearing a face mask
                 if (maskLabel == maskDetectionModel.NO_MASK) {
