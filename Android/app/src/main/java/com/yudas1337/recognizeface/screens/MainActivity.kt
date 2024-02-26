@@ -9,18 +9,19 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
+import android.graphics.YuvImage
 import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
 import android.util.Log
-import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.yudas1337.recognizeface.DetectionResult
@@ -30,17 +31,21 @@ import com.yudas1337.recognizeface.constants.ConstShared
 import com.yudas1337.recognizeface.constants.ModelControl
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
 import com.yudas1337.recognizeface.detection.FaceBox
+import com.yudas1337.recognizeface.recognize.BitmapUtils
 import com.yudas1337.recognizeface.recognize.FrameAnalyser
 import com.yudas1337.recognizeface.recognize.LoadFace
 import com.yudas1337.recognizeface.recognize.model.FaceNetModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
+
 
 @ObsoleteCoroutinesApi
 class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDialogListener {
@@ -122,6 +127,49 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     }
 
+    private fun checkFaceBoundingBox(face: Face): Boolean {
+        val box = face.boundingBox
+        return box.left >= 0 && box.top >= 0 && box.right >= 0 && box.bottom >= 0
+    }
+
+    private fun saveFace(byteArray: ByteArray, fileName: String, face: Face): Boolean {
+
+        val yuvImage = YuvImage(byteArray, ImageFormat.NV21, previewWidth, previewHeight, null)
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, previewWidth, previewHeight), 100, out)
+        val imageBytes = out.toByteArray()
+
+
+        if(checkFaceBoundingBox(face)){
+            binding.facePositionText.text = "Wajah Terdeteksi.."
+            binding.timeText.visibility = View.VISIBLE
+
+            val bitmap = BitmapUtils.cropRectFromBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size), face.boundingBox)
+
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val imageFile = File(downloadsDir, fileName)
+
+            return try {
+                val outputStream: OutputStream = FileOutputStream(imageFile, false)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.write(imageBytes)
+                outputStream.flush()
+                outputStream.close()
+
+                true
+            } catch (e: Exception) {
+                Log.d("wajahnya", "error gan ${e.message}")
+                e.printStackTrace()
+                false
+            }
+
+        } else{
+            binding.facePositionText.text = "Anda berada di luar frame deteksi"
+            binding.timeText.visibility = View.GONE
+        }
+        return false
+    }
+
     private fun processImageByteArray(data: ByteArray) {
         val inputImage = InputImage.fromByteArray(
             data,
@@ -153,55 +201,23 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                             if (stableTime.toInt() == 3000) {
                                 timer.start()
                             }
+
                             stableTime -= 1000
-
-                            // cek timer dan liveness
-                            if (stableTime <= 0 && isReal == true) {
-//                                Toast.makeText(this, "sudah selesai", Toast.LENGTH_SHORT).show()
-
-                                val downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                                val file = File(downloadsDirectory, "cropped.png")
-
-                                if (file.exists()) {
-                                    try {
-                                        val bitmap: Bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                                        CoroutineScope( Dispatchers.Default ).launch {
-                                            frameAnalyser.runModel(face, bitmap)
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.d("wajahnya", "Gagal membaca bitmap dari file", e)
-                                    }
-                                } else {
-                                    Log.d("wajahnya", "File cropped.png tidak ditemukan")
-                                }
-
-//                                try {
-//                                    // Membuat output stream
-//                                    val outputStream = FileOutputStream(file)
-//
-//                                    // Menyimpan bitmap ke file JPEG dengan kualitas 100
-//                                    frameBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-//
-//                                    // Menutup output stream
-//                                    outputStream.close()
-//
-//                                    // Memberi tahu pengguna bahwa gambar telah disimpan
-//                                    Log.d("wajahnya", "Gambar disimpan di ${file.absolutePath}")
-//                                } catch (e: IOException) {
-//                                    // Handle kesalahan jika gagal menyimpan gambar
-//                                    e.printStackTrace()
-//                                }
-
-                                CoroutineScope( Dispatchers.Default ).launch {
-//                                    frameAnalyser.runModel(face, bitmap)
-                                }
-
-                            }
 
                             // cek liveness
                             if(isReal == true){
                                 binding.timeText.visibility = View.VISIBLE
-                                binding.facePositionText.text = "Posisikan Wajah ke Dalam Frame"
+
+                                // cek timer
+                                if(stableTime <= 0){
+                                    saveFace(data, "cropped_face.png", face)
+
+//                                CoroutineScope( Dispatchers.Default ).launch {
+//                                    frameAnalyser.runModel(face, bitmap)
+//                                }
+
+
+                                }
                             } else{
 //                                resetTimer()
                                 binding.facePositionText.text = "Spoofing Terdeteksi"
@@ -224,7 +240,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             }
     }
 
-
+    @OptIn(DelicateCoroutinesApi::class)
     private fun init() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -235,6 +251,8 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
         loadFace = LoadFace(this, frameAnalyser, getSharedPreferences(ConstShared.fileName, MODE_PRIVATE))
         frameAnalyser.faceList = loadFace.loadSerializedImageData()
+
+        binding.facePositionText.text = facePositionText
 
         startTimer()
 
@@ -259,16 +277,15 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                     previewHeight,
                                     frameOrientation
                                 )
+
                                 result.threshold = threshold
 
                                 if(result.confidence > result.threshold){
                                     isReal = true
                                     FaceBox.updateColor(isReal!!)
-                                    Log.i("liveness", "ASLI ${result.confidence}")
                                 } else{
                                     isReal = false
                                     FaceBox.updateColor(isReal!!)
-                                    Log.i("liveness", "PALSU ${result.confidence}")
                                 }
                                 working = false
                             }
@@ -365,10 +382,9 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     }
 
     companion object {
-        const val tag = "MainActivity"
         //      const val defaultThreshold = 0.915F
         const val defaultThreshold = 0.60F
-        private const val REQUEST_CODE_CHOOSE_DIRECTORY = 123
+        const val facePositionText = "Posisikan Wajah ke tengah di Dalam Frame"
         val permissions: Array<String> = arrayOf(Manifest.permission.CAMERA)
         const val permissionReqCode = 1
     }

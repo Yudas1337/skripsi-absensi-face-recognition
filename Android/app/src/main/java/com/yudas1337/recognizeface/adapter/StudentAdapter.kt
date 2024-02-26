@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.squareup.picasso.Picasso
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.constants.Gender
 import com.yudas1337.recognizeface.network.Result
 import kotlinx.android.synthetic.main.student_adapter.view.name
 import kotlinx.android.synthetic.main.student_adapter.view.school
@@ -35,9 +36,11 @@ class StudentAdapter(private val context: Context, private val results: List<Res
             itemView.name!!.text = result.name
             itemView.school!!.text = result.school
 
+            val gender = if(result.gender == Gender.MALE){ R.drawable.ic_student_male } else{ R.drawable.ic_student_female }
+
             Picasso.get()
-                .load(R.drawable.ic_students)
-                .placeholder(R.drawable.ic_students)
+                .load(gender)
+                .placeholder(gender)
                 .into(itemView.student_photo)
         }
 

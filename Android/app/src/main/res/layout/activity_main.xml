@@ -12,6 +12,7 @@
     </data>
 
     <RelativeLayout
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -61,22 +62,6 @@
             android:id="@+id/graphic_overlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
-        <com.yudas1337.recognizeface.RectView
-            android:visibility="gone"
-            android:id="@+id/rectView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:lineLength="40dp"
-            app:radius="3dp"
-            app:textSize="15sp"
-            app:textPadding="6dp"
-            app:x1="@{result.left}"
-            app:x2="@{result.right}"
-            app:y1="@{result.top}"
-            app:y2="@{result.bottom}"
-            app:confidence="@{`Liveness Score: ` + String.valueOf(result.confidence)}"
-            app:color="@{result.confidence >= result.threshold ? @color/real_face_color : @color/fake_face_color}" />
 
         <LinearLayout
             android:layout_width="142dp"

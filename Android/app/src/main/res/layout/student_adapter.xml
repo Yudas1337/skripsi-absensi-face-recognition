@@ -23,7 +23,7 @@
             android:id="@+id/student_photo"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:src="@drawable/ic_students" />
+            android:src="@drawable/ic_student_male" />
 
         <Space
             android:layout_width="12dp"

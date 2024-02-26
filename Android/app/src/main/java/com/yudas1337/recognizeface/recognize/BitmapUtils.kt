@@ -1,17 +1,20 @@
 package com.yudas1337.recognizeface.recognize
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import androidx.camera.core.ImageProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileDescriptor
 import java.io.FileOutputStream
+import java.nio.ByteBuffer
 
 class BitmapUtils {
 
@@ -91,6 +94,33 @@ class BitmapUtils {
             return flipBitmap( output )
         }
 
+        @SuppressLint("UnsafeOptInUsageError")
+        fun imageProxyToBitmap(imageProxy: ImageProxy): Bitmap? {
+            val image: Image? = imageProxy.image
+            if (image != null) {
+                try {
+                    val buffer: ByteBuffer = image.planes[0].buffer
+                    val bytes = ByteArray(buffer.remaining())
+                    buffer.get(bytes)
+
+                    val width: Int = imageProxy.width
+                    val height: Int = imageProxy.height
+
+                    // Create Bitmap from the image data
+                    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                    bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bytes))
+
+                    return bitmap
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    imageProxy.close()
+                    image.close()
+                }
+            }
+            return null
+        }
+
 
         // Convert the given Bitmap to NV21 ByteArray
         // See this comment -> https://github.com/firebase/quickstart-android/issues/932#issuecomment-531204396
@@ -101,6 +131,51 @@ class BitmapUtils {
                     * Math.ceil(bitmap.width / 2.0).toInt())
             encodeYUV420SP( yuv, argb, bitmap.width, bitmap.height)
             return@withContext yuv
+        }
+
+        fun nv21ToBitmap(yuv: ByteArray, width: Int, height: Int): Bitmap? {
+            val argb = IntArray(width * height)
+            decodeYUV420SP(argb, yuv, width, height)
+
+            return Bitmap.createBitmap(argb, width, height, Bitmap.Config.ARGB_8888)
+        }
+
+        private fun decodeYUV420SP(argb: IntArray, yuv: ByteArray, width: Int, height: Int) {
+            val frameSize = width * height
+
+            var uvp = frameSize
+            var u = 0
+            var v = 0
+            var yIndex = 0
+
+            for (j in 0 until height) {
+                var uvpIndex = 0
+                val yp = yIndex
+                for (i in 0 until width) {
+                    var y = (0xff and yuv[yp].toInt()) - 16
+                    if (y < 0) y = 0
+
+                    if (i and 1 == 0) {
+                        u = (0xff and yuv[uvp + uvpIndex].toInt()) - 128
+                        v = (0xff and yuv[uvp + uvpIndex + 1].toInt()) - 128
+                        uvpIndex += 2
+                    }
+
+                    var y1192 = 1192 * y
+                    var r = y1192 + 1634 * v
+                    var g = y1192 - 833 * v - 400 * u
+                    var b = y1192 + 2066 * u
+
+                    if (r < 0) r = 0 else if (r > 262143) r = 262143
+                    if (g < 0) g = 0 else if (g > 262143) g = 262143
+                    if (b < 0) b = 0 else if (b > 262143) b = 262143
+
+                    argb[yIndex++] = -0x1000000 or ((r shl 6) and 0xff0000) or ((g shr 2) and 0xff00) or (b shr 10)
+                }
+                if (j and 1 == 0) {
+                    uvp += width
+                }
+            }
         }
 
         private fun encodeYUV420SP(yuv420sp: ByteArray, argb: IntArray, width: Int, height: Int) {

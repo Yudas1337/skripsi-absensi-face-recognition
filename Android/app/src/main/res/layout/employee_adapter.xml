@@ -23,7 +23,7 @@
             android:id="@+id/employee_photo"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:src="@drawable/ic_students" />
+            android:src="@drawable/ic_student_male" />
 
         <Space
             android:layout_width="100dp"
@@ -57,14 +57,6 @@
                 android:textSize="18dp"
                 android:textStyle="bold"
                 android:text="PROGRAMMER" />
-
-            <TextView
-                android:layout_gravity="right"
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Click untuk detail" />
-
 
         </LinearLayout>
     </LinearLayout>

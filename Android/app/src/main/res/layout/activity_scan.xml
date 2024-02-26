@@ -133,6 +133,7 @@
                 android:padding="12dp" />
 
             <Button
+                android:text="Scan Kartu"
                 android:id="@+id/btn_submit"
                 android:textColor="@color/white"
                 android:layout_marginTop="20dp"

@@ -18,7 +18,7 @@
     <color name="white">#FFF</color>
 
     <color name="background_color">#FBFBFD</color>
-    <color name="background_color_50">#B3FFFFFF</color>
+    <color name="background_color_50">#72FFFFFF</color>
     <color name="text_color_header">#323232</color>
     <color name="text_color_description">#616161</color>
 </resources>

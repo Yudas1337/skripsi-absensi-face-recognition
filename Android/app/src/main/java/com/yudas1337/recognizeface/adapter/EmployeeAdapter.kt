@@ -36,7 +36,6 @@ class EmployeeAdapter(private val context: Context, private val results: List<Re
             itemView.name!!.text = result.name
 
             itemView.position!!.text = result.position
-            Log.d("debug", "debug: " + result.photo)
             Picasso.get().load(result.photo).into(itemView.employee_photo)
         }
 

@@ -32,6 +32,7 @@ class UserListActivity : AppCompatActivity() {
                 val emailColumnIndex = it.getColumnIndex("email")
                 val photoColumnIndex = it.getColumnIndex("photo")
                 val schoolColumnIndex = it.getColumnIndex("school")
+                val genderColumnIndex = it.getColumnIndex("gender")
 
                 do {
                     if (idColumnIndex >= 0 && nameColumnIndex >= 0) {
@@ -41,6 +42,7 @@ class UserListActivity : AppCompatActivity() {
                         a.email = it.getString(emailColumnIndex)
                         a.photo = it.getString(photoColumnIndex)
                         a.school = it.getString(schoolColumnIndex)
+                        a.gender = it.getString(genderColumnIndex)
                         dataList.add(a)
                     }
                 } while (it.moveToNext())

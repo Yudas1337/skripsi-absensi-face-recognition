@@ -56,7 +56,7 @@ class FileReader( private var faceNetModel: FaceNetModel) {
             )
             detector.process(inputImage)
                 .addOnSuccessListener { faces ->
-                    if (faces.size != 0) {
+                    if (faces.isNotEmpty()) {
                         mainScope.launch {
                             val embedding = getEmbedding(image, faces[0].boundingBox)
                             imageData.add(Pair(name, embedding))
