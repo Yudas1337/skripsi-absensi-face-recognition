@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:stretchColumns="1,2,3,4,5,6,7"
+    android:layout_height="wrap_content">
+
+    <TableRow
+        android:padding="18dp"
+        android:background="@color/white">
+        <TextView
+            android:id="@+id/name"
+            android:layout_column="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_gravity="center"
+            android:text="Nama Siswa" />
+        <TextView
+            android:id="@+id/school"
+            android:layout_column="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_gravity="center"
+            android:text="SMKN 1 LUMAJANG" />
+        <TextView
+            android:id="@+id/status"
+            android:layout_column="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_gravity="center"
+            android:text="masuk" />
+        <TextView
+            android:id="@+id/present"
+            android:layout_column="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_gravity="center"
+            android:text="08:00" />
+        <TextView
+            android:id="@+id/break_time"
+            android:layout_column="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_gravity="center"
+            android:text="08:00" />
+        <TextView
+            android:id="@+id/return_break"
+            android:layout_column="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_gravity="center"
+            android:text="08:00" />
+        <TextView
+            android:id="@+id/return_home"
+            android:layout_column="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:layout_gravity="center"
+            android:text="08:00" />
+    </TableRow>
+
+
+</TableLayout>
