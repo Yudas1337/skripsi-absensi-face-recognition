@@ -9,7 +9,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
-import android.graphics.YuvImage
 import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
@@ -35,12 +34,13 @@ import com.yudas1337.recognizeface.recognize.BitmapUtils
 import com.yudas1337.recognizeface.recognize.FrameAnalyser
 import com.yudas1337.recognizeface.recognize.LoadFace
 import com.yudas1337.recognizeface.recognize.model.FaceNetModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -132,42 +132,28 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         return box.left >= 0 && box.top >= 0 && box.right >= 0 && box.bottom >= 0
     }
 
-    private fun saveFace(byteArray: ByteArray, fileName: String, face: Face): Boolean {
+    private fun saveFace(imageBytes: ByteArray, bitmap: Bitmap, fileName: String): Boolean {
 
-        val yuvImage = YuvImage(byteArray, ImageFormat.NV21, previewWidth, previewHeight, null)
-        val out = ByteArrayOutputStream()
-        yuvImage.compressToJpeg(Rect(0, 0, previewWidth, previewHeight), 100, out)
-        val imageBytes = out.toByteArray()
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val imageFile = File(downloadsDir, fileName)
 
-
-        if(checkFaceBoundingBox(face)){
-            binding.facePositionText.text = "Wajah Terdeteksi.."
-            binding.timeText.visibility = View.VISIBLE
-
-            val bitmap = BitmapUtils.cropRectFromBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size), face.boundingBox)
-
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val imageFile = File(downloadsDir, fileName)
-
-            return try {
-                val outputStream: OutputStream = FileOutputStream(imageFile, false)
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                outputStream.write(imageBytes)
-                outputStream.flush()
-                outputStream.close()
-
-                true
-            } catch (e: Exception) {
-                Log.d("wajahnya", "error gan ${e.message}")
-                e.printStackTrace()
-                false
-            }
-
-        } else{
-            binding.facePositionText.text = "Anda berada di luar frame deteksi"
-            binding.timeText.visibility = View.GONE
+        if(imageFile.exists()){
+            imageFile.delete()
         }
-        return false
+
+        return try {
+            val outputStream: OutputStream = FileOutputStream(imageFile)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.write(imageBytes)
+            outputStream.flush()
+            outputStream.close()
+            Log.d("wajahnya", "berhasil gan")
+            true
+        } catch (e: Exception) {
+            Log.d("wajahnya", "error gan ${e.message}")
+            e.printStackTrace()
+            false
+        }
     }
 
     private fun processImageByteArray(data: ByteArray) {
@@ -210,16 +196,29 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
                                 // cek timer
                                 if(stableTime <= 0){
-                                    saveFace(data, "cropped_face.png", face)
 
-//                                CoroutineScope( Dispatchers.Default ).launch {
-//                                    frameAnalyser.runModel(face, bitmap)
-//                                }
+                                    if(checkFaceBoundingBox(face)){
+                                        binding.facePositionText.text = "Wajah Terdeteksi.."
+                                        binding.timeText.visibility = View.VISIBLE
 
+                                        val imageBytes = BitmapUtils.frameToImageBytes(data, previewWidth, previewHeight)
+
+                                        val bitmap = BitmapUtils.cropRectFromBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size), face.boundingBox)
+
+//                                        saveFace(imageBytes, bitmap, "cropped_face.png")
+
+                                        CoroutineScope( Dispatchers.Default ).launch {
+                                            frameAnalyser.runModel(face, bitmap)
+                                        }
+
+                                    } else{
+                                        binding.facePositionText.text = "Anda berada di luar frame deteksi"
+                                        binding.timeText.visibility = View.GONE
+                                    }
 
                                 }
                             } else{
-//                                resetTimer()
+                                resetTimer()
                                 binding.facePositionText.text = "Spoofing Terdeteksi"
                                 binding.timeText.visibility = View.GONE
                             }
@@ -228,7 +227,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
                     } else{
                         binding.facePositionText.text = "Wajah tidak Terdeteksi"
-//                        resetTimer()
+                        resetTimer()
                         binding.timeText.visibility = View.GONE
                     }
                 }

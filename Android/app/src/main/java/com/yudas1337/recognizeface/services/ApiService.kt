@@ -19,7 +19,7 @@ import java.io.File
 class ApiService(private val context: Context) {
 
     fun getStudents(){
-        val call = RetrofitBuilder.builder(context).getStudents()
+        val call = RetrofitBuilder.builder().getStudents()
         call.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
                 if (response.isSuccessful) {
@@ -44,7 +44,7 @@ class ApiService(private val context: Context) {
     }
 
     fun getEmployees() {
-        val call: Call<Value> = RetrofitBuilder.employeeBuilder(context).getEmployees()
+        val call: Call<Value> = RetrofitBuilder.employeeBuilder().getEmployees()
 
         call.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
@@ -70,7 +70,7 @@ class ApiService(private val context: Context) {
     }
 
     fun getSchedules(){
-        val call: Call<Value> = RetrofitBuilder.builder(context).getSchedules()
+        val call: Call<Value> = RetrofitBuilder.builder().getSchedules()
 
         call.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
@@ -97,7 +97,7 @@ class ApiService(private val context: Context) {
     }
 
     fun getAttendanceLimit(){
-        val call: Call<Value> = RetrofitBuilder.builder(context).getAttendanceLimit()
+        val call: Call<Value> = RetrofitBuilder.builder().getAttendanceLimit()
 
         call.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {

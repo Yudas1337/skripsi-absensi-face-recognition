@@ -52,13 +52,13 @@ class EmployeeListActivity : AppCompatActivity() {
         viewAdapter = results?.let { EmployeeAdapter(this, it) }
         recyclermodules!!.adapter = viewAdapter
 
-        var btnStudent = findViewById<LinearLayout>(R.id.btnStudent)
+        val btnStudent = findViewById<LinearLayout>(R.id.btnStudent)
         btnStudent.setOnClickListener {
             startActivity(Intent(this, UserListActivity::class.java))
             finish()
         }
 
-        var btnBack = findViewById<Button>(R.id.btn_bck)
+        val btnBack = findViewById<Button>(R.id.btn_bck)
         btnBack.setOnClickListener {
             startActivity(Intent(this, MenuActivity::class.java))
             finish()

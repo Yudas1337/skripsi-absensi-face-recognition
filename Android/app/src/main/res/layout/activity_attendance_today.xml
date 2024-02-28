@@ -47,10 +47,9 @@
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         android:layout_marginTop="100dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="200dp"
         android:background="@drawable/rounded_all"
         android:stretchColumns="1,2,3,4,5,6,7"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:layout_editor_absoluteX="40dp">
 
@@ -122,73 +121,11 @@
                 android:text="Pulang" />
         </TableRow>
 
-        <TableRow
-            android:padding="18dp"
-            android:background="@color/white">
-            <TextView
-                android:layout_column="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:textStyle="normal"
-                android:layout_gravity="center"
-                android:text="Nama Siswa" />
-            <TextView
-                android:layout_column="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:textStyle="normal"
-                android:layout_gravity="center"
-                android:text="SMKN 1 LUMAJANG" />
-            <TextView
-                android:layout_column="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:textStyle="normal"
-                android:layout_gravity="center"
-                android:text="masuk" />
-            <TextView
-                android:layout_column="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:textStyle="normal"
-                android:layout_gravity="center"
-                android:text="08:00" />
-            <TextView
-                android:layout_column="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:textStyle="normal"
-                android:layout_gravity="center"
-                android:text="08:00" />
-            <TextView
-                android:layout_column="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:textStyle="normal"
-                android:layout_gravity="center"
-                android:text="08:00" />
-            <TextView
-                android:layout_column="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:textStyle="normal"
-                android:layout_gravity="center"
-                android:text="08:00" />
-        </TableRow>
-
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/resikelpiew"
+            android:layout_margin="10dp"
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            ></androidx.recyclerview.widget.RecyclerView>
-
+            android:layout_height="wrap_content" />
 
     </TableLayout>
 

@@ -20,6 +20,14 @@ class BitmapUtils {
 
     companion object {
 
+        fun frameToImageBytes(byteArray: ByteArray, previewWidth: Int, previewHeight: Int): ByteArray {
+            val yuvImage = YuvImage(byteArray, ImageFormat.NV21, previewWidth, previewHeight, null)
+            val out = ByteArrayOutputStream()
+            yuvImage.compressToJpeg(Rect(0, 0, previewWidth, previewHeight), 100, out)
+
+            return out.toByteArray()
+        }
+
         // Crop the given bitmap with the given rect.
         fun cropRectFromBitmap(source: Bitmap, rect: Rect ): Bitmap {
             var width = rect.width()

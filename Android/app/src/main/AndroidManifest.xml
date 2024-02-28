@@ -25,6 +25,7 @@
         tools:replace="android:icon">
         <activity
             android:name=".screens.AttendanceTodayActivity"
+            android:screenOrientation="landscape"
             android:exported="false" />
         <activity
             android:name=".screens.EmployeeListActivity"
