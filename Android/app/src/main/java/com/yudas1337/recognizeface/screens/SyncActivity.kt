@@ -2,38 +2,34 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
+import android.os.Environment
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.lifecycleScope
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.constants.ConstShared
-import com.yudas1337.recognizeface.constants.ModelControl
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
+import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
 import com.yudas1337.recognizeface.recognize.CustomDispatcher
+import com.yudas1337.recognizeface.recognize.FaceUtil
 import com.yudas1337.recognizeface.recognize.FileReader
 import com.yudas1337.recognizeface.recognize.FrameAnalyser
 import com.yudas1337.recognizeface.recognize.LoadFace
 import com.yudas1337.recognizeface.recognize.model.FaceNetModel
 import com.yudas1337.recognizeface.services.SyncService
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
 
 class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
@@ -46,8 +42,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
     private lateinit var networkConnection: NetworkConnection
     private var isInternetAvailable: Boolean = false
 
-    lateinit var pDialog: SweetAlertDialog
-
     private lateinit var frameAnalyser  : FrameAnalyser
     private lateinit var faceNetModel : FaceNetModel
     private lateinit var fileReader : FileReader
@@ -59,6 +53,9 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
     private val deferred = CompletableDeferred<Unit>()
 
+    lateinit var pDialog: SweetAlertDialog
+
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sync)
@@ -106,6 +103,7 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
             if(isInternetAvailable){
                 SyncService(this, dbHelper).syncAttendances()
                 Toast.makeText(this, "Menu 3", Toast.LENGTH_SHORT).show()
+
             } else{
                 AlertHelper.internetNotAvailable(this)
             }
@@ -113,45 +111,24 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
         fourthMenu.setOnClickListener {
 
-            if(!isInitialized){
-                pDialog = AlertHelper.progressDialog(this, "Load Model..")
-                pDialog.show()
-                GlobalScope.launch(Dispatchers.Default) {
-                    initializeModels()
-                    deferred.complete(Unit)
-                    withContext(Dispatchers.Main) {
-                        pDialog.dismissWithAnimation()
-                        isInitialized = true
-                        loadFaceDirectory()
-                    }
+            if (Environment.isExternalStorageManager()) {
+                AlertHelper.doSync(this){
+                    pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                    pDialog.show()
+                    SyncService(this, dbHelper).syncFaces()
+                    Toast.makeText(this, "sudah kok", Toast.LENGTH_SHORT).show()
+                    pDialog.dismissWithAnimation()
                 }
-            } else{
-                loadFaceDirectory()
+            } else {
+                PermissionHelper.requestAccessFiles(this){
+                    Toast.makeText(this, "Perizinan Dibatalkan.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
         btnBack.setOnClickListener{
             backService()
         }
-    }
-
-    private suspend fun initializeModels(): Unit = withContext(CustomDispatcher.dispatcher) {
-        faceNetModel = FaceNetModel(this@SyncActivity, ModelControl.modelInfo, ModelControl.useGpu, ModelControl.useXNNPack)
-        frameAnalyser = FrameAnalyser(this@SyncActivity, faceNetModel)
-        fileReader = FileReader(faceNetModel)
-    }
-
-    private fun loadFaceDirectory(){
-        sharedPreferences = getSharedPreferences(ConstShared.fileName, MODE_PRIVATE)
-
-        loadFace = LoadFace(this, frameAnalyser, sharedPreferences)
-        loadFace.loadListFaces(this)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        loadFace.launchDocumentTree(requestCode, resultCode, data, fileReader, this)
     }
 
     companion object{

@@ -96,7 +96,6 @@ class FileReader( private var faceNetModel: FaceNetModel) {
         )
     }
 
-
     private fun reset() {
         imageCounter = 0
         numImages = 0

@@ -3,10 +3,9 @@ package com.yudas1337.recognizeface.recognize
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import com.google.mlkit.vision.face.Face
+import com.yudas1337.recognizeface.constants.FaceStatus
 import com.yudas1337.recognizeface.recognize.model.FaceNetModel
 import com.yudas1337.recognizeface.recognize.model.MaskDetectionModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -17,9 +16,6 @@ class FrameAnalyser( context: Context ,
 
     private val nameScoreHashmap = HashMap<String,ArrayList<Float>>()
     private var subject = FloatArray( model.embeddingDim )
-
-    // Used to determine whether the incoming frame should be dropped or processed.
-    private var isProcessing = false
 
     // Store the face embeddings in a ( String , FloatArray ) ArrayList.
     // Where String -> name of the person and FloatArray -> Embedding of the face.
@@ -38,11 +34,11 @@ class FrameAnalyser( context: Context ,
 
     // <-------------------------------------------------------->
 
-      suspend fun runModel(faces: Face, cameraFrameBitmap: Bitmap ){
-        withContext( Dispatchers.Default ) {
+      suspend fun runModel(cameraFrameBitmap: Bitmap): String {
+        var output = ""
+        withContext( CustomDispatcher.dispatcher ) {
 
             t1 = System.currentTimeMillis()
-            val predictions = ArrayList<Prediction>()
             try {
                 // Crop the frame using face.boundingBox.
                 // Convert the cropped Bitmap to a ByteBuffer.
@@ -58,7 +54,6 @@ class FrameAnalyser( context: Context ,
 
                 // Continue with the recognition if the user is not wearing a face mask
                 if (maskLabel == maskDetectionModel.NO_MASK) {
-                    Log.d("wajahnya", "tidak ada masker")
                     // Perform clustering ( grouping )
                     // Store the clusters in a HashMap. Here, the key would represent the 'name'
                     // of that cluster and ArrayList<Float> would represent the collection of all
@@ -91,7 +86,8 @@ class FrameAnalyser( context: Context ,
 
                     // Compute the average of all scores norms for each cluster.
                     val avgScores = nameScoreHashmap.values.map{ scores -> scores.toFloatArray().average() }
-                    Log.d( "wajahnya", "Average score for each user : $nameScoreHashmap" )
+
+                    Log.d("wajahnya", "list wajah $avgScores")
 
                     val names = nameScoreHashmap.keys.toTypedArray()
                     nameScoreHashmap.clear()
@@ -103,38 +99,22 @@ class FrameAnalyser( context: Context ,
                             names[ avgScores.indexOf( avgScores.maxOrNull()!! ) ]
                         }
                         else {
-                            Log.d("wajahnya", "unknown")
-                            "Unknown"
+                           FaceStatus.UNKNOWN
                         }
                     } else {
                         // In case of L2 norm, choose the lowest value.
                         if ( avgScores.minOrNull()!! > model.model.l2Threshold ) {
-                            Log.d("wajahnya", "unknown")
-                            "Unknown"
+                            FaceStatus.UNKNOWN
                         }
                         else {
                             names[ avgScores.indexOf( avgScores.minOrNull()!! ) ]
                         }
                     }
-                    Log.d( "wajahnya","Person identified as $bestScoreUserName" )
-                    predictions.add(
-                        Prediction(
-                            faces.boundingBox,
-                            bestScoreUserName ,
-                            maskLabel
-                        )
-                    )
+
+                    output = bestScoreUserName
                 }
                 else {
-                    Log.d("wajahnya", "ada masker")
-                    // Inform the user to remove the mask
-                    predictions.add(
-                        Prediction(
-                            faces.boundingBox,
-                            "Please remove the mask" ,
-                            maskLabel
-                        )
-                    )
+                    output = FaceStatus.MASKED
                 }
             }
             catch ( e : Exception ) {
@@ -142,7 +122,10 @@ class FrameAnalyser( context: Context ,
                 Log.e( "wajahnya" , "Exception in FrameAnalyser : ${e.message}" )
             }
             Log.e( "wajahnya" , "Inference time -> ${System.currentTimeMillis() - t1}")
+
         }
+
+         return output
     }
 
 

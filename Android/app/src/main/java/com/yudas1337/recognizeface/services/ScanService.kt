@@ -17,8 +17,10 @@ import java.time.LocalTime
 
 class ScanService(private val context: Context, private val dbHelper: DBHelper, private val voiceHelper: VoiceHelper) {
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun handleScan(rfid: String) {
+
+    fun handleScan(rfid: String): HashMap<String, String?> {
+        val result = HashMap<String, String?>()
+
         val students = dbHelper.findUsersByRfid("students", rfid)
         val employees = dbHelper.findUsersByRfid("employees", rfid)
 
@@ -28,23 +30,32 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
             val indexId = students.getColumnIndex("id")
             val id = students.getString(indexId)
 
-            if(handleAttendances(id, Role.SISWA)){
-                students.close()
-                dbHelper.close()
-            }
+            students.close()
+            dbHelper.close()
+
+            result["rfid"] = rfid
+            result["name"] = name
+            result["id"] = id
+            result["role"] = Role.STUDENT
+
         } else if(employees != null && employees.moveToFirst()) {
             val indexName = employees.getColumnIndex("name")
             val name = employees.getString(indexName)
             val indexId = employees.getColumnIndex("uuid")
             val id = employees.getString(indexId)
 
-            startActivity(context, rfid, name)
-
             employees.close()
             dbHelper.close()
-        } else{
-            AlertHelper.runVoiceAndToast(voiceHelper, context, "Kartu tidak terdaftar")
+
+            result["rfid"] = rfid
+            result["name"] = name
+            result["id"] = id
+            result["role"] = Role.EMPLOYEE
+
         }
+
+        return result
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -53,7 +64,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun handleAttendances(id: String, role: String): Boolean{
+     fun handleAttendances(id: String, role: String, name: String): Boolean{
         val day = dbHelper.getScheduleDay(CalendarHelper.getToday())
 
         if(day.moveToFirst()){
@@ -111,7 +122,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                             "created_at" to CalendarHelper.getAttendanceTimestamps(),
                             "updated_at" to CalendarHelper.getAttendanceTimestamps()
                         ), voiceHelper)){
-                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen pagi")
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen pagi")
                     }
                     return true
                 } else if(isBetween(breakStarts, breakEnds, hours)){
@@ -122,7 +133,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                             "created_at" to CalendarHelper.getAttendanceTimestamps(),
                             "updated_at" to CalendarHelper.getAttendanceTimestamps()
                         ), voiceHelper)){
-                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen istirahat")
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen istirahat")
                     }
                     return true
                 } else if(isBetween(returnStarts, returnEnds, hours)){
@@ -133,7 +144,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                             "created_at" to CalendarHelper.getAttendanceTimestamps(),
                             "updated_at" to CalendarHelper.getAttendanceTimestamps()
                         ), voiceHelper)){
-                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen kembali")
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen kembali")
                     }
                     return true
                 } else if(isBetween(checkoutStarts, checkoutEnds, hours)){
@@ -144,7 +155,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                             "created_at" to CalendarHelper.getAttendanceTimestamps(),
                             "updated_at" to CalendarHelper.getAttendanceTimestamps()
                         ), voiceHelper)){
-                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Berhasil absen pulang")
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen pulang")
                     }
                     return true
                 } else {
@@ -154,7 +165,6 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                 return false
             }
         } else{
-            // cek jika pada hari itu tidak ada jam absen
             AlertHelper.runVoiceAndToast(voiceHelper, context, "Tidak ada jam absen hari ini")
         }
 
@@ -167,10 +177,12 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
     }
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    private fun startActivity(context: Context, rfid: String, name: String) {
+    private fun startActivity(context: Context, rfid: String, name: String, id: String, role: String) {
         context.startActivity(
             Intent(context, MainActivity::class.java)
             .putExtra("rfid", rfid)
-            .putExtra("name", name))
+            .putExtra("name", name)
+            .putExtra("id", id)
+            .putExtra("role", role))
     }
 }

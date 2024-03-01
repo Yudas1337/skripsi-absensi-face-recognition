@@ -127,6 +127,14 @@ class ApiService(private val context: Context) {
 
     }
 
+    fun getEmployeeFaces(){
+
+    }
+
+    fun getStudentFaces(){
+
+    }
+
     fun recognizeFaceApi(imageFile: File) {
         // Create a request body with the file and content type
         val requestFile: RequestBody =

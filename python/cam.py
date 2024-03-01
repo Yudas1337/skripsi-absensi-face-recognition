@@ -3,7 +3,7 @@ import uuid
 
 import cv2
 
-IMAGES_PATH = os.path.join('images', 'dafa')
+IMAGES_PATH = os.path.join('images', 'kader')
 number_images = 10
 
 cap = cv2.VideoCapture(0)

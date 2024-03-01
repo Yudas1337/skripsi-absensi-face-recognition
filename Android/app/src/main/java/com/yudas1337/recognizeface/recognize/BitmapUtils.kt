@@ -8,6 +8,7 @@ import android.media.Image
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.camera.core.ImageProxy
+import androidx.exifinterface.media.ExifInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -62,7 +63,6 @@ class BitmapUtils {
             matrix.postRotate( degrees )
             return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix , false )
         }
-
 
         // Flip the given `Bitmap` horizontally.
         // See this SO answer -> https://stackoverflow.com/a/36494192/10878733
@@ -129,6 +129,21 @@ class BitmapUtils {
             return null
         }
 
+        // Get the image as a Bitmap from given Uri and fix the rotation using the Exif interface
+        // Source -> https://stackoverflow.com/questions/14066038/why-does-an-image-captured-using-camera-intent-gets-rotated-on-some-devices-on-a
+         fun getFixedBitmap( imageFileUri : Uri, context: Context) : Bitmap {
+            var imageBitmap = BitmapUtils.getBitmapFromUri(context.contentResolver , imageFileUri )
+            val exifInterface = ExifInterface(context.contentResolver.openInputStream( imageFileUri )!! )
+            imageBitmap =
+                when (exifInterface.getAttributeInt( ExifInterface.TAG_ORIENTATION ,
+                    ExifInterface.ORIENTATION_UNDEFINED )) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> BitmapUtils.rotateBitmap( imageBitmap , 90f )
+                    ExifInterface.ORIENTATION_ROTATE_180 -> BitmapUtils.rotateBitmap( imageBitmap , 180f )
+                    ExifInterface.ORIENTATION_ROTATE_270 -> BitmapUtils.rotateBitmap( imageBitmap , 270f )
+                    else -> imageBitmap
+                }
+            return imageBitmap
+        }
 
         // Convert the given Bitmap to NV21 ByteArray
         // See this comment -> https://github.com/firebase/quickstart-android/issues/932#issuecomment-531204396

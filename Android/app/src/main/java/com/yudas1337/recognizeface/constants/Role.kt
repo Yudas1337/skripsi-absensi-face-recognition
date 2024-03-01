@@ -1,6 +1,6 @@
 package com.yudas1337.recognizeface.constants
 
 object Role {
-    const val PEGAWAI = "pegawai"
-    const val SISWA = "siswa"
+    const val EMPLOYEE = "pegawai"
+    const val STUDENT = "siswa"
 }

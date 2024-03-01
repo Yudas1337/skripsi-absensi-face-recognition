@@ -4,6 +4,7 @@ package com.yudas1337.recognizeface.screens
 
 import android.Manifest
 import android.annotation.TargetApi
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -19,6 +20,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import cn.pedant.SweetAlert.SweetAlertDialog
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
@@ -27,20 +29,18 @@ import com.yudas1337.recognizeface.DetectionResult
 import com.yudas1337.recognizeface.EngineWrapper
 import com.yudas1337.recognizeface.SetThresholdDialogFragment
 import com.yudas1337.recognizeface.constants.ConstShared
-import com.yudas1337.recognizeface.constants.ModelControl
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
 import com.yudas1337.recognizeface.detection.FaceBox
+import com.yudas1337.recognizeface.helpers.AlertHelper
+import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.recognize.BitmapUtils
-import com.yudas1337.recognizeface.recognize.FrameAnalyser
-import com.yudas1337.recognizeface.recognize.LoadFace
-import com.yudas1337.recognizeface.recognize.model.FaceNetModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -49,67 +49,54 @@ import java.io.OutputStream
 
 @ObsoleteCoroutinesApi
 class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDialogListener {
-
-    private lateinit var binding: ActivityMainBinding
-
-    private var enginePrepared: Boolean = false
-    private lateinit var engineWrapper: EngineWrapper
-    private var threshold: Float = defaultThreshold
-
-    private var camera: Camera? = null
-    private var cameraId: Int = Camera.CameraInfo.CAMERA_FACING_FRONT
-
-    private val previewWidth: Int = 1920
-    private val previewHeight: Int = 1440
-
     // https://jpegclub.org/exif_orientation.html
 
-    private val frameOrientation: Int = 1
-
-    private var screenWidth: Int = 0
-    private var screenHeight: Int = 0
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var engineWrapper: EngineWrapper
 
     private var factorX: Float = 0F
     private var factorY: Float = 0F
+    private var threshold: Float = defaultThreshold
+
+    private var camera: Camera? = null
+
+    private var enginePrepared: Boolean = false
+    private var working: Boolean = false
+    private var isReal: Boolean? = null
+
+    private var cameraId: Int = Camera.CameraInfo.CAMERA_FACING_FRONT
+    private val previewWidth: Int = 1920
+    private val previewHeight: Int = 1440
+    private val frameOrientation: Int = 1
+    private var screenWidth: Int = 0
+    private var screenHeight: Int = 0
 
     private val detectionContext = newSingleThreadContext("detection")
-    private var working: Boolean = false
 
     private lateinit var timer: CountDownTimer
     private var stableTime: Long = 3000
 
-    private var isReal: Boolean? = null
+    private var name: String? = null
+    private var id: String? = null
+    private var rfid: String? = null
+    private var role: String? = null
 
-    private lateinit var frameAnalyser  : FrameAnalyser
-    private lateinit var faceNetModel : FaceNetModel
-    private lateinit var loadFace: LoadFace
+    lateinit var pDialog: SweetAlertDialog
+
+    private var surfaceCallback: SurfaceHolder.Callback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (hasPermissions()) {
+        if (PermissionHelper.hasPermissions(this, permissions)) {
             init()
         } else {
-            requestPermission()
+            PermissionHelper.requestPermission(this, permissions, permissionReqCode)
         }
 
     }
 
-    private fun hasPermissions(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (permission in permissions) {
-                if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private fun requestPermission() = requestPermissions(permissions, permissionReqCode)
-
-    private fun startTimer(){
+    private fun startTimer(stableTime: Long){
         timer = object: CountDownTimer(stableTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {
 
@@ -124,7 +111,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     private fun resetTimer() {
         timer.cancel()
         stableTime = 3000
-
+        startTimer(stableTime)
     }
 
     private fun checkFaceBoundingBox(face: Face): Boolean {
@@ -132,10 +119,19 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         return box.left >= 0 && box.top >= 0 && box.right >= 0 && box.bottom >= 0
     }
 
-    private fun saveFace(imageBytes: ByteArray, bitmap: Bitmap, fileName: String): Boolean {
+    private fun stopCamera() {
+        if (camera != null) {
+            camera!!.setPreviewCallback(null)
+            camera!!.stopPreview()
+            camera!!.release()
+            camera = null
+        }
+    }
+
+    private fun saveFace(bitmap: Bitmap): Boolean {
 
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val imageFile = File(downloadsDir, fileName)
+        val imageFile = File(downloadsDir, ConstShared.CROPPED_FACE)
 
         if(imageFile.exists()){
             imageFile.delete()
@@ -144,10 +140,9 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         return try {
             val outputStream: OutputStream = FileOutputStream(imageFile)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.write(imageBytes)
             outputStream.flush()
             outputStream.close()
-            Log.d("wajahnya", "berhasil gan")
+
             true
         } catch (e: Exception) {
             Log.d("wajahnya", "error gan ${e.message}")
@@ -202,13 +197,14 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                         binding.timeText.visibility = View.VISIBLE
 
                                         val imageBytes = BitmapUtils.frameToImageBytes(data, previewWidth, previewHeight)
-
                                         val bitmap = BitmapUtils.cropRectFromBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size), face.boundingBox)
 
-//                                        saveFace(imageBytes, bitmap, "cropped_face.png")
+                                        if(saveFace(bitmap)){
+                                            destroySurfaceCallback()
+                                            stopCamera()
 
-                                        CoroutineScope( Dispatchers.Default ).launch {
-                                            frameAnalyser.runModel(face, bitmap)
+                                            setResult(RESULT_OK, Intent())
+                                            finish()
                                         }
 
                                     } else{
@@ -239,107 +235,114 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             }
     }
 
+    private fun destroySurfaceCallback() {
+        binding.surface.holder.removeCallback(surfaceCallback)
+        surfaceCallback = null
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     private fun init() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.result = DetectionResult()
 
-        faceNetModel = FaceNetModel( this , ModelControl.modelInfo , ModelControl.useGpu , ModelControl.useXNNPack )
-        frameAnalyser = FrameAnalyser(this, faceNetModel)
-
-        loadFace = LoadFace(this, frameAnalyser, getSharedPreferences(ConstShared.fileName, MODE_PRIVATE))
-        frameAnalyser.faceList = loadFace.loadSerializedImageData()
-
         binding.facePositionText.text = facePositionText
 
-        startTimer()
+        rfid = intent.getStringExtra("rfid")
+        name = intent.getStringExtra("name")
+        id = intent.getStringExtra("id")
+        role = intent.getStringExtra("role")
 
-        binding.surface.holder.let {
-            it.setFormat(ImageFormat.NV21)
-            it.addCallback(object : SurfaceHolder.Callback, Camera.PreviewCallback {
+        startTimer(stableTime)
 
-                @Deprecated("Deprecated in Java")
-                override fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
+        // Inisialisasi callback Anda
+        surfaceCallback = object : SurfaceHolder.Callback, Camera.PreviewCallback {
+            @Deprecated("Deprecated in Java")
+            override fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
 
-                    if(data != null){
-                        processImageByteArray(data)
-                    }
+                if(data != null){
+                    processImageByteArray(data)
+                }
 
-                    if (enginePrepared && data != null) {
-                        if (!working) {
-                            GlobalScope.launch(detectionContext) {
-                                working = true
-                                val result = engineWrapper.detect(
-                                    data,
-                                    previewWidth,
-                                    previewHeight,
-                                    frameOrientation
-                                )
+                if (enginePrepared && data != null) {
+                    if (!working) {
+                        GlobalScope.launch(detectionContext) {
+                            working = true
+                            val result = engineWrapper.detect(
+                                data,
+                                previewWidth,
+                                previewHeight,
+                                frameOrientation
+                            )
 
-                                result.threshold = threshold
+                            result.threshold = threshold
 
-                                if(result.confidence > result.threshold){
-                                    isReal = true
-                                    FaceBox.updateColor(isReal!!)
-                                } else{
-                                    isReal = false
-                                    FaceBox.updateColor(isReal!!)
-                                }
-                                working = false
+                            if(result.confidence > result.threshold){
+                                isReal = true
+                                FaceBox.updateColor(isReal!!)
+                            } else{
+                                isReal = false
+                                FaceBox.updateColor(isReal!!)
                             }
+                            working = false
                         }
                     }
                 }
+            }
 
-                override fun surfaceCreated(p0: SurfaceHolder) {
-                    try {
-                        camera = Camera.open(cameraId)
-                    } catch (e: Exception) {
-                        cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT
-                        camera = Camera.open(cameraId)
-                    }
-
-                    try {
-                        camera!!.setPreviewDisplay(binding.surface.holder)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
+            override fun surfaceCreated(p0: SurfaceHolder) {
+                try {
+                    camera = Camera.open(cameraId)
+                } catch (e: Exception) {
+                    cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT
+                    camera = Camera.open(cameraId)
                 }
 
-                override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+                try {
+                    camera!!.setPreviewDisplay(binding.surface.holder)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
 
-                    if (p0.surface == null) return
+            override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
 
-                    if (camera == null) return
+                if (p0.surface == null) return
 
-                    try {
-                        camera?.stopPreview()
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
-                    }
+                if (camera == null) return
 
-                    val parameters = camera?.parameters
-
-                    parameters?.setPreviewSize(previewWidth, previewHeight)
-
-                    factorX = screenWidth / previewHeight.toFloat()
-                    factorY = screenHeight / previewWidth.toFloat()
-
-                    camera?.parameters = parameters
-
-                    camera?.startPreview()
-                    camera?.setPreviewCallback(this)
-
+                try {
+                    camera?.stopPreview()
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
                 }
 
-                override fun surfaceDestroyed(p0: SurfaceHolder) {
-                    camera?.setPreviewCallback(null)
-                    camera?.release()
-                    camera = null
-                }
-            })
+                val parameters = camera?.parameters
+
+                parameters?.setPreviewSize(previewWidth, previewHeight)
+
+                factorX = screenWidth / previewHeight.toFloat()
+                factorY = screenHeight / previewWidth.toFloat()
+
+                camera?.parameters = parameters
+
+                camera?.startPreview()
+                camera?.setPreviewCallback(this)
+
+            }
+
+            override fun surfaceDestroyed(p0: SurfaceHolder) {
+                camera?.setPreviewCallback(null)
+                camera!!.stopPreview()
+                camera?.release()
+                camera = null
+            }
         }
+
+        // Tambahkan callback ke SurfaceHolder
+        binding.surface.holder.setFormat(ImageFormat.NV21)
+
+        binding.surface.holder.addCallback(surfaceCallback)
     }
 
     fun setting(@Suppress("UNUSED_PARAMETER") view: View) =
@@ -355,13 +358,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == permissionReqCode) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                init()
-            } else {
-                Toast.makeText(this, "Permission Not Granted", Toast.LENGTH_LONG).show()
-            }
-        }
+
     }
 
     override fun onResume() {

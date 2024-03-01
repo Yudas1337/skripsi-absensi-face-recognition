@@ -83,10 +83,10 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
             return false
         }
 
-        if(SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_FACES) == 0){
-            AlertHelper.errorDialog(this, contentText = "Data wajah pegawai masih kosong. Silahkan sinkronisasi ulang!")
-            return false
-        }
+//        if(SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_FACES) == 0){
+//            AlertHelper.errorDialog(this, contentText = "Data wajah pegawai masih kosong. Silahkan sinkronisasi ulang!")
+//            return false
+//        }
 
         return true
     }

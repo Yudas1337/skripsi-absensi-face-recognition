@@ -28,4 +28,8 @@ class SyncService(private val context: Context, private val dbHelper: DBHelper) 
     fun syncAttendances(){
         dbHelper.truncateTables(arrayOf("attendances", "detail_attendances"))
     }
+
+    fun syncFaces(){
+
+    }
 }

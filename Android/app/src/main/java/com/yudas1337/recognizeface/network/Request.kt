@@ -8,13 +8,6 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface Request {
-    @Multipart
-    @POST("attendance-rfid/")
-    fun uploadSync(
-        @Part image: MultipartBody.Part,
-        rfid: String
-    ): Call<Value>
-
     @POST("sync")
     fun syncAttendances(attendances: ArrayList<String>): Call<Value>
 
@@ -29,4 +22,12 @@ interface Request {
 
     @GET("limit")
     fun getAttendanceLimit(): Call<Value>
+
+    // students
+    @GET("face")
+    fun getStudentFaces(): Call<Value>
+
+    // employees
+    @GET("face-api")
+    fun getEmployeeFaces(): Call<Value>
 }

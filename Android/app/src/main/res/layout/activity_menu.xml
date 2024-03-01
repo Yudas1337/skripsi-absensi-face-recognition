@@ -207,7 +207,7 @@
                         android:layout_margin="20dp"
                         android:background="@drawable/general_img_background"
                         android:padding="25dp"
-                        android:src="@drawable/ic_help"
+                        android:src="@drawable/ic_attendance_today"
                         app:tint="#fff" />
 
                     <TextView

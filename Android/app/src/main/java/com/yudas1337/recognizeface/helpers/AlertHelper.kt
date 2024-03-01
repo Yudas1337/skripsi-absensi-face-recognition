@@ -17,7 +17,7 @@ class AlertHelper {
         }
 
         fun internetAvailable(context: Context, confirmClickListener: () -> Unit, cancelClickListener: () -> Unit) {
-            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Terdeteksi Internet")
                 .setContentText("Ingin melakukan sinkronisasi?")
                 .setConfirmText("Sinkronisasi")
@@ -30,11 +30,13 @@ class AlertHelper {
                     cancelClickListener.invoke()
                     sDialog.cancel()
                 }
-                .show()
+
+            dialog.setCancelable(false)
+            dialog.show()
         }
 
         fun doSync(context: Context, confirmClickListener: () -> Unit){
-            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Lakukan Sinkronisasi?")
                 .setContentText("Klik Ok untuk menjalankan")
                 .setConfirmText("Ok")
@@ -46,7 +48,9 @@ class AlertHelper {
                 .setCancelClickListener { sDialog ->
                     sDialog.cancel()
                 }
-                .show()
+
+            dialog.setCancelable(false)
+            dialog.show()
         }
 
         fun progressDialog(context: Context, titleText: String): SweetAlertDialog {
@@ -73,7 +77,7 @@ class AlertHelper {
         }
 
         fun errorDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
-            SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
                 .setTitleText(titleText)
                 .setContentText(contentText)
                 .setConfirmText(positiveButton)
@@ -86,11 +90,13 @@ class AlertHelper {
                     cancelClickListener.invoke()
                     sDialog.cancel()
                 }
-                .show()
+
+            dialog.setCancelable(false)
+            dialog.show()
         }
 
         fun selectDirectoryDialog(context: Context, titleText: String, contentText: String, confirmText: String, confirmClickListener: () -> Unit){
-            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(titleText)
                 .setContentText(contentText)
                 .setConfirmText(confirmText)
@@ -99,11 +105,13 @@ class AlertHelper {
                     confirmClickListener.invoke()
                     sDialog.dismissWithAnimation()
                 }
-                .show()
+
+            dialog.setCancelable(false)
+            dialog.show()
         }
 
         fun warningDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
-            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+           val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(titleText)
                 .setContentText(contentText)
                 .setConfirmText(positiveButton)
@@ -116,9 +124,10 @@ class AlertHelper {
                     cancelClickListener.invoke()
                     sDialog.cancel()
                 }
-                .show()
-        }
 
+            dialog.setCancelable(false)
+            dialog.show()
+        }
 
         fun runVoiceAndToast(voiceHelper: VoiceHelper, context: Context, text: String){
             voiceHelper.runVoice(text)

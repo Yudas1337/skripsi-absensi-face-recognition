@@ -6,33 +6,35 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.DocumentsContract
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
-import androidx.documentfile.provider.DocumentFile
-import androidx.exifinterface.media.ExifInterface
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.Role
 import com.yudas1337.recognizeface.database.SharedPref
 import com.yudas1337.recognizeface.helpers.AlertHelper
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.yudas1337.recognizeface.helpers.VoiceHelper
+import com.yudas1337.recognizeface.screens.MainActivity
+import com.yudas1337.recognizeface.screens.ScanActivity
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
+
 class LoadFace(private val context: Context, private val frameAnalyser: FrameAnalyser, private val sharedPreferences: SharedPreferences) {
 
     private lateinit var dialog: SweetAlertDialog
     private var faceSize: Int = 0
 
+    private lateinit var scanData: HashMap<String, String?>
+
     companion object {
 
         const val REQUEST_CODE_CHOOSE_DIRECTORY = 1001
-
         private var isSerializedDataStored = false
 
     }
@@ -43,83 +45,21 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
         activity.startActivityForResult(intent, REQUEST_CODE_CHOOSE_DIRECTORY)
     }
 
-    fun launchDocumentTree(requestCode: Int, resultCode: Int, data: Intent?, fileReader: FileReader, activity: Activity){
-        if (requestCode == REQUEST_CODE_CHOOSE_DIRECTORY && resultCode == Activity.RESULT_OK) {
-            val dirUri = data?.data
-            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
-                dirUri,
-                DocumentsContract.getTreeDocumentId(dirUri)
-            )
-            val tree = DocumentFile.fromTreeUri(context, childrenUri)
-            val images = ArrayList<Pair<String, Bitmap>>()
-            var errorFound = false
-            if (tree?.listFiles()?.isNotEmpty() == true) {
-                for (doc in tree.listFiles() ?: emptyArray()) {
-                    if (doc.isDirectory && !errorFound) {
-                        val name = doc.name ?: continue
-                        for (imageDocFile in doc.listFiles() ?: emptyArray()) {
-                            try {
-                                images.add(Pair(name, getFixedBitmap(imageDocFile.uri)))
-                            } catch (e: Exception) {
-                                errorFound = true
-                                Toast.makeText(context, "Parsing Image Error. Pastikan struktur folder benar", Toast.LENGTH_SHORT).show()
-                                break
-                            }
-                        }
-                        Log.d("wajahnya","Found ${doc.listFiles().size} images in $name directory")
-                    } else {
-                        errorFound = true
-                        Log.e("error", "tidak ditemukan list gambar wajah atau struktur folder salah")
-                    }
-                }
-            } else {
-                errorFound = true
-                AlertHelper.errorDialogWithButton(context, "Parsing Error",
-                    "Tidak ditemukan list gambar wajah atau struktur folder salah", "RESELECT", "CANCEL",
-                    { launchChooseDirectoryIntent(activity) },
-                    {})
-            }
-            if (!errorFound) {
-                dialog = AlertHelper.progressDialog(context, "Parsing Image to TFlite Model")
-                dialog.show()
-                fileReader.run(images, fileReaderCallback)
-                faceSize = images.size
-                Log.d("wajahnya", "Terdeteksi $faceSize wajah gambar ...")
-            } else {
-                AlertHelper.errorDialogWithButton(context, "Parsing Error",
-                    "Tidak ditemukan list gambar wajah atau struktur folder salah", "RESELECT", "CANCEL",
-                    { launchChooseDirectoryIntent(activity) },
-                    {})
-            }
-        }
-    }
-
-    // Get the image as a Bitmap from given Uri and fix the rotation using the Exif interface
-    // Source -> https://stackoverflow.com/questions/14066038/why-does-an-image-captured-using-camera-intent-gets-rotated-on-some-devices-on-a
-    private fun getFixedBitmap( imageFileUri : Uri) : Bitmap {
-        var imageBitmap = BitmapUtils.getBitmapFromUri(context.contentResolver , imageFileUri )
-        val exifInterface = ExifInterface(context.contentResolver.openInputStream( imageFileUri )!! )
-        imageBitmap =
-            when (exifInterface.getAttributeInt( ExifInterface.TAG_ORIENTATION ,
-                ExifInterface.ORIENTATION_UNDEFINED )) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> BitmapUtils.rotateBitmap( imageBitmap , 90f )
-                ExifInterface.ORIENTATION_ROTATE_180 -> BitmapUtils.rotateBitmap( imageBitmap , 180f )
-                ExifInterface.ORIENTATION_ROTATE_270 -> BitmapUtils.rotateBitmap( imageBitmap , 270f )
-                else -> imageBitmap
-            }
-        return imageBitmap
-    }
-
+    @OptIn(ObsoleteCoroutinesApi::class)
     private val fileReaderCallback = object : FileReader.ProcessCallback {
         override fun onProcessCompleted(data: ArrayList<Pair<String, FloatArray>>, numImagesWithNoFaces: Int) {
 
             frameAnalyser.faceList = data
-
             saveSerializedImageData(data)
 
             dialog.dismissWithAnimation()
-            AlertHelper.successDialog(context, "Image Parsed",
-                "Total $faceSize gambar, $numImagesWithNoFaces gambar tidak terdeteksi wajah ")
+
+            val run = context as Activity
+            run.runOnUiThread{
+                context.startActivityForResult(Intent(context, MainActivity::class.java), ScanActivity.REQUEST_CODE_MAIN)
+            }
+
+            Log.d("wajahnya", "${frameAnalyser.faceList.size}")
         }
     }
 
@@ -155,6 +95,50 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
         }
     }
 
+    fun readFileUsingRfid(rfid: String, fileReader: FileReader, data: HashMap<String, String?>, voiceHelper: VoiceHelper): Boolean {
+        scanData = data
+        val images = ArrayList<Pair<String, Bitmap>>()
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+
+        val facesDir = File(downloadDir, ConstShared.DIR_FACES_NAME)
+
+        if (facesDir.isDirectory && facesDir.exists()) {
+            val role = if(Role.EMPLOYEE == scanData["role"].toString())
+            { ConstShared.EMPLOYEE_DIR_FACES_NAME } else{ ConstShared.STUDENTS_DIR_FACES_NAME}
+
+            val rfidDir = File(facesDir, "$role/$rfid")
+
+            if (rfidDir.isDirectory && rfidDir.exists()) {
+                val name = rfidDir.name
+                for (imageDocFile in rfidDir.listFiles() ?: emptyArray()) {
+                    try {
+                        images.add(Pair(name, BitmapUtils.getFixedBitmap(Uri.fromFile(imageDocFile), context)))
+                    } catch (e: Exception) {
+                        Log.e("wajahnya", "Parsing Image Error. Pastikan struktur folder benar")
+                        return false
+                    }
+                }
+                Log.d("wajahnya", "jumlah file nya ${rfidDir.listFiles()?.size}")
+            } else {
+                AlertHelper.runVoiceAndToast(voiceHelper, context, "Wajah pengguna tidak terdaftar. Harap Sinkronisasi Ulang")
+                return false
+            }
+        } else{
+            Toast.makeText(context, "Folder ${ConstShared.DIR_FACES_NAME } tidak ditemukan", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        dialog = AlertHelper.progressDialog(context, "Extracting Saved Face..")
+        dialog.show()
+
+        fileReader.run(images, fileReaderCallback)
+
+        faceSize = images.size
+        Log.d("wajahnya", "Terdeteksi $faceSize wajah gambar ...")
+
+        return true
+    }
+
     fun loadListFaces(activity: Activity){
         isSerializedDataStored = SharedPref.isSerializedDataStored(sharedPreferences, ConstShared.SHARED_PREF_IS_DATA_STORED_KEY)
         if ( !isSerializedDataStored ) {
@@ -175,5 +159,4 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
                 })
         }
     }
-
 }

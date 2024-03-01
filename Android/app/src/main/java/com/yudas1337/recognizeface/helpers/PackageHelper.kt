@@ -5,6 +5,10 @@ import java.util.UUID
 
 class PackageHelper {
 
+    fun imageDownloader(){
+
+    }
+
     companion object{
          val uuid = UUID.randomUUID().toString()
     }
