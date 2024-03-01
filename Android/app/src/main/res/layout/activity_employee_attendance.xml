@@ -42,14 +42,14 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:paddingBottom="40dp"
         android:layout_height="match_parent"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         android:layout_marginTop="100dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="200dp"
+        android:paddingBottom="40dp"
         android:background="@drawable/rounded_all"
-        android:stretchColumns="1,2,3,4,5,6,7"
+        android:stretchColumns="1,2,3,4,5,6"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:layout_editor_absoluteX="40dp">
 
@@ -70,18 +70,7 @@
                 android:layout_gravity="center"
                 android:text="Nama" />
 
-            <TextView
-                android:id="@+id/school"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="3dip"
-                android:textSize="16dp"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:text="Sekolah" />
+
 
             <TextView
                 android:id="@+id/status"
@@ -167,6 +156,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
+            android:id="@+id/tabStudent"
             android:layout_width="147dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -179,7 +169,7 @@
                 android:id="@+id/imageView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/baseline_supervisor_account_24_active" />
+                app:srcCompat="@drawable/baseline_supervisor_account_24_nonactive" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -187,11 +177,11 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Siswa"
-                android:textColor="@color/colorPrimary" />
+                android:textColor="@color/black" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/buttonEmployee"
+            android:id="@+id/tabEmployee"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -204,7 +194,7 @@
                 android:id="@+id/imageView6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/baseline_co_present_24_nonactive" />
+                app:srcCompat="@drawable/baseline_co_present_24_active" />
 
             <TextView
                 android:id="@+id/textView4"
@@ -212,7 +202,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Pegawai"
-                android:textColor="@color/black" />
+                android:textColor="@color/colorPrimary" />
         </LinearLayout>
     </LinearLayout>
 
