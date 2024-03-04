@@ -11,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.constants.Role
 import com.yudas1337.recognizeface.database.SharedPref
 import com.yudas1337.recognizeface.helpers.AlertHelper
@@ -73,10 +74,9 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
             close()
         }
 
-        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_FACES, frameAnalyser.faceList.size)
+        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_EXTRACTED_FACES, frameAnalyser.faceList.size)
         SharedPref.putBoolean(sharedPreferences, ConstShared.SHARED_PREF_IS_DATA_STORED_KEY , true)
     }
-
 
      fun loadSerializedImageData() : ArrayList<Pair<String,FloatArray>> {
         val serializedDataFile = File(context.filesDir , ConstShared.SERIALIZED_DATA_FILENAME )
@@ -98,13 +98,12 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
     fun readFileUsingRfid(rfid: String, fileReader: FileReader, data: HashMap<String, String?>, voiceHelper: VoiceHelper): Boolean {
         scanData = data
         val images = ArrayList<Pair<String, Bitmap>>()
-        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
-        val facesDir = File(downloadDir, ConstShared.DIR_FACES_NAME)
+        val facesDir = FaceFolder.facesDir
 
         if (facesDir.isDirectory && facesDir.exists()) {
             val role = if(Role.EMPLOYEE == scanData["role"].toString())
-            { ConstShared.EMPLOYEE_DIR_FACES_NAME } else{ ConstShared.STUDENTS_DIR_FACES_NAME}
+            { FaceFolder.EMPLOYEE_DIR_FACES_NAME } else{ FaceFolder.STUDENTS_DIR_FACES_NAME}
 
             val rfidDir = File(facesDir, "$role/$rfid")
 
@@ -124,7 +123,7 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
                 return false
             }
         } else{
-            Toast.makeText(context, "Folder ${ConstShared.DIR_FACES_NAME } tidak ditemukan", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Folder ${FaceFolder.DIR_FACES_NAME } tidak ditemukan. Harap Sinkronisasi Ulang", Toast.LENGTH_SHORT).show()
             return false
         }
 

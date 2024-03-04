@@ -3,15 +3,12 @@
 package com.yudas1337.recognizeface.screens
 
 import android.Manifest
-import android.annotation.TargetApi
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
@@ -28,23 +25,18 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.yudas1337.recognizeface.DetectionResult
 import com.yudas1337.recognizeface.EngineWrapper
 import com.yudas1337.recognizeface.SetThresholdDialogFragment
-import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
 import com.yudas1337.recognizeface.detection.FaceBox
-import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.recognize.BitmapUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStream
 
 
 @ObsoleteCoroutinesApi
@@ -131,17 +123,15 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
     private fun saveFace(bitmap: Bitmap): Boolean {
 
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val imageFile = File(downloadsDir, ConstShared.CROPPED_FACE)
+        val imageFile = File(downloadsDir, FaceFolder.CROPPED_FACE)
 
         if(imageFile.exists()){
             imageFile.delete()
         }
 
         return try {
-            val outputStream: OutputStream = FileOutputStream(imageFile)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
+
+            BitmapUtils.saveBitmap(bitmap, imageFile)
 
             true
         } catch (e: Exception) {

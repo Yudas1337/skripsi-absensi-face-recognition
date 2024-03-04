@@ -13,23 +13,11 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LifecycleObserver
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
-import com.yudas1337.recognizeface.constants.ConstShared
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
-import com.yudas1337.recognizeface.recognize.CustomDispatcher
-import com.yudas1337.recognizeface.recognize.FaceUtil
-import com.yudas1337.recognizeface.recognize.FileReader
-import com.yudas1337.recognizeface.recognize.FrameAnalyser
-import com.yudas1337.recognizeface.recognize.LoadFace
-import com.yudas1337.recognizeface.recognize.model.FaceNetModel
 import com.yudas1337.recognizeface.services.SyncService
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
@@ -41,17 +29,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
     private lateinit var networkConnection: NetworkConnection
     private var isInternetAvailable: Boolean = false
-
-    private lateinit var frameAnalyser  : FrameAnalyser
-    private lateinit var faceNetModel : FaceNetModel
-    private lateinit var fileReader : FileReader
-    private lateinit var loadFace: LoadFace
-
-    private var isInitialized : Boolean = false
-
-    private lateinit var sharedPreferences: SharedPreferences
-
-    private val deferred = CompletableDeferred<Unit>()
 
     lateinit var pDialog: SweetAlertDialog
 
@@ -115,9 +92,7 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
                 AlertHelper.doSync(this){
                     pDialog = AlertHelper.progressDialog(this, percentageProgress)
                     pDialog.show()
-                    SyncService(this, dbHelper).syncFaces()
-                    Toast.makeText(this, "sudah kok", Toast.LENGTH_SHORT).show()
-                    pDialog.dismissWithAnimation()
+                    SyncService(this, dbHelper).syncAttendanceFaces()
                 }
             } else {
                 PermissionHelper.requestAccessFiles(this){

@@ -32,4 +32,6 @@ class Result {
     internal var return_ends: String? = null
     internal var checkout_starts: String? = null
     internal var checkout_ends: String? = null
+
+    internal var faces: List<FaceList>? = null
 }

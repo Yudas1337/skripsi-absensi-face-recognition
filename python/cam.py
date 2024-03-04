@@ -3,7 +3,20 @@ import uuid
 
 import cv2
 
-IMAGES_PATH = os.path.join('images', 'kader')
+nama_folder = "siswa"
+nama_orang = "test"
+
+IMAGES_PATH = os.path.join(nama_folder, nama_orang)
+
+# Periksa apakah direktori sudah ada
+if not os.path.exists(IMAGES_PATH):
+    # Jika belum ada, buat direktori
+    os.mkdir(IMAGES_PATH)
+
+# rumus dijalankan 3x
+# 1 : 25 (hadap depan)
+# 2 : 10 (hadap kiri)
+# 3 : 10 (hadap kanan)
 number_images = 10
 
 cap = cv2.VideoCapture(0)

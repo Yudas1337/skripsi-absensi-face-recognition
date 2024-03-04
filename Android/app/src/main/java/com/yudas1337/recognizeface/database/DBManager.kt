@@ -3,15 +3,94 @@ package com.yudas1337.recognizeface.database
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.yudas1337.recognizeface.constants.FaceFolder
+import com.yudas1337.recognizeface.constants.URL
 import com.yudas1337.recognizeface.helpers.AlertHelper
+import com.yudas1337.recognizeface.helpers.PackageHelper
 import com.yudas1337.recognizeface.network.Result
+import com.yudas1337.recognizeface.recognize.BitmapUtils
 import com.yudas1337.recognizeface.screens.SyncActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import java.io.File
 
 class DBManager(private val dbHelper: DBHelper,
                 private val context: Context,
                 private val sharedPreferences: SharedPreferences?) {
 
     private var processedDataCount: Int = 0
+    private var totalEmployeeFaces: Int = 0
+    private var totalStudentFaces: Int = 0
+
+    fun insertStudentFacesFromJson(jsonData: List<Result>?){
+
+    }
+    suspend fun insertEmployeeFacesFromJson(jsonData: List<Result>?){
+        try {
+            if (jsonData != null) {
+                processedDataCount = 0
+
+                val jobs = mutableListOf<Deferred<Boolean>>()
+
+                for (i in jsonData.indices) {
+                    val faces = jsonData[i].faces
+                    val rfid = jsonData[i].rfid
+                    val employeeDir = File(FaceFolder.facesDir, "${FaceFolder.EMPLOYEE_DIR_FACES_NAME}/$rfid")
+
+                    if (!employeeDir.exists() && !employeeDir.isDirectory) employeeDir.mkdir()
+
+                    val job = CoroutineScope(Dispatchers.IO).async {
+                        var allFacesSaved = true
+
+                        faces?.forEach {
+                            val bitmap = BitmapUtils.downloadImage(it.photo!!, URL.EMPLOYEE_FACES_DIR)
+                            if (bitmap != null) {
+                                val save = BitmapUtils.saveBitmap(bitmap, File(employeeDir, "${PackageHelper.generateUUID()}.png"))
+                                if (!save) {
+                                    allFacesSaved = false
+                                }
+                            } else {
+                                allFacesSaved = false
+                                Log.d("wajahnya", "Gagal mengunduh gambar dari URL: ${it.photo}")
+                            }
+                        }
+
+                        allFacesSaved
+                    }
+
+                    jobs.add(job)
+                }
+
+                val results = jobs.awaitAll()
+
+                val allFacesSaved = results.all { it }
+                val ctx = context as SyncActivity
+
+                if (!allFacesSaved) {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.errorDialog(
+                            ctx,
+                            contentText = "Beberapa Wajah Gagal Disimpan! Silahkan Ulangi dan Periksa Koneksi Internet Anda"
+                        )
+                    }
+                } else {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.successDialog(
+                            ctx,
+                            contentText = "Sinkronisasi Wajah Pengguna Berhasil"
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     fun insertEmployeesFromJson(jsonData: List<Result>?){
         try {

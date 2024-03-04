@@ -1,11 +1,14 @@
 package com.yudas1337.recognizeface.network
 
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Url
 
 interface Request {
     @POST("sync")
@@ -28,6 +31,9 @@ interface Request {
     fun getStudentFaces(): Call<Value>
 
     // employees
-    @GET("face-api")
+    @GET("face")
     fun getEmployeeFaces(): Call<Value>
+
+    @GET
+    suspend fun downloadImage(@Url imageUrl: String): Response<ResponseBody>
 }

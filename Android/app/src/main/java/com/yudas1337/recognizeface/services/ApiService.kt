@@ -1,20 +1,30 @@
 package com.yudas1337.recognizeface.services
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.DBManager
 import com.yudas1337.recognizeface.database.SharedPref
+import com.yudas1337.recognizeface.network.Request
 import com.yudas1337.recognizeface.network.Value
 import com.yudas1337.recognizeface.network.config.RetrofitBuilder
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class ApiService(private val context: Context) {
 
@@ -127,22 +137,50 @@ class ApiService(private val context: Context) {
 
     }
 
-    fun getEmployeeFaces(){
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun <T> Call<T>.await(): T {
+        return suspendCancellableCoroutine { continuation ->
+            enqueue(object : Callback<T> {
+                override fun onResponse(call: Call<T>, response: Response<T>) {
+                    if (response.isSuccessful) {
+                        continuation.resume(response.body()!!)
+                    } else {
+                        continuation.resumeWithException(Exception("Failed to execute call: ${response.code()}"))
+                    }
+                }
 
+                override fun onFailure(call: Call<T>, t: Throwable) {
+                    continuation.resumeWithException(t)
+                }
+            })
+
+            continuation.invokeOnCancellation {
+                cancel()
+            }
+        }
+    }
+
+    fun getEmployeeFaces(){
+        val call: Call<Value> = RetrofitBuilder.employeeBuilder().getEmployeeFaces()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = call.await()
+                val responseData = response.result
+                val dbHelper = DBHelper(context, null)
+                val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
+
+                withContext(Dispatchers.IO) {
+                    DBManager(dbHelper, context, sharedPreferences).insertEmployeeFacesFromJson(responseData)
+                }
+
+            } catch (e: Exception) {
+                Log.d("wajahnya", "Gagal wajah pegawai ${e.message}")
+            }
+        }
     }
 
     fun getStudentFaces(){
 
     }
-
-    fun recognizeFaceApi(imageFile: File) {
-        // Create a request body with the file and content type
-        val requestFile: RequestBody =
-            RequestBody.create(MediaType.parse("multipart/form-data"), imageFile)
-
-        // Create MultipartBody.Part using file request-body, name, and filename
-        val body: MultipartBody.Part =
-            MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
-    }
-
 }

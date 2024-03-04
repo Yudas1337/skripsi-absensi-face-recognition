@@ -3,6 +3,7 @@ package com.yudas1337.recognizeface.services
 import android.content.Context
 import android.os.Handler
 import com.yudas1337.recognizeface.database.DBHelper
+import com.yudas1337.recognizeface.helpers.FaceHelper
 
 class SyncService(private val context: Context, private val dbHelper: DBHelper) {
 
@@ -29,7 +30,15 @@ class SyncService(private val context: Context, private val dbHelper: DBHelper) 
         dbHelper.truncateTables(arrayOf("attendances", "detail_attendances"))
     }
 
-    fun syncFaces(){
+    fun syncAttendanceFaces(){
+
+        FaceHelper.initAttendanceFaceDirectory()
+
+        ApiService(context).getStudentFaces()
+
+        Handler().postDelayed({
+            ApiService(context).getEmployeeFaces()
+        }, 2000L)
 
     }
 }

@@ -22,20 +22,10 @@ object ConstShared {
     // shared pref for limit
     const val TOTAL_LIMIT = "totalLimit"
 
-    // shared pref for list faces
-    const val TOTAL_FACES = "totalFaces"
+    // shared pref for extracted faces
+    const val TOTAL_EXTRACTED_FACES = "totalExtractedFaces"
 
-    // shared pref for presensi_faces directory name
-    const val DIR_FACES_NAME = "presensi_faces"
-
-    // shared pref for employees directory name
-    const val EMPLOYEE_DIR_FACES_NAME = "employees"
-
-    // shared pref for students directory name
-    const val STUDENTS_DIR_FACES_NAME = "students"
-
-    // shared pref for cropped face
-    const val CROPPED_FACE = "cropped_face.png"
-
+    // shared pref for employee list faces
+    const val TOTAL_EMPLOYEE_FACES = "totalEmployeeFaces"
 
 }

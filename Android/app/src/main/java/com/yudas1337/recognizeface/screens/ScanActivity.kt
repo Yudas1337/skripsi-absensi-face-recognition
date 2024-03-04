@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
@@ -17,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.PermissionHelper
@@ -36,7 +36,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.yudas1337.recognizeface.constants.FaceStatus
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import java.io.File
 
 class ScanActivity : AppCompatActivity() {
@@ -131,7 +131,11 @@ class ScanActivity : AppCompatActivity() {
                 scanData = scanService.handleScan(input)
                 getRfid.clear()
                 if (scanData.isNotEmpty()) {
-                    loadFace.readFileUsingRfid(input, fileReader, scanData, voiceHelper!!)
+
+                    if(scanService.checkTodayAttendance(scanData["id"].toString())){
+                        loadFace.readFileUsingRfid(input, fileReader, scanData, voiceHelper!!)
+                    }
+
                 } else {
                     AlertHelper.runVoiceAndToast(voiceHelper!!, this, "Kartu tidak terdaftar")
                 }
@@ -169,12 +173,13 @@ class ScanActivity : AppCompatActivity() {
         voiceHelper!!.stopAndShutdown()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_MAIN && resultCode == RESULT_OK) {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val imageFile = File(downloadsDir, ConstShared.CROPPED_FACE)
+            val imageFile = File(downloadsDir, FaceFolder.CROPPED_FACE)
 
             if (imageFile.exists()) {
                 val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)

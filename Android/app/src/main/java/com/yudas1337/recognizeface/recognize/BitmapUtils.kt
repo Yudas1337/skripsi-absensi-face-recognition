@@ -7,15 +7,21 @@ import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import androidx.camera.core.ImageProxy
 import androidx.exifinterface.media.ExifInterface
+import com.yudas1337.recognizeface.constants.URL
+import com.yudas1337.recognizeface.network.config.RetrofitBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
+import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileDescriptor
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
+
 
 class BitmapUtils {
 
@@ -44,10 +50,28 @@ class BitmapUtils {
 
         }
 
+        suspend fun downloadImage(photoName: String, url: String): Bitmap? {
+
+            try {
+                val response: Response<ResponseBody> = RetrofitBuilder.imageBuilder(url).downloadImage(photoName)
+                if (response.isSuccessful) {
+                    val responseBody: ResponseBody? = response.body()
+                    responseBody?.let {
+                        return BitmapFactory.decodeStream(it.byteStream())
+                    }
+                } else {
+                    Log.d("wajahnya", "Response not successful: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.d("wajahnya", "Error: ${e.message}")
+            }
+
+            return null
+        }
 
         // Get the image as a Bitmap from given Uri
         // Source -> https://developer.android.com/training/data-storage/shared/documents-files#bitmap
-        fun getBitmapFromUri( contentResolver : ContentResolver , uri: Uri): Bitmap {
+        private fun getBitmapFromUri( contentResolver : ContentResolver , uri: Uri): Bitmap {
             val parcelFileDescriptor: ParcelFileDescriptor? = contentResolver.openFileDescriptor(uri, "r")
             val fileDescriptor: FileDescriptor = parcelFileDescriptor!!.fileDescriptor
             val image: Bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
@@ -55,10 +79,9 @@ class BitmapUtils {
             return image
         }
 
-
         // Rotate the given `source` by `degrees`.
         // See this SO answer -> https://stackoverflow.com/a/16219591/10878733
-        fun rotateBitmap( source: Bitmap , degrees : Float ): Bitmap {
+        private fun rotateBitmap( source: Bitmap , degrees : Float ): Bitmap {
             val matrix = Matrix()
             matrix.postRotate( degrees )
             return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix , false )
@@ -66,7 +89,7 @@ class BitmapUtils {
 
         // Flip the given `Bitmap` horizontally.
         // See this SO answer -> https://stackoverflow.com/a/36494192/10878733
-        fun flipBitmap( source: Bitmap ): Bitmap {
+        private fun flipBitmap( source: Bitmap ): Bitmap {
             val matrix = Matrix()
             matrix.postScale(-1f, 1f, source.width / 2f, source.height / 2f)
             return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
@@ -75,9 +98,14 @@ class BitmapUtils {
 
         // Use this method to save a Bitmap to the internal storage ( app-specific storage ) of your device.
         // To see the image, go to "Device File Explorer" -> "data" -> "data" -> "com.ml.quaterion.facenetdetection" -> "files"
-        fun saveBitmap(context: Context, image: Bitmap, name: String) {
-            val fileOutputStream = FileOutputStream(File( context.filesDir.absolutePath + "/$name.png"))
-            image.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+        fun saveBitmap(image: Bitmap?, file: File): Boolean {
+            val fileOutputStream = FileOutputStream(file)
+            image?.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+
+            fileOutputStream.flush()
+            fileOutputStream.close()
+
+            return true
         }
 
         // Convert android.media.Image to android.graphics.Bitmap
