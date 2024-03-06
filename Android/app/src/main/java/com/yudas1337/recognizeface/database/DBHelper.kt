@@ -71,7 +71,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         return minute
     }
 
-    fun insertDetailAttendance(context: Context, tableName: String, data: Map<String, Any?>, voiceHelper: VoiceHelper): Boolean{
+    fun insertDetailAttendance(tableName: String, data: Map<String, Any?>): Boolean{
         val db = this.readableDatabase
         val attendanceId = data["attendance_id"].toString()
         val status = data["status"].toString()
@@ -79,7 +79,6 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         val query = db.rawQuery("SELECT * FROM detail_attendances WHERE attendance_id = ? AND status = ?", arrayOf(attendanceId, status))
 
         return if(query.moveToFirst()){
-            AlertHelper.runVoiceAndToast(voiceHelper, context, "Anda sudah absen pada jam ini")
             false
         } else{
             insertData(tableName, data)

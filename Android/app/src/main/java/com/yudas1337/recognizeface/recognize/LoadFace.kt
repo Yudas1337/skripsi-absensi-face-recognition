@@ -86,15 +86,6 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
         return data
     }
 
-    // Open File chooser to choose the images directory.
-    private fun showSelectDirectoryDialog(activity: Activity) {
-        AlertHelper.selectDirectoryDialog(context,"Pilih Folder Berisi Wajah",
-            "Silahkan pilih folder berisi gambar wajah pegawai", "PILIH"
-        ) {
-            launchChooseDirectoryIntent(activity)
-        }
-    }
-
     fun readFileUsingRfid(rfid: String, fileReader: FileReader, data: HashMap<String, String?>, voiceHelper: VoiceHelper): Boolean {
         scanData = data
         val images = ArrayList<Pair<String, Bitmap>>()
@@ -141,7 +132,7 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
     fun loadListFaces(activity: Activity){
         isSerializedDataStored = SharedPref.isSerializedDataStored(sharedPreferences, ConstShared.SHARED_PREF_IS_DATA_STORED_KEY)
         if ( !isSerializedDataStored ) {
-            showSelectDirectoryDialog(activity)
+//            showSelectDirectoryDialog(activity)
         }
         else {
 

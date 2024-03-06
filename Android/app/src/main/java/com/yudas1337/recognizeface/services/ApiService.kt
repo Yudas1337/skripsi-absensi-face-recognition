@@ -30,53 +30,50 @@ class ApiService(private val context: Context) {
 
     fun getStudents(){
         val call = RetrofitBuilder.builder().getStudents()
-        call.enqueue(object : Callback<Value> {
-            override fun onResponse(call: Call<Value>, response: Response<Value>) {
-                if (response.isSuccessful) {
-                    val responseData = response.body()?.result
-                    val dbHelper = DBHelper(context, null)
 
-                    val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
-                    response.body()?.total?.let {
-                        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_STUDENTS, it)
-                    }
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = call.await()
+                val responseData = response.result
+                val dbHelper = DBHelper(context, null)
+                val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
 
-                    DBManager(dbHelper, context, sharedPreferences).insertStudentsFromJson(responseData)
-                } else {
-                    Log.e("connFailure", "Gagal siswa")
+                response.total?.let {
+                    SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_STUDENTS, it)
                 }
-            }
 
-            override fun onFailure(call: Call<Value>, t: Throwable) {
-                Log.e("connFailure", "Gagal siswa ${t.message}")
+                withContext(Dispatchers.IO) {
+                    DBManager(dbHelper, context, sharedPreferences).insertStudentsFromJson(responseData)
+                }
+
+            } catch (e: Exception) {
+                Log.d("wajahnya", "Gagal siswa magang ${e.message}")
             }
-        })
+        }
     }
 
     fun getEmployees() {
         val call: Call<Value> = RetrofitBuilder.employeeBuilder().getEmployees()
 
-        call.enqueue(object : Callback<Value> {
-            override fun onResponse(call: Call<Value>, response: Response<Value>) {
-                if (response.isSuccessful) {
-                    val responseData = response.body()?.result
-                    val dbHelper = DBHelper(context, null)
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = call.await()
+                val responseData = response.result
+                val dbHelper = DBHelper(context, null)
+                val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
 
-                    val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
-                    response.body()?.total?.let {
-                        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_EMPLOYEES, it)
-                    }
-
-                    DBManager(dbHelper, context, sharedPreferences).insertEmployeesFromJson(responseData)
-                } else {
-                    Log.d("connFailure", "Gagal pegawai")
+                response.total?.let {
+                    SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_EMPLOYEES, it)
                 }
-            }
 
-            override fun onFailure(call: Call<Value>, t: Throwable) {
-                Log.d("connFailure", "Gagal pegawai ${t.message}")
+                withContext(Dispatchers.IO) {
+                    DBManager(dbHelper, context, sharedPreferences).insertEmployeesFromJson(responseData)
+                }
+
+            } catch (e: Exception) {
+                Log.d("wajahnya", "Gagal pegawai ${e.message}")
             }
-        })
+        }
     }
 
     fun getSchedules(){
@@ -181,6 +178,22 @@ class ApiService(private val context: Context) {
     }
 
     fun getStudentFaces(){
+        val call: Call<Value> = RetrofitBuilder.builder().getStudentFaces()
 
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = call.await()
+                val responseData = response.result
+                val dbHelper = DBHelper(context, null)
+                val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
+
+                withContext(Dispatchers.IO) {
+                    DBManager(dbHelper, context, sharedPreferences).insertStudentFacesFromJson(responseData)
+                }
+
+            } catch (e: Exception) {
+                Log.d("wajahnya", "Gagal wajah siswa ${e.message}")
+            }
+        }
     }
 }

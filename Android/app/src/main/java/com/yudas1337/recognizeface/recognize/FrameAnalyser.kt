@@ -27,7 +27,7 @@ class FrameAnalyser( context: Context ,
     // <-------------- User controls --------------------------->
 
     // Use any one of the two metrics, "cosine" or "l2"
-    private val metricToBeUsed = "l2"
+    private val metricToBeUsed = "cosine"
 
     // Use this variable to enable/disable mask detection.
     private val isMaskDetectionOn = true
@@ -84,8 +84,14 @@ class FrameAnalyser( context: Context ,
                         }
                     }
 
+
+                    Log.d("wajahnya", "score hashmap nya $nameScoreHashmap")
+
                     // Compute the average of all scores norms for each cluster.
-                    val avgScores = nameScoreHashmap.values.map{ scores -> scores.toFloatArray().average() }
+                    val avgScores = nameScoreHashmap.values.map{ scores ->
+                        Log.d("wajahnya", "rata rata nya adalah ${scores.toFloatArray().average()}")
+                        scores.toFloatArray().average()
+                    }
 
                     Log.d("wajahnya", "list wajah $avgScores")
 
@@ -137,10 +143,20 @@ class FrameAnalyser( context: Context ,
 
     // Compute the cosine of the angle between x1 and x2.
     private fun cosineSimilarity( x1 : FloatArray , x2 : FloatArray ) : Float {
+        // mag 1 = akar pangkat 2 kemudian dijumlah
         val mag1 = sqrt( x1.map { it * it }.sum() )
+
+        // mag 2 = akar pangkat 2 kemudian dijumlah
         val mag2 = sqrt( x2.map { it * it }.sum() )
-        val dot = x1.mapIndexed{ i , xi -> xi * x2[ i ] }.sum()
+
+        // maping tiap index dengan nilai x1 * tiap nilai index dari x2, kemudian dijumlahkan
+        val dot = x1.mapIndexed{ index, value -> value * x2[ index ] }.sum()
+
+        // hasil akhir dimasukkan ke dalam array
+        // misal 0.7886003
+        // [0.7886003, 0.7892291, 0.8033318, dst.. sebanyak jumlah gambar]
         return dot / (mag1 * mag2)
+
     }
 
 }

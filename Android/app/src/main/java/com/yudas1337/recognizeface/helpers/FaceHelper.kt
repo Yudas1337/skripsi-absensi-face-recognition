@@ -7,23 +7,36 @@ class FaceHelper {
     companion object{
 
         private fun deleteFaceDirectory(facesDir: File){
-            facesDir.delete()
+            if(facesDir.exists() && facesDir.isDirectory) facesDir.deleteRecursively()
         }
 
         private fun deleteProfileDirectory(profilesDir: File){
-            profilesDir.delete()
+           if(profilesDir.exists() && profilesDir.isDirectory) profilesDir.deleteRecursively()
         }
 
-        fun initProfileDirectory(): Unit{
+        fun initProfileDirectory(folderRole: String): Unit {
             val profilesDir = FaceFolder.profileDir
+            val faces = File(profilesDir, folderRole)
 
-            if(!profilesDir.exists() && !profilesDir.isDirectory) profilesDir.mkdir()
+            deleteProfileDirectory(faces)
+
+            if(!profilesDir.exists() && !profilesDir.isDirectory){
+                profilesDir.mkdir()
+            }
+
+            val roleDir = arrayOf(FaceFolder.EMPLOYEE_DIR_FACES_NAME, FaceFolder.STUDENTS_DIR_FACES_NAME)
+
+            for(role in roleDir){
+                val tmp = File(profilesDir, role)
+                if(!tmp.exists() && !tmp.isDirectory) tmp.mkdir()
+            }
         }
 
-        fun initAttendanceFaceDirectory(): Unit {
+        fun initAttendanceFaceDirectory(folderRole: String) {
             val facesDir = FaceFolder.facesDir
+            val faces = File(facesDir, folderRole)
 
-            deleteFaceDirectory(facesDir)
+           deleteFaceDirectory(faces)
 
             if(!facesDir.exists() && !facesDir.isDirectory){
                 facesDir.mkdir()

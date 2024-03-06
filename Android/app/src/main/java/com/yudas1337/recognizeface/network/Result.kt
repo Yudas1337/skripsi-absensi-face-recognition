@@ -5,6 +5,7 @@ class Result {
     internal var id: String? = null
     internal var name: String? = null
     internal var email: String? = null
+    internal var url: String? = null
     internal var photo: String? = null
     internal var national_student_number: String? = null
     internal var classroom: String? = null

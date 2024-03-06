@@ -8,11 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.squareup.picasso.Picasso
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.constants.Gender
 import com.yudas1337.recognizeface.network.Result
 import kotlinx.android.synthetic.main.student_adapter.view.name
 import kotlinx.android.synthetic.main.student_adapter.view.school
 import kotlinx.android.synthetic.main.student_adapter.view.student_photo
+import java.io.File
 
 class StudentAdapter(private val context: Context, private val results: List<Result>) : RecyclerView.Adapter<StudentAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,10 +38,12 @@ class StudentAdapter(private val context: Context, private val results: List<Res
             itemView.name!!.text = result.name
             itemView.school!!.text = result.school
 
+            val photo = File(FaceFolder.profileDir, "${FaceFolder.STUDENTS_DIR_FACES_NAME}/${result.photo}")
+
             val gender = if(result.gender == Gender.MALE){ R.drawable.ic_student_male } else{ R.drawable.ic_student_female }
 
             Picasso.get()
-                .load(gender)
+                .load(photo)
                 .placeholder(gender)
                 .into(itemView.student_photo)
         }

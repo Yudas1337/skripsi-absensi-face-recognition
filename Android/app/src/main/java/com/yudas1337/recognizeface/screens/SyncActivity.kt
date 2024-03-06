@@ -1,7 +1,6 @@
 package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -53,11 +52,17 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
         firstMenu.setOnClickListener {
             if(isInternetAvailable){
-                AlertHelper.doSync(this) {
-                    pDialog = AlertHelper.progressDialog(this, percentageProgress)
-                    pDialog.show()
-                    SyncService(this, dbHelper).syncUsers()
-                }
+                AlertHelper.doSyncWithPictures(this,
+                    {
+                        pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                        pDialog.show()
+                        SyncService(this, dbHelper).syncEmployees()
+                    },
+                    {
+                        pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                        pDialog.show()
+                        SyncService(this, dbHelper).syncStudents()
+                    }, "Pegawai", "Siswa Magang")
             } else{
                 AlertHelper.internetNotAvailable(this)
             }
@@ -89,11 +94,22 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         fourthMenu.setOnClickListener {
 
             if (Environment.isExternalStorageManager()) {
-                AlertHelper.doSync(this){
-                    pDialog = AlertHelper.progressDialog(this, percentageProgress)
-                    pDialog.show()
-                    SyncService(this, dbHelper).syncAttendanceFaces()
+                if(isInternetAvailable){
+                    AlertHelper.doSyncWithPictures(this,
+                        {
+                            pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                            pDialog.show()
+                            SyncService(this, dbHelper).syncEmployeeFaces()
+                        },
+                        {
+                            pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                            pDialog.show()
+                            SyncService(this, dbHelper).syncStudentFaces()
+                        }, "Wajah Pegawai", "Wajah Siswa Magang")
+                } else{
+                    AlertHelper.internetNotAvailable(this)
                 }
+
             } else {
                 PermissionHelper.requestAccessFiles(this){
                     Toast.makeText(this, "Perizinan Dibatalkan.", Toast.LENGTH_SHORT).show()

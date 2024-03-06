@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.yudas1337.recognizeface.R
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.network.Result
 import kotlinx.android.synthetic.main.employee_adapter.view.employee_photo
 import kotlinx.android.synthetic.main.employee_adapter.view.name
 import kotlinx.android.synthetic.main.employee_adapter.view.position
+import java.io.File
 
 class EmployeeAdapter(private val context: Context, private val results: List<Result>) : RecyclerView.Adapter<EmployeeAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,9 +36,16 @@ class EmployeeAdapter(private val context: Context, private val results: List<Re
         fun setData(result: Result)
         {
             itemView.name!!.text = result.name
-
             itemView.position!!.text = result.position
-            Picasso.get().load(result.photo).into(itemView.employee_photo)
+
+            val photo = File(FaceFolder.profileDir, "${FaceFolder.EMPLOYEE_DIR_FACES_NAME}/${result.photo}")
+
+            Log.d("wajahnnya", "path foto adalah ${result.photo}")
+
+            Picasso.get()
+                .load(photo)
+                .placeholder(R.drawable.ic_student_male)
+                .into(itemView.employee_photo)
         }
 
 

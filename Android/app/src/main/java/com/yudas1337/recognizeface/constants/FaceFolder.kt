@@ -28,4 +28,11 @@ object FaceFolder {
 
     // get PROFILE_FACES_NAME
     val profileDir: File = File(downloadDir, PROFILE_FACES_NAME)
+
+    // get employees faces name
+
+
+    // get students faces name
+
+
 }

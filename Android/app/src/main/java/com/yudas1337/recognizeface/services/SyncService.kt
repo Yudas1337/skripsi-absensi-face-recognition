@@ -2,19 +2,22 @@ package com.yudas1337.recognizeface.services
 
 import android.content.Context
 import android.os.Handler
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.FaceHelper
 
 class SyncService(private val context: Context, private val dbHelper: DBHelper) {
 
-    fun syncUsers() {
-        dbHelper.truncateTables(arrayOf("students", "employees"))
+    fun syncEmployees(){
+        dbHelper.truncateTables(arrayOf("employees"))
+        FaceHelper.initProfileDirectory(FaceFolder.EMPLOYEE_DIR_FACES_NAME)
+        ApiService(context).getEmployees()
+    }
+
+    fun syncStudents(){
+        dbHelper.truncateTables(arrayOf("students"))
+        FaceHelper.initProfileDirectory(FaceFolder.STUDENTS_DIR_FACES_NAME)
         ApiService(context).getStudents()
-
-        Handler().postDelayed({
-            ApiService(context).getEmployees()
-        }, 2000L)
-
     }
 
     fun syncSchedules(){
@@ -30,15 +33,13 @@ class SyncService(private val context: Context, private val dbHelper: DBHelper) 
         dbHelper.truncateTables(arrayOf("attendances", "detail_attendances"))
     }
 
-    fun syncAttendanceFaces(){
-
-        FaceHelper.initAttendanceFaceDirectory()
-
+    fun syncStudentFaces(){
+        FaceHelper.initAttendanceFaceDirectory(FaceFolder.STUDENTS_DIR_FACES_NAME)
         ApiService(context).getStudentFaces()
+    }
 
-        Handler().postDelayed({
-            ApiService(context).getEmployeeFaces()
-        }, 2000L)
-
+    fun syncEmployeeFaces(){
+        FaceHelper.initAttendanceFaceDirectory(FaceFolder.EMPLOYEE_DIR_FACES_NAME)
+        ApiService(context).getEmployeeFaces()
     }
 }

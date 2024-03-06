@@ -22,11 +22,69 @@ class DBManager(private val dbHelper: DBHelper,
                 private val sharedPreferences: SharedPreferences?) {
 
     private var processedDataCount: Int = 0
-    private var totalEmployeeFaces: Int = 0
-    private var totalStudentFaces: Int = 0
 
-    fun insertStudentFacesFromJson(jsonData: List<Result>?){
+    suspend fun insertStudentFacesFromJson(jsonData: List<Result>?){
+        try {
+            if (jsonData != null) {
+                processedDataCount = 0
 
+                val jobs = mutableListOf<Deferred<Boolean>>()
+
+                for (i in jsonData.indices) {
+                    val faces = jsonData[i].faces
+                    val rfid = jsonData[i].rfid
+                    val studentDir = File(FaceFolder.facesDir, "${FaceFolder.STUDENTS_DIR_FACES_NAME}/$rfid")
+
+                    if (!studentDir.exists() && !studentDir.isDirectory) studentDir.mkdir()
+
+                    val job = CoroutineScope(Dispatchers.IO).async {
+                        var allFacesSaved = true
+
+                        faces?.forEach {
+                            val bitmap = BitmapUtils.downloadImage(it.photo!!, URL.STUDENT_FACES_DIR)
+                            if (bitmap != null) {
+                                val save = BitmapUtils.saveBitmap(bitmap, File(studentDir, "${PackageHelper.generateUUID()}.png"))
+                                if (!save) {
+                                    allFacesSaved = false
+                                }
+                            } else {
+                                allFacesSaved = false
+                                Log.d("wajahnya", "Gagal mengunduh gambar dari URL: ${it.photo}")
+                            }
+                        }
+
+                        allFacesSaved
+                    }
+
+                    jobs.add(job)
+                }
+
+                val results = jobs.awaitAll()
+
+                val allFacesSaved = results.all { it }
+                val ctx = context as SyncActivity
+
+                if (!allFacesSaved) {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.errorDialog(
+                            ctx,
+                            contentText = "Beberapa Wajah Gagal Disimpan! Silahkan Ulangi dan Periksa Koneksi Internet Anda"
+                        )
+                    }
+                } else {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.successDialog(
+                            ctx,
+                            contentText = "Sinkronisasi Wajah Siswa Berhasil"
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
     suspend fun insertEmployeeFacesFromJson(jsonData: List<Result>?){
         try {
@@ -82,7 +140,7 @@ class DBManager(private val dbHelper: DBHelper,
                         ctx.pDialog.dismissWithAnimation()
                         AlertHelper.successDialog(
                             ctx,
-                            contentText = "Sinkronisasi Wajah Pengguna Berhasil"
+                            contentText = "Sinkronisasi Wajah Pegawai Berhasil"
                         )
                     }
                 }
@@ -92,68 +150,24 @@ class DBManager(private val dbHelper: DBHelper,
         }
     }
 
-    fun insertEmployeesFromJson(jsonData: List<Result>?){
+    suspend fun insertStudentsFromJson(jsonData: List<Result>?) {
         try {
             if (jsonData != null) {
-                val totalData = SharedPref.getInt(sharedPreferences, "totalEmployees")
-                processedDataCount = 0
 
-                Log.d("percentage", "awalnya $processedDataCount")
-
-                for (i in jsonData.indices) {
-                    val data: Map<String, Any?> = mapOf(
-                        "uuid" to jsonData[i].id,
-                        "name" to jsonData[i].name,
-                        "email" to jsonData[i].email,
-                        "national_identity_number" to jsonData[i].national_identity_number,
-                        "phone_number" to jsonData[i].phone_number,
-                        "position" to jsonData[i].position,
-                        "photo" to jsonData[i].photo,
-                        "gender" to jsonData[i].gender,
-                        "salary" to jsonData[i].salary,
-                        "rfid" to jsonData[i].rfid,
-                        "address" to jsonData[i].address,
-                        "date_of_birth" to jsonData[i].date_of_birth,
-                    )
-                    dbHelper.insertData(Table.employees, data)
-
-                    if(context is SyncActivity){
-                        processedDataCount++
-                        val progressPercent = (processedDataCount.toDouble() / totalData.toDouble() * 100).toInt()
-
-                        context.runOnUiThread {
-                            if(progressPercent == 100){
-                                context.pDialog.dismissWithAnimation()
-                                AlertHelper.successDialog(context, contentText = "Sinkronisasi Pengguna Berhasil")
-                            } else{
-                                context.pDialog.titleText = "Loading $progressPercent% of 100"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (e: Exception){
-            e.printStackTrace()
-        }
-    }
-
-     fun insertStudentsFromJson(jsonData: List<Result>?) {
-        try {
-            if (jsonData != null) {
-                val totalData = SharedPref.getInt(sharedPreferences, "totalStudents")
-                processedDataCount = 0
+                val jobs = mutableListOf<Deferred<Boolean>>()
+                val studentDir = File(FaceFolder.profileDir, FaceFolder.STUDENTS_DIR_FACES_NAME)
 
                 for (i in jsonData.indices) {
+                    val rfid = jsonData[i].rfid
                     val data: Map<String, Any?> = mapOf(
                         "id" to  jsonData[i].id,
                         "name" to jsonData[i].name,
                         "email" to jsonData[i].email,
-                        "photo" to jsonData[i].photo,
+                        "photo" to "${rfid}.png",
                         "national_student_number" to jsonData[i].national_student_number,
                         "classroom" to jsonData[i].classroom,
                         "school" to jsonData[i].school,
-                        "rfid" to jsonData[i].rfid,
+                        "rfid" to rfid,
                         "gender" to jsonData[i].gender,
                         "address" to jsonData[i].address,
                         "phone_number" to jsonData[i].phone_number,
@@ -163,21 +177,126 @@ class DBManager(private val dbHelper: DBHelper,
 
                     dbHelper.insertData(Table.students, data)
 
-                    if(context is SyncActivity){
-                        processedDataCount++
-                        val progressPercent = (processedDataCount.toDouble() / totalData.toDouble() * 100).toInt()
+                    if (!studentDir.exists() && !studentDir.isDirectory) studentDir.mkdir()
 
-                        context.runOnUiThread {
-                            if(progressPercent < 100){
-                                context.pDialog.titleText = "Loading $progressPercent% of 100"
+                    val job = CoroutineScope(Dispatchers.IO).async {
+                        var allFacesSaved = true
+                        val bitmap = BitmapUtils.downloadImage(jsonData[i].photo!!, URL.STUDENT_STORAGE)
+                        if (bitmap != null) {
+                            val save = BitmapUtils.saveBitmap(bitmap, File(studentDir, "${rfid}.png"))
+                            if (!save) {
+                                allFacesSaved = false
                             }
+                        } else {
+                            allFacesSaved = false
+                            Log.d("wajahnya", "Gagal mengunduh gambar punya ${jsonData[i].name} dari URL: ${jsonData[i].url!!}")
                         }
+
+                        allFacesSaved
                     }
+
+                    jobs.add(job)
                 }
 
+                val results = jobs.awaitAll()
+
+                val allFacesSaved = results.all { it }
+                val ctx = context as SyncActivity
+
+                if (!allFacesSaved) {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.errorDialog(
+                            ctx,
+                            contentText = "Beberapa Data Gagal Disimpan! Silahkan Ulangi dan Periksa Koneksi Internet Anda"
+                        )
+                    }
+                } else {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.successDialog(
+                            ctx,
+                            contentText = "Sinkronisasi Siswa Magang Berhasil"
+                        )
+                    }
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        catch (e: Exception){
+    }
+
+    suspend fun insertEmployeesFromJson(jsonData: List<Result>?){
+
+        try {
+            if (jsonData != null) {
+
+                val jobs = mutableListOf<Deferred<Boolean>>()
+                val employeeDir = File(FaceFolder.profileDir, FaceFolder.EMPLOYEE_DIR_FACES_NAME)
+
+                for (i in jsonData.indices) {
+                    val rfid = jsonData[i].rfid
+                    val data: Map<String, Any?> = mapOf(
+                        "uuid" to jsonData[i].id,
+                        "name" to jsonData[i].name,
+                        "email" to jsonData[i].email,
+                        "national_identity_number" to jsonData[i].national_identity_number,
+                        "phone_number" to jsonData[i].phone_number,
+                        "position" to jsonData[i].position,
+                        "photo" to "${rfid}.png",
+                        "gender" to jsonData[i].gender,
+                        "salary" to jsonData[i].salary,
+                        "rfid" to jsonData[i].rfid,
+                        "address" to jsonData[i].address,
+                        "date_of_birth" to jsonData[i].date_of_birth,
+                    )
+                    dbHelper.insertData(Table.employees, data)
+
+                    if (!employeeDir.exists() && !employeeDir.isDirectory) employeeDir.mkdir()
+
+                    val job = CoroutineScope(Dispatchers.IO).async {
+                        var allFacesSaved = true
+                        val bitmap = BitmapUtils.downloadImage(jsonData[i].photo!!, URL.EMPLOYEE_FACES_DIR)
+                        if (bitmap != null) {
+                            val save = BitmapUtils.saveBitmap(bitmap, File(employeeDir, "${rfid}.png"))
+                            if (!save) {
+                                allFacesSaved = false
+                            }
+                        } else {
+                            allFacesSaved = false
+                            Log.d("wajahnya", "Gagal mengunduh gambar punya ${jsonData[i].name} dari URL: ${jsonData[i].url!!}")
+                        }
+
+                        allFacesSaved
+                    }
+
+                    jobs.add(job)
+                }
+
+                val results = jobs.awaitAll()
+
+                val allFacesSaved = results.all { it }
+                val ctx = context as SyncActivity
+
+                if (!allFacesSaved) {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.errorDialog(
+                            ctx,
+                            contentText = "Beberapa Data Gagal Disimpan! Silahkan Ulangi dan Periksa Koneksi Internet Anda"
+                        )
+                    }
+                } else {
+                    ctx.runOnUiThread {
+                        ctx.pDialog.dismissWithAnimation()
+                        AlertHelper.successDialog(
+                            ctx,
+                            contentText = "Sinkronisasi Pegawai Berhasil"
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

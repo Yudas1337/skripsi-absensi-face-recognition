@@ -4,6 +4,7 @@ package com.yudas1337.recognizeface.screens
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
@@ -347,8 +348,13 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
+        if (requestCode == permissionReqCode) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                init()
+            } else {
+                Toast.makeText(this, "Permission Denied. Failed to Launch Camera", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onResume() {

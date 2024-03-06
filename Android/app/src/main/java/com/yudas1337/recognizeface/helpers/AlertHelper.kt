@@ -53,6 +53,23 @@ class AlertHelper {
             dialog.show()
         }
 
+        fun doSyncWithPictures(context: Context, confirmClickListener: () -> Unit, cancelClickListener: () -> Unit, confirmText: String, cancelText: String){
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Lakukan Sinkronisasi?")
+                .setContentText("Pilih Jenis Sinkronisasi")
+                .setConfirmText(confirmText)
+                .setCancelText(cancelText)
+                .setConfirmClickListener { sDialog ->
+                    confirmClickListener.invoke()
+                    sDialog.dismissWithAnimation()
+                }
+                .setCancelClickListener { sDialog ->
+                    cancelClickListener.invoke()
+                    sDialog.cancel()
+                }
+            dialog.show()
+        }
+
         fun progressDialog(context: Context, titleText: String): SweetAlertDialog {
             val pDialog = SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE)
             pDialog.progressHelper.barColor = Color.parseColor("#A5DC86")
@@ -94,22 +111,6 @@ class AlertHelper {
             dialog.setCancelable(false)
             dialog.show()
         }
-
-        fun selectDirectoryDialog(context: Context, titleText: String, contentText: String, confirmText: String, confirmClickListener: () -> Unit){
-            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText(titleText)
-                .setContentText(contentText)
-                .setConfirmText(confirmText)
-                .showCancelButton(false)
-                .setConfirmClickListener { sDialog ->
-                    confirmClickListener.invoke()
-                    sDialog.dismissWithAnimation()
-                }
-
-            dialog.setCancelable(false)
-            dialog.show()
-        }
-
         fun warningDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(titleText)

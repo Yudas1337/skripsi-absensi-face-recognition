@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
@@ -186,7 +187,9 @@ class ScanActivity : AppCompatActivity() {
                 val pDialog = AlertHelper.progressDialog(this, "Recognizing..")
                 pDialog.show()
                 GlobalScope.launch(Dispatchers.Default) {
+
                     frameAnalyser.faceList = loadFace.loadSerializedImageData()
+
                     deferred.complete(Unit)
                     withContext(CustomDispatcher.dispatcher) {
 

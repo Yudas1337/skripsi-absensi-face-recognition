@@ -3,6 +3,7 @@ package com.yudas1337.recognizeface.services
 import android.content.Context
 import android.database.Cursor
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.constants.AttendanceStatus
 import com.yudas1337.recognizeface.constants.Role
@@ -115,12 +116,58 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
 
                 formatAttendanceHours()
 
-                if (!(isBetween(checkinStarts, checkinEnds, hours) ||
-                            isBetween(breakStarts, breakEnds, hours) ||
-                            isBetween(returnStarts, returnEnds, hours) ||
-                            isBetween(checkoutStarts, checkoutEnds, hours))) {
-                    AlertHelper.runVoiceAndToast(voiceHelper, context, "Gagal absen! anda absen diluar jam")
-                    return false
+                val indexAttendanceId = attendance.getColumnIndex("id")
+                val attendanceId = attendance.getString(indexAttendanceId)
+
+                when {
+                    isBetween(checkinStarts, checkinEnds, hours) -> {
+                        if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
+                                "attendance_id" to attendanceId,
+                                "status" to AttendanceStatus.PRESENT,
+                                "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                                "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                            ))) {
+                            AlertHelper.runVoiceAndToast(voiceHelper, context, "Anda sudah absen pada jam ini")
+                            return false
+                        }
+                    }
+                    isBetween(breakStarts, breakEnds, hours) -> {
+                        if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
+                                "attendance_id" to attendanceId,
+                                "status" to AttendanceStatus.BREAK,
+                                "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                                "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                            ))) {
+                            AlertHelper.runVoiceAndToast(voiceHelper, context, "Anda sudah absen pada jam ini")
+                            return false
+                        }
+                    }
+                    isBetween(returnStarts, returnEnds, hours) -> {
+                        if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
+                                "attendance_id" to attendanceId,
+                                "status" to AttendanceStatus.RETURN_BREAK,
+                                "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                                "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                            ))) {
+                            AlertHelper.runVoiceAndToast(voiceHelper, context, "Anda sudah absen pada jam ini")
+                            return false
+                        }
+                    }
+                    isBetween(checkoutStarts, checkoutEnds, hours) -> {
+                        if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
+                                "attendance_id" to attendanceId,
+                                "status" to AttendanceStatus.RETURN,
+                                "created_at" to CalendarHelper.getAttendanceTimestamps(),
+                                "updated_at" to CalendarHelper.getAttendanceTimestamps()
+                            ))) {
+                            AlertHelper.runVoiceAndToast(voiceHelper, context, "Anda sudah absen pada jam ini")
+                            return false
+                        }
+                    }
+                    else -> {
+                        AlertHelper.runVoiceAndToast(voiceHelper, context, "Gagal absen! Anda absen diluar jam")
+                        return false
+                    }
                 }
             }
         } else{
@@ -132,7 +179,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-     fun handleAttendances(id: String, role: String, name: String): Boolean{
+    fun handleAttendances(id: String, role: String, name: String): Boolean{
 
         var attendance = getCurrentAttendance(id, dbHelper)
 
@@ -148,57 +195,60 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
             )
             dbHelper.insertData("attendances", data)
             attendance = getCurrentAttendance(id, dbHelper)
+
         }
 
-        formatAttendanceHours()
+        Log.d("wajahnya", "nilai move to first ${attendance.moveToFirst()}")
 
-        val indexAttendanceId = attendance.getColumnIndex("id")
-        val attendanceId = attendance.getString(indexAttendanceId)
+        if(attendance.moveToFirst()){
+            formatAttendanceHours()
+            val indexAttendanceId = attendance.getColumnIndex("id")
+            val attendanceId = attendance.getString(indexAttendanceId)
 
-        if (isBetween(checkinStarts, checkinEnds, hours)) {
-            // absen pagi antara jam 07.00 - 08.15 (toleransi 15 menit)
-            if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+            Log.d("wajahnya", "$attendanceId")
+            Log.d("wajahnya", "$checkinStarts $checkinEnds $hours")
+
+            if (isBetween(checkinStarts, checkinEnds, hours)) {
+                // absen pagi antara jam 07.00 - 08.15 (toleransi 15 menit)
+                dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
                     "status" to AttendanceStatus.PRESENT,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()
-                ), voiceHelper)){
+                ))
                 AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen pagi")
-            }
-            return true
-        } else if(isBetween(breakStarts, breakEnds, hours)){
-            // absen istirahat antara jam 11.00 - 12.00
-            if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+                return true
+            } else if(isBetween(breakStarts, breakEnds, hours)){
+                // absen istirahat antara jam 11.00 - 12.00
+                dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
                     "status" to AttendanceStatus.BREAK,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()
-                ), voiceHelper)){
+                ))
                 AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen istirahat")
-            }
-            return true
-        } else if(isBetween(returnStarts, returnEnds, hours)){
-            // absen kembali antara jam 12.30 - 13.00
-            if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+                return true
+            } else if(isBetween(returnStarts, returnEnds, hours)){
+                // absen kembali antara jam 12.30 - 13.00
+                dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
                     "status" to AttendanceStatus.RETURN_BREAK,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()
-                ), voiceHelper)){
+                ))
                 AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen kembali")
-            }
-            return true
-        } else if(isBetween(checkoutStarts, checkoutEnds, hours)){
-            // absen pulang antara jam 16.00 - 20.00
-            if(dbHelper.insertDetailAttendance(context, "detail_attendances", mapOf(
+                return true
+            } else if(isBetween(checkoutStarts, checkoutEnds, hours)){
+                // absen pulang antara jam 16.00 - 20.00
+                dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
                     "status" to AttendanceStatus.RETURN,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()
-                ), voiceHelper)){
+                ))
                 AlertHelper.runVoiceAndToast(voiceHelper, context, "$name Berhasil absen pulang")
+                return true
             }
-            return true
         }
 
         return false
