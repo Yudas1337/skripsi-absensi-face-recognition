@@ -9,6 +9,7 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleObserver
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.database.SharedPref
 import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
@@ -83,10 +84,10 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
             return false
         }
 
-//        if(SharedPref.getInt(sharedPreferences, ConstShared.TOTAL_FACES) == 0){
-//            AlertHelper.errorDialog(this, contentText = "Data wajah pegawai masih kosong. Silahkan sinkronisasi ulang!")
-//            return false
-//        }
+        if(FaceFolder.facesDir.listFiles()?.isEmpty() == true){
+            AlertHelper.errorDialog(this, contentText = "Data wajah pengguna masih kosong. Silahkan sinkronisasi ulang!")
+            return false
+        }
 
         return true
     }
