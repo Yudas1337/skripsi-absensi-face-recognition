@@ -5,9 +5,9 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.widget.Toast
-import com.yudas1337.recognizeface.helpers.AlertHelper
-import com.yudas1337.recognizeface.helpers.VoiceHelper
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION) {
@@ -119,7 +119,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     }
 
     fun syncAttendances(): Cursor {
-        val db = this.writableDatabase
+        val db = this.readableDatabase
 
         return db.rawQuery("SELECT\n" +
                 "    attendances.user_id,\n" +
@@ -141,10 +141,38 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                 "    attendances.id", null)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun fetchStudentAttendances(name: String): Cursor {
+        val db = this.readableDatabase
+
+        val query = """
+        SELECT 
+            students.name,
+            students.school,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'present' THEN detail_attendances.created_at ELSE NULL END) AS present_hour,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'break' THEN detail_attendances.created_at ELSE NULL END) AS break_hour,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'return_break' THEN detail_attendances.created_at ELSE NULL END) AS return_break_hour,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'return' THEN detail_attendances.created_at ELSE NULL END) AS return_hour
+        FROM 
+            students
+        LEFT JOIN 
+            attendances ON students.id = attendances.user_id AND date(attendances.created_at) = date("now")
+        LEFT JOIN 
+            detail_attendances ON attendances.id = detail_attendances.attendance_id
+        GROUP BY 
+            students.name
+        ORDER BY 
+            students.name ASC;
+    """.trimIndent()
+
+        return db.rawQuery(query, null)
+    }
+
     companion object{
 
         private const val DATABASE_NAME = "db_attendance"
 
         private const val DATABASE_VERSION = 1
+
     }
 }

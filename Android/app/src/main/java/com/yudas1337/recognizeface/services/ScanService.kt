@@ -106,18 +106,19 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
             // cek apakah belum absen masuk hari ini di pagi hari
             if(!attendance.moveToFirst()){
 //                 cek apakah dia telat atau tidak
-                if(CalendarHelper.getAttendanceHours() > getLimit.toString()){
-                    AlertHelper.runVoiceAndToast(voiceHelper, context, "Gagal absen karena telat masuk pagi")
-                    return false
-                }
+//                if(CalendarHelper.getAttendanceHours() > getLimit.toString()){
+//                    AlertHelper.runVoiceAndToast(voiceHelper, context, "Gagal absen karena telat masuk pagi")
+//                    return false
+//                }
             }
 
             if(attendance.moveToFirst()){
-
                 formatAttendanceHours()
 
                 val indexAttendanceId = attendance.getColumnIndex("id")
                 val attendanceId = attendance.getString(indexAttendanceId)
+
+                return true
 
                 when {
                     isBetween(checkinStarts, checkinEnds, hours) -> {
@@ -204,9 +205,6 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
             formatAttendanceHours()
             val indexAttendanceId = attendance.getColumnIndex("id")
             val attendanceId = attendance.getString(indexAttendanceId)
-
-            Log.d("wajahnya", "$attendanceId")
-            Log.d("wajahnya", "$checkinStarts $checkinEnds $hours")
 
             if (isBetween(checkinStarts, checkinEnds, hours)) {
                 // absen pagi antara jam 07.00 - 08.15 (toleransi 15 menit)

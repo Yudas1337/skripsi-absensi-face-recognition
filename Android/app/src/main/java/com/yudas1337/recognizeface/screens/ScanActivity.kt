@@ -132,11 +132,9 @@ class ScanActivity : AppCompatActivity() {
                 scanData = scanService.handleScan(input)
                 getRfid.clear()
                 if (scanData.isNotEmpty()) {
-
                     if(scanService.checkTodayAttendance(scanData["id"].toString())){
                         loadFace.readFileUsingRfid(input, fileReader, scanData, voiceHelper!!)
                     }
-
                 } else {
                     AlertHelper.runVoiceAndToast(voiceHelper!!, this, "Kartu tidak terdaftar")
                 }
@@ -150,7 +148,10 @@ class ScanActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun init() {
         if (Environment.isExternalStorageManager()) {
-            executeMain()
+            GlobalScope.launch(Dispatchers.Main) {
+                deferred.await() // Menunggu hingga inisialisasi selesai
+                executeMain()
+            }
         } else {
             PermissionHelper.requestAccessFiles(this){
                 Toast.makeText(this, "Perizinan Dibatalkan.", Toast.LENGTH_SHORT).show()
@@ -188,7 +189,7 @@ class ScanActivity : AppCompatActivity() {
                 pDialog.show()
                 GlobalScope.launch(Dispatchers.Default) {
 
-                    frameAnalyser.faceList = loadFace.loadSerializedImageData()
+                    frameAnalyser.faceList = loadFace.loadSerializedImageData(scanData["rfid"].toString())
 
                     deferred.complete(Unit)
                     withContext(CustomDispatcher.dispatcher) {

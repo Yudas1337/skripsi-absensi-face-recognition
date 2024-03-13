@@ -32,6 +32,7 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
     private var faceSize: Int = 0
 
     private lateinit var scanData: HashMap<String, String?>
+    private var rfidUser: String? = null
 
     companion object {
 
@@ -51,7 +52,7 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
         override fun onProcessCompleted(data: ArrayList<Pair<String, FloatArray>>, numImagesWithNoFaces: Int) {
 
             frameAnalyser.faceList = data
-            saveSerializedImageData(data)
+            saveSerializedImageData(data, rfidUser)
 
             dialog.dismissWithAnimation()
 
@@ -59,14 +60,12 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
             run.runOnUiThread{
                 context.startActivityForResult(Intent(context, MainActivity::class.java), ScanActivity.REQUEST_CODE_MAIN)
             }
-
-            Log.d("wajahnya", "${frameAnalyser.faceList.size}")
         }
     }
 
 
-    private fun saveSerializedImageData(data : ArrayList<Pair<String,FloatArray>> ) {
-        val serializedDataFile = File(context.filesDir , ConstShared.SERIALIZED_DATA_FILENAME)
+    private fun saveSerializedImageData(data : ArrayList<Pair<String,FloatArray>>, rfid: String?) {
+        val serializedDataFile = File(context.filesDir , "${rfid}-${ConstShared.SERIALIZED_DATA_FILENAME}")
 
         ObjectOutputStream( FileOutputStream( serializedDataFile )  ).apply {
             writeObject( data )
@@ -74,19 +73,30 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
             close()
         }
 
-        SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_EXTRACTED_FACES, frameAnalyser.faceList.size)
-        SharedPref.putBoolean(sharedPreferences, ConstShared.SHARED_PREF_IS_DATA_STORED_KEY , true)
+        SharedPref.putInt(sharedPreferences, "${rfid}-${ConstShared.TOTAL_EXTRACTED_FACES}", frameAnalyser.faceList.size)
+        SharedPref.putBoolean(sharedPreferences, "${rfid}-${ConstShared.SHARED_PREF_IS_DATA_STORED_KEY}", true)
     }
 
-     fun loadSerializedImageData() : ArrayList<Pair<String,FloatArray>> {
-        val serializedDataFile = File(context.filesDir , ConstShared.SERIALIZED_DATA_FILENAME )
+     fun loadSerializedImageData(rfid: String) : ArrayList<Pair<String,FloatArray>> {
+        val serializedDataFile = File(context.filesDir , "${rfid}-${ConstShared.SERIALIZED_DATA_FILENAME}")
         val objectInputStream = ObjectInputStream(FileInputStream( serializedDataFile ) )
         val data = objectInputStream.readObject() as ArrayList<Pair<String,FloatArray>>
         objectInputStream.close()
         return data
     }
 
+    @OptIn(ObsoleteCoroutinesApi::class)
     fun readFileUsingRfid(rfid: String, fileReader: FileReader, data: HashMap<String, String?>, voiceHelper: VoiceHelper): Boolean {
+        rfidUser = rfid
+
+        if (SharedPref.isSerializedDataStored(sharedPreferences, "${rfid}-${ConstShared.SHARED_PREF_IS_DATA_STORED_KEY}")) {
+            val run = context as Activity
+            run.runOnUiThread{
+                context.startActivityForResult(Intent(context, MainActivity::class.java), ScanActivity.REQUEST_CODE_MAIN)
+            }
+            return true
+        }
+
         scanData = data
         val images = ArrayList<Pair<String, Bitmap>>()
 
@@ -127,26 +137,5 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
         Log.d("wajahnya", "Terdeteksi $faceSize wajah gambar ...")
 
         return true
-    }
-
-    fun loadListFaces(activity: Activity){
-        isSerializedDataStored = SharedPref.isSerializedDataStored(sharedPreferences, ConstShared.SHARED_PREF_IS_DATA_STORED_KEY)
-        if ( !isSerializedDataStored ) {
-//            showSelectDirectoryDialog(activity)
-        }
-        else {
-
-            AlertHelper.warningDialogWithButton(context, "Data Wajah ditemukan",
-                "Data wajah sudah terdaftar. Apa anda ingin menggantinya?",
-                "Ganti Data",
-                "Gunakan Data Lama", {
-                    launchChooseDirectoryIntent(activity)
-                }, {
-                    frameAnalyser.faceList = loadSerializedImageData()
-                    AlertHelper.successDialog(context, contentText = "Data wajah berhasil disimpan")
-                    Log.d("wajahnya", "Serialized data loaded.")
-                    Log.d("wajahnya", "${frameAnalyser.faceList.size}")
-                })
-        }
     }
 }

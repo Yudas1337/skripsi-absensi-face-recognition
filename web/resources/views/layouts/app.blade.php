@@ -1,9 +1,5 @@
 <!doctype html>
 <html lang="en">
-
-
-<!-- Mirrored from themesbrand.com/skote/layouts/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 05 Dec 2023 01:38:23 GMT -->
-
 <head>
 
     <meta charset="utf-8" />

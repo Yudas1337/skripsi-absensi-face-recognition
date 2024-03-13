@@ -9,9 +9,11 @@ import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.DBManager
 import com.yudas1337.recognizeface.database.SharedPref
+import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.network.Request
 import com.yudas1337.recognizeface.network.Value
 import com.yudas1337.recognizeface.network.config.RetrofitBuilder
+import com.yudas1337.recognizeface.screens.SyncActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +49,7 @@ class ApiService(private val context: Context) {
                 }
 
             } catch (e: Exception) {
+                dismissDialog()
                 Log.d("wajahnya", "Gagal siswa magang ${e.message}")
             }
         }
@@ -71,6 +74,7 @@ class ApiService(private val context: Context) {
                 }
 
             } catch (e: Exception) {
+                dismissDialog()
                 Log.d("wajahnya", "Gagal pegawai ${e.message}")
             }
         }
@@ -97,6 +101,7 @@ class ApiService(private val context: Context) {
             }
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
+                dismissDialog()
                 Log.d("connFailure", "Gagal jadwal ${t.message}")
             }
         })
@@ -124,6 +129,7 @@ class ApiService(private val context: Context) {
             }
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
+                dismissDialog()
                 Log.d("connFailure", "Gagal limit absensi ${t.message}")
             }
         })
@@ -172,6 +178,7 @@ class ApiService(private val context: Context) {
                 }
 
             } catch (e: Exception) {
+                dismissDialog()
                 Log.d("wajahnya", "Gagal wajah pegawai ${e.message}")
             }
         }
@@ -192,8 +199,19 @@ class ApiService(private val context: Context) {
                 }
 
             } catch (e: Exception) {
+                dismissDialog()
                 Log.d("wajahnya", "Gagal wajah siswa ${e.message}")
             }
+        }
+    }
+
+    private fun dismissDialog(){
+        if(context is SyncActivity){
+            context.pDialog.dismissWithAnimation()
+            AlertHelper.errorDialog(
+                context,
+                contentText = "Koneksi Gagal! Silahkan Ulangi dan Periksa Koneksi Internet Anda"
+            )
         }
     }
 }

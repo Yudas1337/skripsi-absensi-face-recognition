@@ -3,8 +3,8 @@ import uuid
 
 import cv2
 
-nama_folder = "siswa"
-nama_orang = "test"
+nama_folder = "pegawai"
+nama_orang = "femas"
 
 IMAGES_PATH = os.path.join(nama_folder, nama_orang)
 
@@ -14,7 +14,7 @@ if not os.path.exists(IMAGES_PATH):
     os.mkdir(IMAGES_PATH)
 
 # rumus dijalankan 3x
-# 1 : 25 (hadap depan)
+# 1 : 10 (hadap depan)
 # 2 : 10 (hadap kiri)
 # 3 : 10 (hadap kanan)
 number_images = 10
