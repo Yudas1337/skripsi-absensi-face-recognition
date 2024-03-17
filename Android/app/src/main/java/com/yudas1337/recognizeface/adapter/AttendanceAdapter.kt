@@ -1,6 +1,7 @@
 package com.yudas1337.recognizeface.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.database.AttendanceData
 import kotlinx.android.synthetic.main.attendance_adapter.view.break_time
+import kotlinx.android.synthetic.main.attendance_adapter.view.card_status
 import kotlinx.android.synthetic.main.attendance_adapter.view.name
 import kotlinx.android.synthetic.main.attendance_adapter.view.present
 import kotlinx.android.synthetic.main.attendance_adapter.view.return_break
@@ -38,6 +40,13 @@ class AttendanceAdapter(private val context: Context, private val results: List<
             itemView.name!!.text = result.name
             itemView.school!!.text = result.school
             itemView.status!!.text = "Masuk"
+            if (itemView.status!!.text.equals("Masuk")) {
+                itemView.status.setTextColor(Color.parseColor("#34EC16"))
+                itemView.card_status.setBackgroundResource(R.drawable.bg_success)
+            } else {
+                itemView.status.setTextColor(Color.parseColor("#EC1616"))
+                itemView.card_status.setBackgroundResource(R.drawable.bg_error)
+            }
             itemView.present!!.text = result.present
             itemView.break_time!!.text = result.breakTime
             itemView.return_break!!.text = result.returnBreak
