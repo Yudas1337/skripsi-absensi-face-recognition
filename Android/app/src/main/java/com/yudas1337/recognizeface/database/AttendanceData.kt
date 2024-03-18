@@ -2,6 +2,7 @@ package com.yudas1337.recognizeface.database
 
 data class AttendanceData(
     val name: String,
+    val status: String,
     val school: String,
     val present: String,
     val breakTime: String,

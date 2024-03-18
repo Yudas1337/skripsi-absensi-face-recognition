@@ -6,7 +6,6 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
@@ -149,6 +148,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         SELECT 
             students.name,
             students.school,
+            attendances.status,
             GROUP_CONCAT(CASE WHEN detail_attendances.status = 'present' THEN detail_attendances.created_at ELSE NULL END) AS present_hour,
             GROUP_CONCAT(CASE WHEN detail_attendances.status = 'break' THEN detail_attendances.created_at ELSE NULL END) AS break_hour,
             GROUP_CONCAT(CASE WHEN detail_attendances.status = 'return_break' THEN detail_attendances.created_at ELSE NULL END) AS return_break_hour,
@@ -163,6 +163,33 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
             students.name
         ORDER BY 
             students.name ASC;
+    """.trimIndent()
+
+        return db.rawQuery(query, null)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun fetchEmployeeAttendances(name: String): Cursor {
+        val db = this.readableDatabase
+
+        val query = """
+        SELECT 
+            employees.name,
+            attendances.status,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'present' THEN detail_attendances.created_at ELSE NULL END) AS present_hour,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'break' THEN detail_attendances.created_at ELSE NULL END) AS break_hour,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'return_break' THEN detail_attendances.created_at ELSE NULL END) AS return_break_hour,
+            GROUP_CONCAT(CASE WHEN detail_attendances.status = 'return' THEN detail_attendances.created_at ELSE NULL END) AS return_hour
+        FROM 
+            employees
+        LEFT JOIN 
+            attendances ON employees.uuid = attendances.user_id AND date(attendances.created_at) = date("now")
+        LEFT JOIN 
+            detail_attendances ON attendances.id = detail_attendances.attendance_id
+        GROUP BY 
+            employees.name
+        ORDER BY 
+            employees.name ASC;
     """.trimIndent()
 
         return db.rawQuery(query, null)

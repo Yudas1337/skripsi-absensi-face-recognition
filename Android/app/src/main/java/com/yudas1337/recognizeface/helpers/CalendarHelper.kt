@@ -32,6 +32,15 @@ class CalendarHelper {
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
+        fun convertToHours(time: String): Any? {
+            if(time.isNotBlank()){
+                return LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
+            }
+
+            return null
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
         // 08:15:00
         fun getAttendanceHours(): String {
             return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))

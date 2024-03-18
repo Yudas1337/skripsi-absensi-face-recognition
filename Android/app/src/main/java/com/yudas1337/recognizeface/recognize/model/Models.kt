@@ -4,10 +4,11 @@ class Models {
 
     companion object {
 
+        // rencana dibuat 0.6, atau 0.7
         val FACENET = ModelInfo(
             "FaceNet" ,
             "facenet.tflite" ,
-            0.4f ,
+            0.5f ,
             10f ,
             128 ,
             160

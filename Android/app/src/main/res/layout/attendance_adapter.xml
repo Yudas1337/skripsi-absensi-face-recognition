@@ -35,27 +35,18 @@
             android:layout_gravity="center"
             android:text="SMKN 1 LUMAJANG" />
 
-        <LinearLayout
-            android:id="@+id/card_status"
-            android:background="@drawable/bg_success"
-            android:layout_marginHorizontal="30dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="3dip"
-                android:text="masuk"
-                android:textColor="@color/black"
-                android:textSize="16dp"
-                android:textStyle="normal" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="3dip"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="masuk" />
 
         <TextView
             android:id="@+id/present"

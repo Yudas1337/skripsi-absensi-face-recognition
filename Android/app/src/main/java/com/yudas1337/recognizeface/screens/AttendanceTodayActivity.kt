@@ -1,7 +1,6 @@
 package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
-import android.database.Cursor
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -50,17 +49,16 @@ class AttendanceTodayActivity : AppCompatActivity() {
 
         while (cursor.moveToNext()) {
             val name = cursor.getStringOrNull(cursor.getColumnIndex("name")) ?: ""
+            val status = cursor.getStringOrNull(cursor.getColumnIndex("status")) ?: ""
             val school = cursor.getStringOrNull(cursor.getColumnIndex("school")) ?: ""
             val present = cursor.getStringOrNull(cursor.getColumnIndex("present_hour")) ?: ""
             val breakTime = cursor.getStringOrNull(cursor.getColumnIndex("break_hour")) ?: ""
             val returnBreak = cursor.getStringOrNull(cursor.getColumnIndex("return_break_hour")) ?: ""
             val returnHome = cursor.getStringOrNull(cursor.getColumnIndex("return_hour")) ?: ""
 
-            Log.d("wajahnya", "hasil nama: $name $school $present $breakTime $returnBreak $returnHome")
-
-
             val attendance = AttendanceData(
                 name = name,
+                status = status,
                 school = school,
                 present = present,
                 breakTime = breakTime,
