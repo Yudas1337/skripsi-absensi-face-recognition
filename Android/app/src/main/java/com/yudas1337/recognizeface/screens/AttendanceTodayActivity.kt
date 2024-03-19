@@ -25,7 +25,7 @@ class AttendanceTodayActivity : AppCompatActivity() {
 
         val gridLayoutManager = GridLayoutManager(this,1)
         recycler_view!!.layoutManager = gridLayoutManager
-        viewAdapter = AttendanceAdapter(this, fetchTodayAttendance())
+        viewAdapter = AttendanceAdapter(DBHelper(this, null), fetchTodayAttendance())
         recycler_view!!.adapter = viewAdapter
 
         val btnEmployee = findViewById<LinearLayout>(R.id.buttonEmployee)

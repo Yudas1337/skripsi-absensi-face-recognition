@@ -32,12 +32,23 @@ class CalendarHelper {
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
-        fun convertToHours(time: String): Any? {
-            if(time.isNotBlank()){
-                return LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
+        fun convertToHours(time: String): String? {
+            if(time.isNotEmpty()){
+                return LocalTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .format(DateTimeFormatter.ofPattern("HH:mm"))
             }
 
-            return null
+            return ""
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun convertToHourAndSecond(time: String): String? {
+            if(time.isNotEmpty()){
+                return LocalTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+            }
+
+            return ""
         }
 
         @RequiresApi(Build.VERSION_CODES.O)

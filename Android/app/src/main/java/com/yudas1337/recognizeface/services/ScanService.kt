@@ -199,8 +199,6 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
 
         }
 
-        Log.d("wajahnya", "nilai move to first ${attendance.moveToFirst()}")
-
         if(attendance.moveToFirst()){
             formatAttendanceHours()
             val indexAttendanceId = attendance.getColumnIndex("id")

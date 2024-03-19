@@ -10,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.database.getStringOrNull
 import androidx.recyclerview.widget.GridLayoutManager
 import com.yudas1337.recognizeface.R
-import com.yudas1337.recognizeface.adapter.AttendanceAdapter
 import com.yudas1337.recognizeface.adapter.EmployeeAttendanceAdapter
 import com.yudas1337.recognizeface.database.AttendanceData
 import com.yudas1337.recognizeface.database.DBHelper
@@ -26,7 +25,7 @@ class EmployeeAttendanceActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this,1)
         recycler_view!!.layoutManager = gridLayoutManager
 
-        viewAdapter = EmployeeAttendanceAdapter(this, fetchTodayAttendance())
+        viewAdapter = EmployeeAttendanceAdapter(DBHelper(this, null),fetchTodayAttendance())
         recycler_view!!.adapter = viewAdapter
 
         val btnStudent = findViewById<LinearLayout>(R.id.tabStudent);

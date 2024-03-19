@@ -156,7 +156,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         FROM 
             students
         LEFT JOIN 
-            attendances ON students.id = attendances.user_id AND date(attendances.created_at) = date("now")
+            attendances ON students.id = attendances.user_id AND DATE(attendances.created_at) = DATE("now")
         LEFT JOIN 
             detail_attendances ON attendances.id = detail_attendances.attendance_id
         GROUP BY 
@@ -183,7 +183,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         FROM 
             employees
         LEFT JOIN 
-            attendances ON employees.uuid = attendances.user_id AND date(attendances.created_at) = date("now")
+            attendances ON employees.uuid = attendances.user_id AND DATE(attendances.created_at) = DATE("now")
         LEFT JOIN 
             detail_attendances ON attendances.id = detail_attendances.attendance_id
         GROUP BY 
