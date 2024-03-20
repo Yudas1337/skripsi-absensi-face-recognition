@@ -19,6 +19,7 @@ import com.yudas1337.recognizeface.helpers.AlertHelper
 import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
 import com.yudas1337.recognizeface.services.CheckSumService
+import com.yudas1337.recognizeface.worker.RunWorker
 
 
 class MenuActivity : AppCompatActivity(), LifecycleObserver {
@@ -52,6 +53,7 @@ class MenuActivity : AppCompatActivity(), LifecycleObserver {
             if(it){
                 sumService.checkAllSum()
                 syncAvailableData()
+                RunWorker(this, this).scheduleWork()
             }
         }
 

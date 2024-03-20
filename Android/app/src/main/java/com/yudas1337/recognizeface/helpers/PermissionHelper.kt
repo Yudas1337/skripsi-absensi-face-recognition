@@ -8,10 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import com.yudas1337.recognizeface.screens.MainActivity
-import com.yudas1337.recognizeface.screens.MenuActivity
 
 class PermissionHelper {
 

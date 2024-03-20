@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -14,7 +13,6 @@ import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
-import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.network.NetworkConnection
 import com.yudas1337.recognizeface.services.SyncService
 
@@ -85,7 +83,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
             if(isInternetAvailable){
                 SyncService(this, dbHelper).syncAttendances()
                 Toast.makeText(this, "Menu 3", Toast.LENGTH_SHORT).show()
-
             } else{
                 AlertHelper.internetNotAvailable(this)
             }

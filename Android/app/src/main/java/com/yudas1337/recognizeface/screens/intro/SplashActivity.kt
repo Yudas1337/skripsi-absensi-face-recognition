@@ -15,7 +15,6 @@ import com.yudas1337.recognizeface.network.NetworkConnection
 import com.yudas1337.recognizeface.screens.MenuActivity
 import com.yudas1337.recognizeface.services.ApiService
 import com.yudas1337.recognizeface.services.CheckSumService
-
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity(), LifecycleObserver {
     private var splashTimeout = 2000
@@ -40,7 +39,6 @@ class SplashActivity : AppCompatActivity(), LifecycleObserver {
         }
 
     }
-
     private fun nextActivity(){
         Handler().postDelayed({
             startActivity(Intent(this, MenuActivity::class.java))
