@@ -10,4 +10,7 @@ open class Value {
 
     var total: Int? = null
         internal set
+
+    var md5: String? = null
+        internal set
 }

@@ -65,7 +65,6 @@ class EmployeeAttendanceAdapter(private val dbHelper: DBHelper, private val resu
             itemView.return_break!!.setTypeface(null, Typeface.BOLD)
             itemView.return_home!!.setTypeface(null, Typeface.BOLD)
 
-
             if (result.status == AttendanceStatus.DEFAULT_ATTENDANCE_STATUS) {
                 itemView.status.setTextColor(Color.parseColor("#86C38F"))
             } else {

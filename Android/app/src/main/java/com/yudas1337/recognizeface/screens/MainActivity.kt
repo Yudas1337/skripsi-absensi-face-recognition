@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
             true
         } catch (e: Exception) {
-            Log.d("wajahnya", "error gan ${e.message}")
+            Log.d("", "error gan ${e.message}")
             e.printStackTrace()
             false
         }

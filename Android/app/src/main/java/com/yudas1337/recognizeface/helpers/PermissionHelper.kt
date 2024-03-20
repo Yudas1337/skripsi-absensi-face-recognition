@@ -37,17 +37,16 @@ class PermissionHelper {
         }
 
         @RequiresApi(Build.VERSION_CODES.R)
-        fun requestAccessFiles(context: Context, cancelClickListener: () -> Unit){
-            AlertHelper.warningDialogWithButton(context, "Perizinan Dibutuhkan",
-                "Izinkan akses untuk mengelola file", "Izinkan", "Jangan Izinkan",
+        fun requestAccessFiles(context: Context){
+            AlertHelper.permissionDialog(context, "Perizinan Dibutuhkan",
+                "Izinkan akses untuk mengelola file", "Izinkan",
                 confirmClickListener = {
                 val intent = Intent()
                 intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
                 val uri = Uri.fromParts("package", context.packageName, null)
                 intent.data = uri
                 context.startActivity(intent)
-            }, cancelClickListener =  cancelClickListener)
-
+            })
         }
     }
 

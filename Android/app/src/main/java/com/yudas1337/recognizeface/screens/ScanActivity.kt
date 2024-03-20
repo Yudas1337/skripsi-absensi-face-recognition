@@ -145,18 +145,12 @@ class ScanActivity : AppCompatActivity() {
     }
 
 
+    @OptIn(DelicateCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.R)
     private fun init() {
-        if (Environment.isExternalStorageManager()) {
-            GlobalScope.launch(Dispatchers.Main) {
-                deferred.await() // Menunggu hingga inisialisasi selesai
-                executeMain()
-            }
-        } else {
-            PermissionHelper.requestAccessFiles(this){
-                Toast.makeText(this, "Perizinan Dibatalkan.", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MenuActivity::class.java))
-            }
+        GlobalScope.launch(Dispatchers.Main) {
+            deferred.await()
+            executeMain()
         }
     }
 

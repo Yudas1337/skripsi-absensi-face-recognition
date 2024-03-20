@@ -1,16 +1,12 @@
 package com.yudas1337.recognizeface.services
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import com.yudas1337.recognizeface.constants.ConstShared
-import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.DBManager
 import com.yudas1337.recognizeface.database.SharedPref
 import com.yudas1337.recognizeface.helpers.AlertHelper
-import com.yudas1337.recognizeface.network.Request
 import com.yudas1337.recognizeface.network.Value
 import com.yudas1337.recognizeface.network.config.RetrofitBuilder
 import com.yudas1337.recognizeface.screens.SyncActivity
@@ -20,11 +16,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -44,13 +38,17 @@ class ApiService(private val context: Context) {
                     SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_STUDENTS, it)
                 }
 
+                response.md5?.let{
+                    SharedPref.putString(sharedPreferences, ConstShared.MD5_STUDENTS, it)
+                }
+
                 withContext(Dispatchers.IO) {
                     DBManager(dbHelper, context, sharedPreferences).insertStudentsFromJson(responseData)
                 }
 
             } catch (e: Exception) {
+                Log.d("wajahnya", "gagal ${e.message}")
                 dismissDialog()
-                Log.d("wajahnya", "Gagal siswa magang ${e.message}")
             }
         }
     }
@@ -69,13 +67,16 @@ class ApiService(private val context: Context) {
                     SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_EMPLOYEES, it)
                 }
 
+                response.md5?.let{
+                    SharedPref.putString(sharedPreferences, ConstShared.MD5_EMPLOYEES, it)
+                }
+
                 withContext(Dispatchers.IO) {
                     DBManager(dbHelper, context, sharedPreferences).insertEmployeesFromJson(responseData)
                 }
 
             } catch (e: Exception) {
                 dismissDialog()
-                Log.d("wajahnya", "Gagal pegawai ${e.message}")
             }
         }
     }
@@ -92,6 +93,10 @@ class ApiService(private val context: Context) {
                     val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
                     response.body()?.total?.let {
                         SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_SCHEDULES, it)
+                    }
+
+                    response.body()?.md5?.let{
+                        SharedPref.putString(sharedPreferences, ConstShared.MD5_SCHEDULES, it)
                     }
 
                     DBManager(dbHelper, context, sharedPreferences).insertSchedulesFromJson(responseData)
@@ -122,6 +127,10 @@ class ApiService(private val context: Context) {
                         SharedPref.putInt(sharedPreferences, ConstShared.TOTAL_LIMIT, it)
                     }
 
+                    response.body()?.md5?.let{
+                        SharedPref.putString(sharedPreferences, ConstShared.MD5_LIMIT, it)
+                    }
+
                     DBManager(dbHelper, context, sharedPreferences).insertAttendanceLimitFromJson(responseData)
                 } else {
                     Log.d("connFailure", "Gagal limit absensi")
@@ -136,7 +145,7 @@ class ApiService(private val context: Context) {
 
     }
 
-    fun syncAttendances(){
+    fun  syncAttendances(){
 
     }
 
@@ -173,13 +182,16 @@ class ApiService(private val context: Context) {
                 val dbHelper = DBHelper(context, null)
                 val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
 
+                response.md5?.let{
+                    SharedPref.putString(sharedPreferences, ConstShared.MD5_EMPLOYEE_FACES, it)
+                }
+
                 withContext(Dispatchers.IO) {
                     DBManager(dbHelper, context, sharedPreferences).insertEmployeeFacesFromJson(responseData)
                 }
 
             } catch (e: Exception) {
                 dismissDialog()
-                Log.d("wajahnya", "Gagal wajah pegawai ${e.message}")
             }
         }
     }
@@ -194,13 +206,16 @@ class ApiService(private val context: Context) {
                 val dbHelper = DBHelper(context, null)
                 val sharedPreferences = context.getSharedPreferences(ConstShared.fileName, Context.MODE_PRIVATE)
 
+                response.md5?.let{
+                    SharedPref.putString(sharedPreferences, ConstShared.MD5_STUDENT_FACES, it)
+                }
+
                 withContext(Dispatchers.IO) {
                     DBManager(dbHelper, context, sharedPreferences).insertStudentFacesFromJson(responseData)
                 }
 
             } catch (e: Exception) {
                 dismissDialog()
-                Log.d("wajahnya", "Gagal wajah siswa ${e.message}")
             }
         }
     }

@@ -114,11 +114,10 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
                     try {
                         images.add(Pair(name, BitmapUtils.getFixedBitmap(Uri.fromFile(imageDocFile), context)))
                     } catch (e: Exception) {
-                        Log.e("wajahnya", "Parsing Image Error. Pastikan struktur folder benar")
+                    
                         return false
                     }
                 }
-                Log.d("wajahnya", "jumlah file nya ${rfidDir.listFiles()?.size}")
             } else {
                 AlertHelper.runVoiceAndToast(voiceHelper, context, "Wajah pengguna tidak terdaftar. Harap Sinkronisasi Ulang")
                 return false
@@ -134,8 +133,6 @@ class LoadFace(private val context: Context, private val frameAnalyser: FrameAna
         fileReader.run(images, fileReaderCallback)
 
         faceSize = images.size
-        Log.d("wajahnya", "Terdeteksi $faceSize wajah gambar ...")
-
         return true
     }
 }

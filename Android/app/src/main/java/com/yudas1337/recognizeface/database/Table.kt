@@ -77,6 +77,7 @@ class Table {
             db.execSQL("CREATE TABLE IF NOT EXISTS $detail_attendances (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "attendance_id TEXT, " +
+                    "is_uploaded TEXT," +
                     "status TEXT, " +
                     "created_at TEXT, " +
                     "updated_at TEXT" +

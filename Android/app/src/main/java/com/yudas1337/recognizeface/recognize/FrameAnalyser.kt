@@ -124,10 +124,8 @@ class FrameAnalyser( context: Context ,
                 }
             }
             catch ( e : Exception ) {
-                // If any exception occurs with this box and continue with the next boxes.
-                Log.e( "wajahnya" , "Exception in FrameAnalyser : ${e.message}" )
+                Log.e( "exception" , "Exception in FrameAnalyser : ${e.message}" )
             }
-            Log.e( "wajahnya" , "Inference time -> ${System.currentTimeMillis() - t1}")
 
         }
 

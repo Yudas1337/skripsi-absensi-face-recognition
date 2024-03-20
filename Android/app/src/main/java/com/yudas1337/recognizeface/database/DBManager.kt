@@ -49,7 +49,6 @@ class DBManager(private val dbHelper: DBHelper,
                                 }
                             } else {
                                 allFacesSaved = false
-                                Log.d("wajahnya", "Gagal mengunduh gambar dari URL: ${it.photo}")
                             }
                         }
 
@@ -112,7 +111,7 @@ class DBManager(private val dbHelper: DBHelper,
                                 }
                             } else {
                                 allFacesSaved = false
-                                Log.d("wajahnya", "Gagal mengunduh gambar dari URL: ${it.photo}")
+                                
                             }
                         }
 
@@ -153,7 +152,6 @@ class DBManager(private val dbHelper: DBHelper,
     suspend fun insertStudentsFromJson(jsonData: List<Result>?) {
         try {
             if (jsonData != null) {
-
                 val jobs = mutableListOf<Deferred<Boolean>>()
                 val studentDir = File(FaceFolder.profileDir, FaceFolder.STUDENTS_DIR_FACES_NAME)
 
@@ -189,8 +187,8 @@ class DBManager(private val dbHelper: DBHelper,
                             }
                         } else {
                             allFacesSaved = false
-                            Log.d("wajahnya", "Gagal mengunduh gambar punya ${jsonData[i].name} dari URL: ${jsonData[i].url!!}")
-                        }
+                            
+                         }
 
                         allFacesSaved
                     }
@@ -264,7 +262,7 @@ class DBManager(private val dbHelper: DBHelper,
                             }
                         } else {
                             allFacesSaved = false
-                            Log.d("wajahnya", "Gagal mengunduh gambar punya ${jsonData[i].name} dari URL: ${jsonData[i].url!!}")
+                            
                         }
 
                         allFacesSaved

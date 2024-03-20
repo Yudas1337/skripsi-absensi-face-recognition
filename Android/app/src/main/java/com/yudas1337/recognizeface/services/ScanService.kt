@@ -3,7 +3,6 @@ package com.yudas1337.recognizeface.services
 import android.content.Context
 import android.database.Cursor
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.constants.AttendanceStatus
 import com.yudas1337.recognizeface.constants.Role
@@ -124,6 +123,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                     isBetween(checkinStarts, checkinEnds, hours) -> {
                         if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                                 "attendance_id" to attendanceId,
+                                "is_uploaded" to 0,
                                 "status" to AttendanceStatus.PRESENT,
                                 "created_at" to CalendarHelper.getAttendanceTimestamps(),
                                 "updated_at" to CalendarHelper.getAttendanceTimestamps()
@@ -135,6 +135,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                     isBetween(breakStarts, breakEnds, hours) -> {
                         if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                                 "attendance_id" to attendanceId,
+                                "is_uploaded" to 0,
                                 "status" to AttendanceStatus.BREAK,
                                 "created_at" to CalendarHelper.getAttendanceTimestamps(),
                                 "updated_at" to CalendarHelper.getAttendanceTimestamps()
@@ -146,6 +147,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                     isBetween(returnStarts, returnEnds, hours) -> {
                         if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                                 "attendance_id" to attendanceId,
+                                "is_uploaded" to 0,
                                 "status" to AttendanceStatus.RETURN_BREAK,
                                 "created_at" to CalendarHelper.getAttendanceTimestamps(),
                                 "updated_at" to CalendarHelper.getAttendanceTimestamps()
@@ -157,6 +159,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                     isBetween(checkoutStarts, checkoutEnds, hours) -> {
                         if (!dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                                 "attendance_id" to attendanceId,
+                                "is_uploaded" to 0,
                                 "status" to AttendanceStatus.RETURN,
                                 "created_at" to CalendarHelper.getAttendanceTimestamps(),
                                 "updated_at" to CalendarHelper.getAttendanceTimestamps()
@@ -208,6 +211,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                 // absen pagi antara jam 07.00 - 08.15 (toleransi 15 menit)
                 dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
+                    "is_uploaded" to 0,
                     "status" to AttendanceStatus.PRESENT,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()
@@ -218,6 +222,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                 // absen istirahat antara jam 11.00 - 12.00
                 dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
+                    "is_uploaded" to 0,
                     "status" to AttendanceStatus.BREAK,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()
@@ -228,6 +233,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                 // absen kembali antara jam 12.30 - 13.00
                 dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
+                    "is_uploaded" to 0,
                     "status" to AttendanceStatus.RETURN_BREAK,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()
@@ -238,6 +244,7 @@ class ScanService(private val context: Context, private val dbHelper: DBHelper, 
                 // absen pulang antara jam 16.00 - 20.00
                 dbHelper.insertDetailAttendance("detail_attendances", mapOf(
                     "attendance_id" to attendanceId,
+                    "is_uploaded" to 0,
                     "status" to AttendanceStatus.RETURN,
                     "created_at" to CalendarHelper.getAttendanceTimestamps(),
                     "updated_at" to CalendarHelper.getAttendanceTimestamps()

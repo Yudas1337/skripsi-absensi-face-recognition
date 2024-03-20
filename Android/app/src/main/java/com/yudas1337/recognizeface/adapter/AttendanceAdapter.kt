@@ -1,6 +1,5 @@
 package com.yudas1337.recognizeface.adapter
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
@@ -28,6 +27,7 @@ class AttendanceAdapter(private val dbHelper: DBHelper, private val results: Lis
 
         return ViewHolder(v)
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val result = results[position]
         holder.setData(result)

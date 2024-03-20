@@ -86,6 +86,13 @@ class AlertHelper {
                 .show()
         }
 
+        fun warningDialog(context: Context, titleText: String = "Peringatan", contentText: String) {
+            SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .show()
+        }
+
         fun errorDialog(context: Context, titleText: String = "Gagal", contentText: String) {
             SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
                 .setTitleText(titleText)
@@ -106,6 +113,20 @@ class AlertHelper {
                 .setCancelClickListener { sDialog ->
                     cancelClickListener.invoke()
                     sDialog.cancel()
+                }
+
+            dialog.setCancelable(false)
+            dialog.show()
+        }
+
+        fun permissionDialog(context: Context, titleText: String, contentText: String, positiveButton: String, confirmClickListener: () -> Unit){
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .setConfirmText(positiveButton)
+                .setConfirmClickListener { sDialog ->
+                    confirmClickListener.invoke()
+                    sDialog.dismissWithAnimation()
                 }
 
             dialog.setCancelable(false)

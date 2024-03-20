@@ -92,8 +92,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         }
 
         fourthMenu.setOnClickListener {
-
-            if (Environment.isExternalStorageManager()) {
                 if(isInternetAvailable){
                     AlertHelper.doSyncWithPictures(this,
                         {
@@ -109,12 +107,6 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
                 } else{
                     AlertHelper.internetNotAvailable(this)
                 }
-
-            } else {
-                PermissionHelper.requestAccessFiles(this){
-                    Toast.makeText(this, "Perizinan Dibatalkan.", Toast.LENGTH_SHORT).show()
-                }
-            }
         }
 
         btnBack.setOnClickListener{

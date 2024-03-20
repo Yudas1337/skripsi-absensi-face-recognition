@@ -59,8 +59,6 @@ class BitmapUtils {
                     responseBody?.let {
                         return BitmapFactory.decodeStream(it.byteStream())
                     }
-                } else {
-                    Log.d("wajahnya", "Response not successful: ${response.code()}")
                 }
             } catch (e: Exception) {
                 Log.d("wajahnya", "Error: ${e.message}")
