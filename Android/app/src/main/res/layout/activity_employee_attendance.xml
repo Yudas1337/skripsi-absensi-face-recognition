@@ -206,5 +206,40 @@
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="40dp"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <androidx.appcompat.widget.SearchView
+            android:queryBackground="@android:color/transparent"
+            app:queryBackground="@android:color/transparent"
+            app:iconifiedByDefault="false"
+            app:searchIcon="@null"
+            android:paddingLeft="12dp"
+            android:background="@drawable/bg_search_input"
+            android:id="@+id/searchText"
+            android:layout_width="184dp"
+            android:layout_height="match_parent"
+            android:width="220dp"
+            android:inputType="text"
+            android:hint="Cari.."/>
+
+        <ImageButton
+            android:tint="@color/white"
+            android:src="@drawable/baseline_search_24"
+            android:width="30dp"
+            android:hint="Search"
+            android:background="@drawable/bg_button_search"
+            android:id="@+id/searchButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
