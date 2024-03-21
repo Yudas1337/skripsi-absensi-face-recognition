@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.employee_adapter.view.name
 import kotlinx.android.synthetic.main.employee_adapter.view.position
 import java.io.File
 
-class EmployeeAdapter(private val context: Context, private val results: List<Result>) : RecyclerView.Adapter<EmployeeAdapter.ViewHolder>() {
+class EmployeeAdapter(private val results: List<Result>) : RecyclerView.Adapter<EmployeeAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.employee_adapter, parent, false)
 
@@ -39,8 +39,6 @@ class EmployeeAdapter(private val context: Context, private val results: List<Re
             itemView.position!!.text = result.position
 
             val photo = File(FaceFolder.profileDir, "${FaceFolder.EMPLOYEE_DIR_FACES_NAME}/${result.photo}")
-
-            Log.d("wajahnnya", "path foto adalah ${result.photo}")
 
             Picasso.get()
                 .load(photo)
