@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -17,6 +16,7 @@ import com.yudas1337.recognizeface.adapter.AttendanceAdapter
 import com.yudas1337.recognizeface.database.AttendanceData
 import com.yudas1337.recognizeface.database.DBHelper
 import kotlinx.android.synthetic.main.activity_attendance_today.btn_bck
+import kotlinx.android.synthetic.main.activity_attendance_today.buttonEmployee
 import kotlinx.android.synthetic.main.activity_attendance_today.recycler_view
 import kotlinx.android.synthetic.main.activity_attendance_today.searchButton
 import kotlinx.android.synthetic.main.activity_attendance_today.searchText
@@ -38,8 +38,7 @@ class AttendanceTodayActivity : AppCompatActivity() {
         viewAdapter = AttendanceAdapter(DBHelper(this, null), fetchTodayAttendance(searchName))
         recycler_view!!.adapter = viewAdapter
 
-        val btnEmployee = findViewById<LinearLayout>(R.id.buttonEmployee)
-        btnEmployee.setOnClickListener {
+        buttonEmployee.setOnClickListener {
             startActivity(Intent(this, EmployeeAttendanceActivity::class.java))
             finish()
         }

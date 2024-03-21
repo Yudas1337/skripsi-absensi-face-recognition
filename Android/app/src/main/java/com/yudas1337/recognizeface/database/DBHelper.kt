@@ -95,18 +95,18 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         return db.rawQuery("SELECT * FROM $table WHERE rfid = ?", arrayOf(rfid))
     }
 
-    fun getStudents(): Cursor? {
+    fun getStudents(name: String): Cursor? {
 
         val db = this.readableDatabase
 
-        return db.rawQuery("SELECT * FROM students", null)
+        return db.rawQuery("SELECT * FROM students WHERE name LIKE ? OR school LIKE ?", arrayOf("%$name%", "%$name%"))
     }
 
-    fun getEmployees(): Cursor? {
+    fun getEmployees(name: String): Cursor? {
 
         val db = this.readableDatabase
 
-        return db.rawQuery("SELECT * FROM employees", null)
+        return db.rawQuery("SELECT * FROM employees WHERE name LIKE ?", arrayOf("%$name%"))
     }
 
     fun truncateTables(tableNames: Array<String>) {

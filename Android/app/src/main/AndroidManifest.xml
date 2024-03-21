@@ -35,6 +35,7 @@
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".screens.EmployeeListActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
@@ -43,6 +44,7 @@
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".screens.UserListActivity"
             android:exported="false"
             android:label="@string/title_activity_user_list"

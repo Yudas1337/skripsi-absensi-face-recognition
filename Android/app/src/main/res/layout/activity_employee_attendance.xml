@@ -83,7 +83,7 @@
                 android:textStyle="bold"
                 android:gravity="center"
                 android:layout_gravity="center"
-                android:text="Status" />
+                android:text="Keterangan" />
 
             <TextView
                 android:id="@+id/present"
@@ -227,7 +227,7 @@
             android:layout_height="match_parent"
             android:width="220dp"
             android:inputType="text"
-            android:hint="Cari.."/>
+            app:defaultQueryHint="Cari.."/>
 
         <ImageButton
             android:tint="@color/white"

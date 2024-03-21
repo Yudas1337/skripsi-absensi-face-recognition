@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.student_adapter.view.school
 import kotlinx.android.synthetic.main.student_adapter.view.student_photo
 import java.io.File
 
-class StudentAdapter(private val context: Context, private val results: List<Result>) : RecyclerView.Adapter<StudentAdapter.ViewHolder>() {
+class StudentAdapter(private val results: List<Result>) : RecyclerView.Adapter<StudentAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.student_adapter, parent, false)
 

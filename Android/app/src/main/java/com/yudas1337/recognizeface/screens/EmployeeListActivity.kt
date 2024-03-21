@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_user_list.recyclermodules
 
 class EmployeeListActivity : AppCompatActivity() {
     private var results: List<Result>? = ArrayList()
+    private var searchName: String = ""
     private var viewAdapter: EmployeeAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +23,7 @@ class EmployeeListActivity : AppCompatActivity() {
 
         val dbHelper = DBHelper(this, null)
         val dataList = mutableListOf<Result>()
-        val cursor = dbHelper.getEmployees()
+        val cursor = dbHelper.getEmployees(searchName)
         cursor?.use {
             if (it.moveToFirst()) {
                 val idColumnIndex = it.getColumnIndex("id")
