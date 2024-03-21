@@ -145,8 +145,42 @@ class ApiService(private val context: Context) {
 
     }
 
-    fun  syncAttendances(){
+    fun syncEmployeeAttendances(){
 
+    }
+
+    fun syncStudentAttendances(){
+
+    }
+
+    fun  syncAttendances(){
+//        val call: Call<Value> = RetrofitBuilder.employeeBuilder().syncAttendances()
+//
+//        call.enqueue(object : Callback<Value> {
+//            override fun onResponse(call: Call<Value>, response: Response<Value>) {
+//                if (response.isSuccessful) {
+//                    val responseData = response.body()?.result
+//                    val dbHelper = DBHelper(context, null)
+//
+//                    response.body()?.message?.let {
+//                        Log.d("wajahnya", "ini pesan berhasilnya $it")
+//                    }
+//
+//                    response.body()?.code?.let{
+//                        Log.d("wajahnya", "ini codenya $it")
+//                    }
+//
+////                    DBManager(dbHelper, context, sharedPreferences).insertAttendanceLimitFromJson(responseData)
+//                } else {
+//                    Log.d("connFailure", "Gagal sinkron presensi")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<Value>, t: Throwable) {
+//                dismissDialog()
+//                Log.d("connFailure", "Gagal sinkron presensi ${t.message}")
+//            }
+//        })
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -81,8 +81,14 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
 
         thirdMenu.setOnClickListener {
             if(isInternetAvailable){
-                SyncService(this, dbHelper).syncAttendances()
-                Toast.makeText(this, "Menu 3", Toast.LENGTH_SHORT).show()
+                if(dbHelper.countUnsyncAttendances() != 0){
+                    pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                    pDialog.show()
+                    SyncService(this, dbHelper).syncAttendances()
+                    pDialog.dismissWithAnimation()
+                } else{
+                    AlertHelper.successDialog(this, "Data presensi lengkap!", "Seluruh data presensi telah tersinkronisasi")
+                }
             } else{
                 AlertHelper.internetNotAvailable(this)
             }

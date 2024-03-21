@@ -16,25 +16,6 @@ class AlertHelper {
                 .show()
         }
 
-        fun internetAvailable(context: Context, confirmClickListener: () -> Unit, cancelClickListener: () -> Unit) {
-            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText("Terdeteksi Internet")
-                .setContentText("Ingin melakukan sinkronisasi?")
-                .setConfirmText("Sinkronisasi")
-                .setCancelText("Batal")
-                .setConfirmClickListener { sDialog ->
-                    confirmClickListener.invoke()
-                    sDialog.dismissWithAnimation()
-                }
-                .setCancelClickListener { sDialog ->
-                    cancelClickListener.invoke()
-                    sDialog.cancel()
-                }
-
-            dialog.setCancelable(false)
-            dialog.show()
-        }
-
         fun doSync(context: Context, confirmClickListener: () -> Unit){
             val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Lakukan Sinkronisasi?")
@@ -100,25 +81,6 @@ class AlertHelper {
                 .show()
         }
 
-        fun errorDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
-            val dialog = SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
-                .setTitleText(titleText)
-                .setContentText(contentText)
-                .setConfirmText(positiveButton)
-                .setCancelText(negativeButton)
-                .setConfirmClickListener { sDialog ->
-                    confirmClickListener.invoke()
-                    sDialog.dismissWithAnimation()
-                }
-                .setCancelClickListener { sDialog ->
-                    cancelClickListener.invoke()
-                    sDialog.cancel()
-                }
-
-            dialog.setCancelable(false)
-            dialog.show()
-        }
-
         fun permissionDialog(context: Context, titleText: String, contentText: String, positiveButton: String, confirmClickListener: () -> Unit){
             val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(titleText)
@@ -127,24 +89,6 @@ class AlertHelper {
                 .setConfirmClickListener { sDialog ->
                     confirmClickListener.invoke()
                     sDialog.dismissWithAnimation()
-                }
-
-            dialog.setCancelable(false)
-            dialog.show()
-        }
-        fun warningDialogWithButton(context: Context, titleText: String, contentText: String, positiveButton: String = "OK", negativeButton: String = "Batal", confirmClickListener: () -> Unit, cancelClickListener: () -> Unit){
-           val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText(titleText)
-                .setContentText(contentText)
-                .setConfirmText(positiveButton)
-                .setCancelText(negativeButton)
-                .setConfirmClickListener { sDialog ->
-                    confirmClickListener.invoke()
-                    sDialog.dismissWithAnimation()
-                }
-                .setCancelClickListener { sDialog ->
-                    cancelClickListener.invoke()
-                    sDialog.cancel()
                 }
 
             dialog.setCancelable(false)

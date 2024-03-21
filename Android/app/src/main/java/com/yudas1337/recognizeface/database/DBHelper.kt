@@ -117,27 +117,47 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         }
     }
 
+    fun countUnsyncAttendances(): Int {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM detail_attendances WHERE is_uploaded = 0", null)
+        var total = 0
+
+        cursor.use {
+            if (it.moveToFirst()) {
+                total = it.getInt(0)
+            }
+        }
+
+        return total
+    }
+
     fun syncAttendances(): Cursor {
         val db = this.readableDatabase
 
-        return db.rawQuery("SELECT\n" +
-                "    attendances.user_id,\n" +
-                "    attendances.status,\n" +
-                "    attendances.created_at,\n" +
-                "    attendances.updated_at,\n" +
-                "    json_group_array(\n" +
-                "        json_object(\n" +
-                "            'status', detail_attendances.status,\n" +
-                "            'created_at', detail_attendances.created_at,\n" +
-                "            'updated_at', detail_attendances.updated_at\n" +
-                "        )\n" +
-                "    ) AS detail_attendances\n" +
-                "FROM\n" +
-                "    attendances\n" +
-                "LEFT JOIN\n" +
-                "    detail_attendances ON attendances.id = detail_attendances.attendance_id\n" +
-                "GROUP BY\n" +
-                "    attendances.id", null)
+        val query = """
+    SELECT
+        attendances.user_id,
+        attendances.status,
+        attendances.created_at,
+        attendances.updated_at,
+        json_group_array(
+            json_object(
+                'status', detail_attendances.status,
+                'created_at', detail_attendances.created_at,
+                'updated_at', detail_attendances.updated_at
+            )
+        ) AS detail_attendances
+    FROM
+        attendances
+    LEFT JOIN
+        detail_attendances ON attendances.id = detail_attendances.attendance_id
+    WHERE
+        detail_attendances.is_uploaded = 0
+    GROUP BY
+        attendances.id
+""".trimIndent()
+
+        return db.rawQuery(query, null)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

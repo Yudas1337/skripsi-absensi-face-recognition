@@ -13,4 +13,10 @@ open class Value {
 
     var md5: String? = null
         internal set
+
+    var message: String? = null
+        internal set
+
+    var code: String? = null
+        internal set
 }

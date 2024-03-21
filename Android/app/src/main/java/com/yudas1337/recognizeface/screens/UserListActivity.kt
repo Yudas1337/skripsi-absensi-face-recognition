@@ -2,11 +2,9 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.GridLayoutManager
@@ -84,8 +82,6 @@ class UserListActivity : AppCompatActivity() {
     private fun prepareData(search: String){
         val dataList = mutableListOf<Result>()
         val cursor = dbHelper.getStudents(search)
-
-        Log.d("wajahnya", "siswanya nya adlaah $search")
 
         cursor?.use {
             if (it.moveToFirst()) {
