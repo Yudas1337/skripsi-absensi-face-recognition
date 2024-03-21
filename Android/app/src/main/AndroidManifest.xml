@@ -25,10 +25,12 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".screens.AttendanceTodayActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".screens.EmployeeAttendanceActivity"
             android:exported="false"
             android:screenOrientation="landscape" />

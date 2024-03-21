@@ -227,7 +227,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView">
 
-        <EditText
+        <androidx.appcompat.widget.SearchView
+            android:queryBackground="@android:color/transparent"
+            app:queryBackground="@android:color/transparent"
+            app:iconifiedByDefault="false"
+            app:searchIcon="@null"
             android:paddingLeft="12dp"
             android:background="@drawable/bg_search_input"
             android:id="@+id/searchText"

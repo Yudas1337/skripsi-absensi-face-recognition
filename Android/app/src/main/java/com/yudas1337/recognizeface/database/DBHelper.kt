@@ -159,13 +159,14 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
             attendances ON students.id = attendances.user_id AND DATE(attendances.created_at) = DATE("now")
         LEFT JOIN 
             detail_attendances ON attendances.id = detail_attendances.attendance_id
+        WHERE students.name LIKE ?
         GROUP BY 
             students.name
         ORDER BY 
             students.name ASC;
     """.trimIndent()
 
-        return db.rawQuery(query, null)
+        return db.rawQuery(query, arrayOf("%$name%"))
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

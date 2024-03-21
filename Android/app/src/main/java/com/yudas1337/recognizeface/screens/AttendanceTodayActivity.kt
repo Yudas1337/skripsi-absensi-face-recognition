@@ -2,14 +2,14 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.inputmethod.EditorInfo
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.database.getStringOrNull
 import androidx.recyclerview.widget.GridLayoutManager
 import com.yudas1337.recognizeface.R
@@ -21,16 +21,21 @@ import kotlinx.android.synthetic.main.activity_attendance_today.recycler_view
 import kotlinx.android.synthetic.main.activity_attendance_today.searchButton
 import kotlinx.android.synthetic.main.activity_attendance_today.searchText
 
+
 class AttendanceTodayActivity : AppCompatActivity() {
     private var viewAdapter: AttendanceAdapter? = null
+    private var searchName: String = ""
+    private lateinit var keyboardPopUp: InputMethodManager
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendance_today)
 
+        keyboardPopUp = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         val gridLayoutManager = GridLayoutManager(this,1)
+
         recycler_view!!.layoutManager = gridLayoutManager
-        viewAdapter = AttendanceAdapter(DBHelper(this, null), fetchTodayAttendance())
+        viewAdapter = AttendanceAdapter(DBHelper(this, null), fetchTodayAttendance(searchName))
         recycler_view!!.adapter = viewAdapter
 
         val btnEmployee = findViewById<LinearLayout>(R.id.buttonEmployee)
@@ -40,20 +45,36 @@ class AttendanceTodayActivity : AppCompatActivity() {
         }
 
         searchButton.setOnClickListener{
-            Toast.makeText(this, "di klik", Toast.LENGTH_SHORT).show()
+            searchAttendance(searchText.query.toString())
+            keyboardPopUp.hideSoftInputFromWindow(searchText.windowToken, 0)
         }
 
-        searchText.setOnEditorActionListener { _, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_DONE ||
-                event != null && event.action == KeyEvent.ACTION_DOWN &&
-                event.keyCode == KeyEvent.KEYCODE_ENTER) {
-                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(searchText.windowToken, 0)
-
-                Toast.makeText(this, "Enter pressed", Toast.LENGTH_SHORT).show()
-                return@setOnEditorActionListener true
+        searchText.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                p0?.let {
+                    searchAttendance(it)
+                }
+                keyboardPopUp.hideSoftInputFromWindow(searchText.windowToken, 0)
+                return true
             }
-            false
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                p0?.let {
+                    searchAttendance(it)
+                }
+                return true
+            }
+        })
+
+
+        val searchCloseButtonId = searchText.findViewById<View>(androidx.appcompat.R.id.search_close_btn).id
+        val closeButton = searchText.findViewById<ImageView>(searchCloseButtonId)
+        closeButton.setOnClickListener {
+            searchText.setQuery("", false)
+            searchText.clearFocus()
+            viewAdapter = AttendanceAdapter(DBHelper(this, null), fetchTodayAttendance(searchName))
+            recycler_view!!.adapter = viewAdapter
+            keyboardPopUp.hideSoftInputFromWindow(searchText.windowToken, 0)
         }
 
         btn_bck.setOnClickListener {
@@ -63,10 +84,18 @@ class AttendanceTodayActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun fetchTodayAttendance(): List<AttendanceData> {
+    private fun searchAttendance(search: String){
+        if(search.isNotEmpty()){
+            viewAdapter = AttendanceAdapter(DBHelper(this, null), fetchTodayAttendance(search))
+            recycler_view!!.adapter = viewAdapter
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun fetchTodayAttendance(searchName: String): List<AttendanceData> {
 
         val dbHelper = DBHelper(this, null)
-        val cursor = dbHelper.fetchStudentAttendances("")
+        val cursor = dbHelper.fetchStudentAttendances(searchName)
         val attendances = mutableListOf<AttendanceData>()
 
         while (cursor.moveToNext()) {
