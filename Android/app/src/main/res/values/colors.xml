@@ -16,6 +16,7 @@
     <color name="cover_background">#997F7F7F</color>
 
     <color name="white">#FFF</color>
+    <color name="scanBackground">#EEEEEE</color>
 
     <color name="background_color">#FBFBFD</color>
     <color name="background_color_50">#72FFFFFF</color>

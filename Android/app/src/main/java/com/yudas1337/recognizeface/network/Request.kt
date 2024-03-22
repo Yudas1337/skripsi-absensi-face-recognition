@@ -1,15 +1,17 @@
 package com.yudas1337.recognizeface.network
 
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Url
 
 interface Request {
     @POST("sync")
-    fun syncAttendances(attendances: ArrayList<String>): Call<Value>
+    fun syncAttendances(@Body data: RequestBody): Call<Value>
 
     @GET("students")
     fun getStudents(): Call<Value>

@@ -131,7 +131,19 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         return total
     }
 
-    fun syncAttendances(): Cursor {
+    fun updateAttendances(): Int {
+        val db = this.writableDatabase
+
+        val values = ContentValues()
+        values.put("is_uploaded", 1)
+
+        val rowsAffected = db.update("detail_attendances", values, null, null)
+        db.close()
+
+        return rowsAffected
+    }
+
+    fun syncAttendances(role: String): Cursor {
         val db = this.readableDatabase
 
         val query = """
@@ -140,24 +152,20 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         attendances.status,
         attendances.created_at,
         attendances.updated_at,
-        json_group_array(
-            json_object(
-                'status', detail_attendances.status,
-                'created_at', detail_attendances.created_at,
-                'updated_at', detail_attendances.updated_at
-            )
-        ) AS detail_attendances
+        detail_attendances.status AS detailStatus,
+        detail_attendances.created_at AS detailCreatedAt,
+        detail_attendances.updated_at AS detailUpdatedAt
     FROM
         attendances
-    LEFT JOIN
+    JOIN
         detail_attendances ON attendances.id = detail_attendances.attendance_id
     WHERE
         detail_attendances.is_uploaded = 0
-    GROUP BY
-        attendances.id
+    AND 
+        attendances.role = ?
 """.trimIndent()
 
-        return db.rawQuery(query, null)
+        return db.rawQuery(query, arrayOf(role))
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

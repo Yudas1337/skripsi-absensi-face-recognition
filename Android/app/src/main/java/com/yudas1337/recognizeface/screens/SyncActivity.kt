@@ -82,10 +82,11 @@ class SyncActivity : AppCompatActivity(), LifecycleObserver {
         thirdMenu.setOnClickListener {
             if(isInternetAvailable){
                 if(dbHelper.countUnsyncAttendances() != 0){
-                    pDialog = AlertHelper.progressDialog(this, percentageProgress)
-                    pDialog.show()
-                    SyncService(this, dbHelper).syncAttendances()
-                    pDialog.dismissWithAnimation()
+                    AlertHelper.doSync(this){
+                        pDialog = AlertHelper.progressDialog(this, percentageProgress)
+                        pDialog.show()
+                        SyncService(this, dbHelper).syncAttendances()
+                    }
                 } else{
                     AlertHelper.successDialog(this, "Data presensi lengkap!", "Seluruh data presensi telah tersinkronisasi")
                 }

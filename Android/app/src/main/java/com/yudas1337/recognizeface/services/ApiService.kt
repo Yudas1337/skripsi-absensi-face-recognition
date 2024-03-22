@@ -1,8 +1,10 @@
 package com.yudas1337.recognizeface.services
 
 import android.content.Context
+import android.database.Cursor
 import android.util.Log
 import com.yudas1337.recognizeface.constants.ConstShared
+import com.yudas1337.recognizeface.constants.Role
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.database.DBManager
 import com.yudas1337.recognizeface.database.SharedPref
@@ -16,6 +18,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,6 +29,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class ApiService(private val context: Context) {
+
+    private lateinit var initCall: Call<Value>
 
     fun getStudents(){
         val call = RetrofitBuilder.builder().getStudents()
@@ -101,6 +109,7 @@ class ApiService(private val context: Context) {
 
                     DBManager(dbHelper, context, sharedPreferences).insertSchedulesFromJson(responseData)
                 } else {
+                    dismissDialog()
                     Log.d("connFailure", "Gagal jadwal")
                 }
             }
@@ -133,6 +142,7 @@ class ApiService(private val context: Context) {
 
                     DBManager(dbHelper, context, sharedPreferences).insertAttendanceLimitFromJson(responseData)
                 } else {
+                    dismissDialog()
                     Log.d("connFailure", "Gagal limit absensi")
                 }
             }
@@ -145,42 +155,118 @@ class ApiService(private val context: Context) {
 
     }
 
-    fun syncEmployeeAttendances(){
+    fun syncAttendances(){
+        val dbHelper = DBHelper(context, null)
 
+        val employees = dbHelper.syncAttendances(Role.EMPLOYEE)
+        val students = dbHelper.syncAttendances(Role.STUDENT)
+
+        if(employees.moveToFirst()){
+            convertAttendances(employees, Role.EMPLOYEE)
+        }
+
+        if(students.moveToFirst()){
+            convertAttendances(students, Role.STUDENT)
+        }
     }
 
-    fun syncStudentAttendances(){
+    private fun convertAttendances(cursor: Cursor, role:String){
+        val dataMap = mutableMapOf<String, JSONObject>()
 
+        cursor.let {
+
+            if(it.moveToFirst()){
+                do{
+                    val idxUserId = cursor.getColumnIndex("user_id")
+                    val idxStatus = cursor.getColumnIndex("status")
+                    val idxCreatedAt = cursor.getColumnIndex("created_at")
+                    val idxUpdatedAt = cursor.getColumnIndex("updated_at")
+                    val idxDetailStatus = cursor.getColumnIndex("detailStatus")
+                    val idxDetailCreatedAt = cursor.getColumnIndex("detailCreatedAt")
+                    val idxDetailUpdatedAt = cursor.getColumnIndex("detailUpdatedAt")
+
+                    val userId = cursor.getString(idxUserId)
+                    val status = cursor.getString(idxStatus)
+                    val createdAt = cursor.getString(idxCreatedAt)
+                    val updatedAt = cursor.getString(idxUpdatedAt)
+                    val attendanceStatus = cursor.getString(idxDetailStatus)
+                    val attendanceCreatedAt = cursor.getString(idxDetailCreatedAt)
+                    val attendanceUpdatedAt = cursor.getString(idxDetailUpdatedAt)
+
+                    val attendanceObject = JSONObject()
+                    attendanceObject.put("status", attendanceStatus)
+                    attendanceObject.put("created_at", attendanceCreatedAt)
+                    attendanceObject.put("updated_at", attendanceUpdatedAt)
+
+                    if (!dataMap.containsKey(userId)) {
+                        val userObject = JSONObject()
+                        userObject.put("user_id", userId)
+                        userObject.put("status", status)
+                        userObject.put("created_at", createdAt)
+                        userObject.put("updated_at", updatedAt)
+
+                        val attendanceArray = JSONArray()
+                        attendanceArray.put(attendanceObject)
+
+                        userObject.put("detail_attendances", attendanceArray)
+
+                        dataMap[userId] = userObject
+                    } else {
+                        val existingUserObject = dataMap[userId]!!
+
+                        existingUserObject.getJSONArray("detail_attendances").put(attendanceObject)
+
+                        dataMap[userId] = existingUserObject
+                    }
+                }while(it.moveToNext())
+            }
+        }
+
+        val jsonArray = JSONArray(dataMap.values)
+
+        val jsonObject = JSONObject()
+        jsonObject.put("data", jsonArray)
+
+        uploadAttendances(jsonObject, role)
     }
 
-    fun  syncAttendances(){
-//        val call: Call<Value> = RetrofitBuilder.employeeBuilder().syncAttendances()
-//
-//        call.enqueue(object : Callback<Value> {
-//            override fun onResponse(call: Call<Value>, response: Response<Value>) {
-//                if (response.isSuccessful) {
-//                    val responseData = response.body()?.result
-//                    val dbHelper = DBHelper(context, null)
-//
-//                    response.body()?.message?.let {
-//                        Log.d("wajahnya", "ini pesan berhasilnya $it")
-//                    }
-//
-//                    response.body()?.code?.let{
-//                        Log.d("wajahnya", "ini codenya $it")
-//                    }
-//
-////                    DBManager(dbHelper, context, sharedPreferences).insertAttendanceLimitFromJson(responseData)
-//                } else {
-//                    Log.d("connFailure", "Gagal sinkron presensi")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<Value>, t: Throwable) {
-//                dismissDialog()
-//                Log.d("connFailure", "Gagal sinkron presensi ${t.message}")
-//            }
-//        })
+    private fun uploadAttendances(jsonObject: JSONObject, role: String){
+
+        val dbHelper = DBHelper(context, null)
+        val ctx = context as SyncActivity
+
+        val body: RequestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString())
+
+        initCall = if(role == Role.EMPLOYEE){
+            RetrofitBuilder.employeeBuilder().syncAttendances(body)
+        } else{
+            RetrofitBuilder.builder().syncAttendances(body)
+        }
+
+        initCall.enqueue(object : Callback<Value> {
+            override fun onResponse(call: Call<Value>, response: Response<Value>) {
+                if (response.isSuccessful) {
+                    ctx.pDialog.dismissWithAnimation()
+                    response.body()?.message?.let {
+                        if( dbHelper.updateAttendances()> 0){
+                        AlertHelper.successDialog(
+                            context,
+                            contentText = it
+                        )
+                    }
+                    }
+
+                } else {
+                    dismissDialog()
+                    Log.d("wajahnya", "Gagal sinkron presensi ${response.code()} ${response.message()} ${response.body()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Value>, t: Throwable) {
+                dismissDialog()
+                Log.d("wajahnya", "Gagal sinkron presensi ${t.message}")
+            }
+        })
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

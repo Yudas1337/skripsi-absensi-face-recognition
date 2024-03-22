@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/lato_bold"
-        android:text="Sinkronisasi"
+        android:text="sinkronisasi"
         android:textColor="@color/text_color_header"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -96,7 +96,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Jalankan Sinkronasi"
+                    android:text="Jalankan sinkronisasi"
                     android:textColor="@color/white"
                     android:textSize="24px" />
             </LinearLayout>
@@ -143,7 +143,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Jalankan Sinkronasi"
+                    android:text="Jalankan sinkronisasi"
                     android:textColor="@color/white"
                     android:textSize="24px" />
             </LinearLayout>
@@ -192,7 +192,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Jalankan Sinkronasi"
+                    android:text="Jalankan sinkronisasi"
                     android:textColor="@color/white"
                     android:textSize="24px" />
             </LinearLayout>
@@ -239,7 +239,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Jalankan Sinkronasi"
+                    android:text="Jalankan sinkronisasi"
                     android:textColor="@color/white"
                     android:textSize="24px" />
             </LinearLayout>
