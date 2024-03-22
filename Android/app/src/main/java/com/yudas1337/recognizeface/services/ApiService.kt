@@ -233,7 +233,6 @@ class ApiService(private val context: Context) {
     private fun uploadAttendances(jsonObject: JSONObject, role: String){
 
         val dbHelper = DBHelper(context, null)
-        val ctx = context as SyncActivity
 
         val body: RequestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString())
 
@@ -246,24 +245,31 @@ class ApiService(private val context: Context) {
         initCall.enqueue(object : Callback<Value> {
             override fun onResponse(call: Call<Value>, response: Response<Value>) {
                 if (response.isSuccessful) {
-                    ctx.pDialog.dismissWithAnimation()
-                    response.body()?.message?.let {
-                        if( dbHelper.updateAttendances()> 0){
-                        AlertHelper.successDialog(
-                            context,
-                            contentText = it
-                        )
-                    }
+
+                    if(context is SyncActivity){
+                        context.pDialog.dismissWithAnimation()
+                        response.body()?.message?.let {
+                            if( dbHelper.updateAttendances()> 0){
+                                AlertHelper.successDialog(
+                                    context,
+                                    contentText = it
+                                )
+                            }
+                        }
                     }
 
                 } else {
-                    dismissDialog()
+                    if(context is SyncActivity){
+                        dismissDialog()
+                    }
                     Log.d("wajahnya", "Gagal sinkron presensi ${response.code()} ${response.message()} ${response.body()}")
                 }
             }
 
             override fun onFailure(call: Call<Value>, t: Throwable) {
-                dismissDialog()
+                if(context is SyncActivity){
+                    dismissDialog()
+                }
                 Log.d("wajahnya", "Gagal sinkron presensi ${t.message}")
             }
         })
