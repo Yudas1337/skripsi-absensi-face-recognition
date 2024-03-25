@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -76,6 +77,11 @@ class CalendarHelper {
                 .plusMinutes(maxMinutes)
                 .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun cutOffDateTime(): String {
+            return LocalDateTime.now().minusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         }
     }
 

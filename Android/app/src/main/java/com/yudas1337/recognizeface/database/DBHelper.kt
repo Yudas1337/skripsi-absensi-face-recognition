@@ -6,7 +6,11 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import com.yudas1337.recognizeface.helpers.CalendarHelper
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION) {
@@ -223,6 +227,18 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     """.trimIndent()
 
         return db.rawQuery(query, arrayOf("%$name%"))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun deleteOldRecords() {
+        val db = this.writableDatabase
+
+        val cutoffDateString = CalendarHelper.cutOffDateTime()
+
+        val rowsAffected = db.execSQL("DELETE FROM detail_attendances WHERE created_at < ? AND is_uploaded = 1", arrayOf(cutoffDateString))
+        db.close()
+
+        return rowsAffected
     }
 
     companion object{

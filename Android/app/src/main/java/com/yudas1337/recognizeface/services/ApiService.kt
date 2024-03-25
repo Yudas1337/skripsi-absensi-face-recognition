@@ -2,7 +2,9 @@ package com.yudas1337.recognizeface.services
 
 import android.content.Context
 import android.database.Cursor
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.constants.ConstShared
 import com.yudas1337.recognizeface.constants.Role
 import com.yudas1337.recognizeface.database.DBHelper
@@ -230,6 +232,7 @@ class ApiService(private val context: Context) {
         uploadAttendances(jsonObject, role)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun uploadAttendances(jsonObject: JSONObject, role: String){
 
         val dbHelper = DBHelper(context, null)
@@ -273,6 +276,8 @@ class ApiService(private val context: Context) {
                 Log.d("wajahnya", "Gagal sinkron presensi ${t.message}")
             }
         })
+
+        DBHelper(context, null).deleteOldRecords()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
