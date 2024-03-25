@@ -115,15 +115,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         return box.left >= 0 && box.top >= 0 && box.right >= 0 && box.bottom >= 0
     }
 
-    private fun stopCamera() {
-        if (camera != null) {
-            camera!!.setPreviewCallback(null)
-            camera!!.stopPreview()
-            camera!!.release()
-            camera = null
-        }
-    }
-
     private fun saveFace(bitmap: Bitmap): Boolean {
 
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -230,10 +221,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             }
     }
 
-    private fun destroySurfaceCallback() {
-        binding.surface.holder.removeCallback(surfaceCallback)
-        surfaceCallback = null
-    }
 
     @RequiresApi(Build.VERSION_CODES.M)
     @OptIn(DelicateCoroutinesApi::class)

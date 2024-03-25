@@ -10,7 +10,6 @@ import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.camera.core.ImageProxy
 import androidx.exifinterface.media.ExifInterface
-import com.yudas1337.recognizeface.constants.URL
 import com.yudas1337.recognizeface.network.config.RetrofitBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,32 +27,49 @@ class BitmapUtils {
 
     companion object {
 
-        // Fungsi untuk mengevaluasi kecerahan gambar
-        fun isImageDark(bitmap: Bitmap): Boolean {
-            val width = bitmap.width
-            val height = bitmap.height
-            val totalPixels = width * height
+        fun isDark(bitmap: Bitmap): Boolean {
+            var dark = false
+            var totalLuminance = 0.0
+            val pixels = IntArray(bitmap.width * bitmap.height)
+            bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
 
-            val histogram = IntArray(256)
+            // Hitung total luminance dari semua piksel
+            for (color in pixels) {
+                val r = Color.red(color)
+                val g = Color.green(color)
+                val b = Color.blue(color)
+                totalLuminance += 0.299 * r + 0.587 * g + 0.114 * b
+            }
 
-            // Hitung histogram
-            for (y in 0 until height) {
-                for (x in 0 until width) {
-                    val pixel = bitmap.getPixel(x, y)
-                    val intensity = (pixel and 0xff) // Ambil komponen warna grayscale dari pixel
-                    histogram[intensity]++
+            // Hitung rata-rata luminance dari semua piksel
+            val averageLuminance = totalLuminance / (bitmap.width * bitmap.height)
+
+            // Tentukan threshold dinamis berdasarkan rata-rata luminance
+            val darkThreshold = averageLuminance * 0.7 // Contoh: ambil 50% dari rata-rata luminance
+
+            Log.d("wajahnya", "threshold gelap $darkThreshold")
+
+            // Hitung jumlah piksel yang dianggap gelap
+            var darkPixels = 0
+            for (color in pixels) {
+                val r = Color.red(color)
+                val g = Color.green(color)
+                val b = Color.blue(color)
+                val luminance = 0.299 * r + 0.587 * g + 0.114 * b
+                if (luminance < darkThreshold) {
+                    darkPixels++
                 }
             }
 
-            // Hitung jumlah piksel total di area gelap
-            var darkPixels = 0
-            for (i in 0 until 128) { // Anggap nilai intensitas kurang dari 128 sebagai gelap
-                darkPixels += histogram[i]
-            }
+            // Tentukan apakah gambar dianggap gelap berdasarkan jumlah piksel gelap
+            dark = darkPixels >= darkThreshold * 0.45 // Misalnya, ambil 45% dari total piksel
 
-            // Jika lebih dari separuh piksel berada di area gelap, gambar dianggap gelap
-            return darkPixels > totalPixels / 2
+            Log.d("wajahnya", "pixel gelap $darkPixels , total pixel ${darkThreshold * 0.45}")
+
+
+            return dark
         }
+
 
         // Fungsi untuk melakukan kontras stretching pada gambar
         fun contrastStretching(bitmap: Bitmap, minInput: Int, maxInput: Int): Bitmap {
@@ -70,18 +86,24 @@ class BitmapUtils {
 
             for (i in inputArray.indices) {
                 val inputPixel = inputArray[i]
-                val inputGray = (inputPixel and 0xff) // Ambil komponen warna grayscale dari pixel
+                val inputRed = (inputPixel shr 16) and 0xFF
+                val inputGreen = (inputPixel shr 8) and 0xFF
+                val inputBlue = inputPixel and 0xFF
 
-                // Terapkan kontras stretching
-                val outputGray = ((inputGray - minInput) * scaleFactor).toInt().coerceIn(0, 255)
+                // Terapkan kontras stretching pada setiap saluran warna
+                val outputRed = ((inputRed - minInput) * scaleFactor).toInt().coerceIn(0, 255)
+                val outputGreen = ((inputGreen - minInput) * scaleFactor).toInt().coerceIn(0, 255)
+                val outputBlue = ((inputBlue - minInput) * scaleFactor).toInt().coerceIn(0, 255)
 
-                // Rekonstruksi pixel dengan kontras yang diperpanjang
-                outputArray[i] = (outputGray shl 16) or (outputGray shl 8) or outputGray or (inputPixel and -0x1000000)
+                // Rekonstruksi piksel dengan kontras yang diperpanjang
+                outputArray[i] = (outputRed shl 16) or (outputGreen shl 8) or outputBlue or (inputPixel and -0x1000000)
             }
 
             outputBitmap.setPixels(outputArray, 0, width, 0, 0, width, height)
             return outputBitmap
         }
+
+
 
         fun frameToImageBytes(byteArray: ByteArray, previewWidth: Int, previewHeight: Int): ByteArray {
             val yuvImage = YuvImage(byteArray, ImageFormat.NV21, previewWidth, previewHeight, null)

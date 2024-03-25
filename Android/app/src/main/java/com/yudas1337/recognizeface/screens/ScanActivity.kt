@@ -3,10 +3,9 @@ package com.yudas1337.recognizeface.screens
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
@@ -17,10 +16,8 @@ import androidx.appcompat.app.AppCompatActivity
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.yudas1337.recognizeface.R
 import com.yudas1337.recognizeface.constants.ConstShared
-import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.database.DBHelper
 import com.yudas1337.recognizeface.helpers.AlertHelper
-import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.helpers.VoiceHelper
 import com.yudas1337.recognizeface.recognize.CustomDispatcher
 import com.yudas1337.recognizeface.recognize.FaceUtil
@@ -38,8 +35,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.yudas1337.recognizeface.constants.FaceStatus
 import com.yudas1337.recognizeface.helpers.BrightnessHelper
+import com.yudas1337.recognizeface.recognize.BitmapUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
-import java.io.File
 
 class ScanActivity : AppCompatActivity() {
 
@@ -187,6 +184,17 @@ class ScanActivity : AppCompatActivity() {
             if(croppedBitmap != null){
                 val pDialog = AlertHelper.progressDialog(this, "Recognizing..")
                 pDialog.show()
+
+//                val darkImage = BitmapUtils.isDark(croppedBitmap!!)
+//
+//                if(darkImage){
+//                    Log.d("wajahnya", "gelap bang fotonya")
+//                    croppedBitmap = BitmapUtils.contrastStretching(
+//                        croppedBitmap!!, 0 ,255)
+//                } else{
+//                    Log.d("wajahnya", "tidak gelap fotonya")
+//                }
+
                 GlobalScope.launch(Dispatchers.Default) {
 
                     frameAnalyser.faceList = loadFace.loadSerializedImageData(scanData["rfid"].toString())
@@ -200,7 +208,7 @@ class ScanActivity : AppCompatActivity() {
                         withContext(Dispatchers.Main){
                             pDialog.dismissWithAnimation()
                             when {
-                                analyser.equals(FaceStatus.MASKED, true) -> AlertHelper.runVoiceAndToast(voiceHelper!!, this@ScanActivity, "Harap lepas Masker")
+                                analyser.equals(FaceStatus.MASKED, true) -> AlertHelper.runVoiceAndToast(voiceHelper!!, this@ScanActivity, "Masker Terdeteksi atau Cahaya Terlalu Gelap")
                                 analyser.equals(FaceStatus.UNKNOWN, true) -> AlertHelper.runVoiceAndToast(voiceHelper!!, this@ScanActivity, "Wajah tidak cocok dengan kartu")
                                 else -> scanService.handleAttendances(scanData["id"].toString(), scanData["role"].toString(), scanData["name"].toString())
                             }

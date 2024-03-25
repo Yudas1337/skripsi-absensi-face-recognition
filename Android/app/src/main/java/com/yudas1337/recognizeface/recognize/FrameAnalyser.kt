@@ -43,13 +43,12 @@ class FrameAnalyser( context: Context ,
                 // Crop the frame using face.boundingBox.
                 // Convert the cropped Bitmap to a ByteBuffer.
                 // Finally, feed the ByteBuffer to the FaceNet model.
-//                val croppedBitmap = BitmapUtils.cropRectFromBitmap( cameraFrameBitmap , faces.boundingBox )
-                subject = model.getFaceEmbedding( cameraFrameBitmap )
+                subject = model.getFaceEmbedding(cameraFrameBitmap)
 
                 // Perform face mask detection on the cropped frame Bitmap.
                 var maskLabel = ""
                 if ( isMaskDetectionOn ) {
-                    maskLabel = maskDetectionModel.detectMask( cameraFrameBitmap )
+                    maskLabel = maskDetectionModel.detectMask(cameraFrameBitmap)
                 }
 
                 // Continue with the recognition if the user is not wearing a face mask

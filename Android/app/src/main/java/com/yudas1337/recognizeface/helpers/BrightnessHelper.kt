@@ -28,7 +28,7 @@ class BrightnessHelper {
 
         // This function only take effect in real physical android device,
         // it can not take effect in android emulator.
-        fun changeScreenBrightness(
+        private fun changeScreenBrightness(
             context: Context,
             screenBrightnessValue: Int
         ) {   // Change the screen brightness change mode to manual.
