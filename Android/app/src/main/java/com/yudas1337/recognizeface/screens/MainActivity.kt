@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
-import android.provider.Settings
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
@@ -135,9 +134,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         }
 
         return try {
-
             BitmapUtils.saveBitmap(bitmap, imageFile)
-
             true
         } catch (e: Exception) {
             Log.d("", "error gan ${e.message}")
@@ -194,13 +191,16 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                         val imageBytes = BitmapUtils.frameToImageBytes(data, previewWidth, previewHeight)
                                         val bitmap = BitmapUtils.cropRectFromBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size), face.boundingBox)
 
-                                        if(saveFace(bitmap)){
-                                            destroySurfaceCallback()
-                                            stopCamera()
+                                        ScanActivity.croppedBitmap = bitmap
+                                        setResult(RESULT_OK, Intent())
+                                        finish()
 
-                                            setResult(RESULT_OK, Intent())
-                                            finish()
-                                        }
+//                                        if(saveFace(bitmap)){
+//                                            destroySurfaceCallback()
+//                                            stopCamera()
+//                                            setResult(RESULT_OK, Intent())
+//                                            finish()
+//                                        }
 
                                     } else{
                                         binding.facePositionText.text = "Anda berada di luar frame deteksi"

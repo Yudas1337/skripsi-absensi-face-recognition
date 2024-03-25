@@ -2,11 +2,11 @@ package com.yudas1337.recognizeface.screens
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
@@ -68,8 +68,10 @@ class ScanActivity : AppCompatActivity() {
 
     private var settingsCanWrite: Boolean = false
 
+
     companion object {
         const val REQUEST_CODE_MAIN = 1
+        var croppedBitmap: Bitmap? = null
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -181,11 +183,8 @@ class ScanActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_MAIN && resultCode == RESULT_OK) {
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val imageFile = File(downloadsDir, FaceFolder.CROPPED_FACE)
 
-            if (imageFile.exists()) {
-                val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+            if(croppedBitmap != null){
                 val pDialog = AlertHelper.progressDialog(this, "Recognizing..")
                 pDialog.show()
                 GlobalScope.launch(Dispatchers.Default) {
@@ -196,7 +195,7 @@ class ScanActivity : AppCompatActivity() {
                     withContext(CustomDispatcher.dispatcher) {
 
                         // returnya adalah rfid pengguna, hanya untuk patokan berhasil
-                        val analyser = frameAnalyser.runModel(bitmap)
+                        val analyser = frameAnalyser.runModel(croppedBitmap!!)
 
                         withContext(Dispatchers.Main){
                             pDialog.dismissWithAnimation()
@@ -209,6 +208,14 @@ class ScanActivity : AppCompatActivity() {
                     }
                 }
             }
+
+//            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//            val imageFile = File(downloadsDir, FaceFolder.CROPPED_FACE)
+//
+//            if (imageFile.exists()) {
+//                val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+//
+//            }
 
             BrightnessHelper.checkBrightnessPermission(this, 20)
         }

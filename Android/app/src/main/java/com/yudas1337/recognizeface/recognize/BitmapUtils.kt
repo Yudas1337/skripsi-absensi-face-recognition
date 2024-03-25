@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileDescriptor
 import java.io.FileOutputStream
+import java.io.IOException
 import java.nio.ByteBuffer
 
 
@@ -152,13 +153,19 @@ class BitmapUtils {
         // Use this method to save a Bitmap to the internal storage ( app-specific storage ) of your device.
         // To see the image, go to "Device File Explorer" -> "data" -> "data" -> "com.ml.quaterion.facenetdetection" -> "files"
         fun saveBitmap(image: Bitmap?, file: File): Boolean {
-            val fileOutputStream = FileOutputStream(file)
-            image?.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+            if (image == null) {
+                return false
+            }
 
-            fileOutputStream.flush()
-            fileOutputStream.close()
-
-            return true
+            return try {
+                FileOutputStream(file).use { fileOutputStream ->
+                    image.compress(Bitmap.CompressFormat.PNG, 50, fileOutputStream)
+                }
+                true
+            } catch (e: IOException) {
+                e.printStackTrace()
+                false
+            }
         }
 
         // Convert android.media.Image to android.graphics.Bitmap
