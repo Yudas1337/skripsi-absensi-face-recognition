@@ -6,11 +6,8 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.yudas1337.recognizeface.helpers.CalendarHelper
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION) {

@@ -37,6 +37,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.yudas1337.recognizeface.constants.FaceStatus
+import com.yudas1337.recognizeface.helpers.BrightnessHelper
 import kotlinx.coroutines.DelicateCoroutinesApi
 import java.io.File
 
@@ -64,6 +65,8 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var scanData: HashMap<String, String?>
 
     private lateinit var scanService: ScanService
+
+    private var settingsCanWrite: Boolean = false
 
     companion object {
         const val REQUEST_CODE_MAIN = 1
@@ -123,6 +126,10 @@ class ScanActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun executeMain() {
+        settingsCanWrite = BrightnessHelper.hasWriteSettingsPermission(this)
+
+        BrightnessHelper.checkBrightnessPermission(this, 20)
+
         scanService = ScanService(this, dbHelper, voiceHelper!!)
         btnSubmit.setOnClickListener {
             val getRfid = rfidController.text
@@ -202,6 +209,8 @@ class ScanActivity : AppCompatActivity() {
                     }
                 }
             }
+
+            BrightnessHelper.checkBrightnessPermission(this, 20)
         }
     }
 

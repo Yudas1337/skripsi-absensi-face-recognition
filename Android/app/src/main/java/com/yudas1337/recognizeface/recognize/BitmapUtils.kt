@@ -27,6 +27,61 @@ class BitmapUtils {
 
     companion object {
 
+        // Fungsi untuk mengevaluasi kecerahan gambar
+        fun isImageDark(bitmap: Bitmap): Boolean {
+            val width = bitmap.width
+            val height = bitmap.height
+            val totalPixels = width * height
+
+            val histogram = IntArray(256)
+
+            // Hitung histogram
+            for (y in 0 until height) {
+                for (x in 0 until width) {
+                    val pixel = bitmap.getPixel(x, y)
+                    val intensity = (pixel and 0xff) // Ambil komponen warna grayscale dari pixel
+                    histogram[intensity]++
+                }
+            }
+
+            // Hitung jumlah piksel total di area gelap
+            var darkPixels = 0
+            for (i in 0 until 128) { // Anggap nilai intensitas kurang dari 128 sebagai gelap
+                darkPixels += histogram[i]
+            }
+
+            // Jika lebih dari separuh piksel berada di area gelap, gambar dianggap gelap
+            return darkPixels > totalPixels / 2
+        }
+
+        // Fungsi untuk melakukan kontras stretching pada gambar
+        fun contrastStretching(bitmap: Bitmap, minInput: Int, maxInput: Int): Bitmap {
+            val width = bitmap.width
+            val height = bitmap.height
+            val outputBitmap = Bitmap.createBitmap(width, height, bitmap.config)
+
+            val inputArray = IntArray(width * height)
+            bitmap.getPixels(inputArray, 0, width, 0, 0, width, height)
+
+            val outputArray = IntArray(inputArray.size)
+
+            val scaleFactor = 255.0f / (maxInput - minInput)
+
+            for (i in inputArray.indices) {
+                val inputPixel = inputArray[i]
+                val inputGray = (inputPixel and 0xff) // Ambil komponen warna grayscale dari pixel
+
+                // Terapkan kontras stretching
+                val outputGray = ((inputGray - minInput) * scaleFactor).toInt().coerceIn(0, 255)
+
+                // Rekonstruksi pixel dengan kontras yang diperpanjang
+                outputArray[i] = (outputGray shl 16) or (outputGray shl 8) or outputGray or (inputPixel and -0x1000000)
+            }
+
+            outputBitmap.setPixels(outputArray, 0, width, 0, 0, width, height)
+            return outputBitmap
+        }
+
         fun frameToImageBytes(byteArray: ByteArray, previewWidth: Int, previewHeight: Int): ByteArray {
             val yuvImage = YuvImage(byteArray, ImageFormat.NV21, previewWidth, previewHeight, null)
             val out = ByteArrayOutputStream()

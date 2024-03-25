@@ -10,13 +10,16 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.google.mlkit.vision.common.InputImage
@@ -29,6 +32,7 @@ import com.yudas1337.recognizeface.SetThresholdDialogFragment
 import com.yudas1337.recognizeface.constants.FaceFolder
 import com.yudas1337.recognizeface.databinding.ActivityMainBinding
 import com.yudas1337.recognizeface.detection.FaceBox
+import com.yudas1337.recognizeface.helpers.BrightnessHelper
 import com.yudas1337.recognizeface.helpers.PermissionHelper
 import com.yudas1337.recognizeface.recognize.BitmapUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -38,7 +42,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import java.io.File
 import java.io.IOException
-
 
 @ObsoleteCoroutinesApi
 class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDialogListener {
@@ -78,6 +81,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
 
     private var surfaceCallback: SurfaceHolder.Callback? = null
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -231,6 +235,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         surfaceCallback = null
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @OptIn(DelicateCoroutinesApi::class)
     private fun init() {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -245,6 +250,8 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         role = intent.getStringExtra("role")
 
         startTimer(stableTime)
+
+        BrightnessHelper.checkBrightnessPermission(this, 255)
 
         // Inisialisasi callback Anda
         surfaceCallback = object : SurfaceHolder.Callback, Camera.PreviewCallback {
@@ -343,6 +350,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         threshold = t
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
