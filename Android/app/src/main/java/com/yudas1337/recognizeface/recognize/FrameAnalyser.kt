@@ -127,7 +127,6 @@ class FrameAnalyser( context: Context ,
             }
 
         }
-
          return output
     }
 
