@@ -143,6 +143,7 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             InputImage.IMAGE_FORMAT_NV21
         )
 
+
         val detector = FaceDetection.getClient(
             FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -185,13 +186,6 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
                                         ScanActivity.croppedBitmap = bitmap
                                         setResult(RESULT_OK, Intent())
                                         finish()
-
-//                                        if(saveFace(bitmap)){
-//                                            destroySurfaceCallback()
-//                                            stopCamera()
-//                                            setResult(RESULT_OK, Intent())
-//                                            finish()
-//                                        }
 
                                     } else{
                                         binding.facePositionText.text = "Anda berada di luar frame deteksi"

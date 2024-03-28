@@ -30,7 +30,7 @@ class FrameAnalyser( context: Context ,
     private val metricToBeUsed = "cosine"
 
     // Use this variable to enable/disable mask detection.
-    private val isMaskDetectionOn = true
+    private val isMaskDetectionOn = false
 
     // <-------------------------------------------------------->
 
@@ -46,7 +46,7 @@ class FrameAnalyser( context: Context ,
                 subject = model.getFaceEmbedding(cameraFrameBitmap)
 
                 // Perform face mask detection on the cropped frame Bitmap.
-                var maskLabel = ""
+                var maskLabel = maskDetectionModel.NO_MASK
                 if ( isMaskDetectionOn ) {
                     maskLabel = maskDetectionModel.detectMask(cameraFrameBitmap)
                 }
